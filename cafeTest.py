@@ -21,21 +21,21 @@ with open('wordVectorIdxRef') as json_file:
 wordBagLen = len(vectorIdxRef)
 
 
-def buildRequestForSinglePlaceSearchWithText(placeName):
+def buildSinglePlaceSearchRequest(placeName):
     if (len(placeName) == 0):
         return
     else:
         placeName = quote(placeName)
         return googlePlacesAPI['urlPrefix'] + googlePlacesAPI['searchPlaceURLSuffix'] + f"inputtype=textquery&input={placeName}&fields=formatted_address,name,place_id"
 
-def buildRequestForCityLocationSearch(cityName):
+def buildCityLocationSearchRequest(cityName):
     if (len(cityName) == 0):
         return
     else:
         cityName = quote(cityName)
         return geocodeXYZAPI['latLongFromPlaceNameURL'].format(cityName=cityName)
 
-def buildRequestForAreaSearch(lat, long, pagetoken):
+def buildForAreaSearchRequest(lat, long, pagetoken):
     suffix = None
     if (pagetoken != None):
         suffix = f"pagetoken={pagetoken}"
@@ -49,9 +49,9 @@ def get60ResultsNearLocation(lat, long):
     for i in range(3):
         areaRequest = None
         if i == 0:
-            areaRequest = buildRequestForAreaSearch(lat, long, None)
+            areaRequest = buildForAreaSearchRequest(lat, long, None)
         else:
-            areaRequest = buildRequestForAreaSearch(None, None, pageToken)
+            areaRequest = buildForAreaSearchRequest(None, None, pageToken)
         response = requests.get(areaRequest).json()
         areaResults = response['results']
         resultsArray.extend(areaResults)
@@ -70,7 +70,6 @@ def givenCafesRetrieveReviews(cafeArr, getFirstNReviews):
             reviewArr.extend(detailsRes['reviews'])
         cafe['reviews'] = reviewArr
     return cafeArr
-
 
 def buildWextractorDetailsRequest(placeId, offset):
     if(len(placeId) == 0):
@@ -93,16 +92,31 @@ def processAreaSearch(rawCafeArr):
             arrayOfCafeObjects.append(cafeObj)
     return arrayOfCafeObjects
 
-def buildVectorFromCafe(cafeObj):
-    reviewText = combineReviewText(cafeObj['reviews'])
-    vectorizedText = convertTextToTFVector(reviewText)
+def processCafeArray(cafeArr):
+    cafesToStrip = []
+    for cafe in cafeArr:
+        res = vectorizeCafeReviews(cafe)
+        if res == -1:
+            cafesToStrip.append(cafe)
+    for cafe in cafesToStrip:
+        cafeArr.remove(cafe)
 
-    return vectorizedText
+
+def vectorizeCafeReviews(cafeObj):
+    reviewText = combineReviewText(cafeObj['reviews'])
+    if len(reviewText) == 0:
+        return -1
+    vectorizedText = convertTextToTFVector(reviewText)
+    cafeObj['reviewVect'] = vectorizedText
+
+    return 1
 
 def combineReviewText(reviewArr):
     finalText = ''
     for review in reviewArr:
-        finalText += (' ' + review['text'])
+        reviewText = review['text']
+        if len(reviewText) > 0:
+            finalText += (' ' + reviewText)
     return finalText
 
 def convertTextToTFVector(text):
@@ -138,6 +152,8 @@ def stemAndRemoveStopwordsFromStringArr(stringArr):
 cafeArr = None
 with open('trainingSet.txt') as json_file:
     cafeArr = json.load(json_file)
+
+processCafeArray(cafeArr)
 
 lol = 'hey'
 

@@ -8,7 +8,7 @@ googlePlacesAPI = {
 
 wextractorAPI = {
     'detailsURLPrefix': f"https://wextractor.com/api/v1/reviews?auth_token={testEnv['wextractorAPIKey']}&",
-    'detailsURLSuffix': "id={id}&offset={offset}"
+    'detailsURLSuffix': "id={id}&offset={offset}&sort=relevancy"
 }
 
 geocodeXYZAPI = {
