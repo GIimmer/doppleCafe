@@ -1,14 +1,11 @@
-import requests
 import functools
-import json
 import copy
 import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 
-from urllib.parse import quote
-from environment import testEnv
-from constants import googlePlacesAPI, wextractorAPI, geocodeXYZAPI
+from utilities import saveDataToFileWithName, getDataFromFileWithName
+
 from nltk.stem import PorterStemmer
 from nltk.corpus import stopwords
 from nltk.tokenize import regexp_tokenize
@@ -16,67 +13,8 @@ from nltk.tokenize import regexp_tokenize
 ps = PorterStemmer()
 sw = stopwords.words("english")
 
-vectorIdxRef = {}
-with open('wordVectorIdxRef') as json_file:
-    vectorIdxRef = json.load(json_file)
+vectorIdxRef = getDataFromFileWithName('wordVectorIdxRef')
 wordBagLen = len(vectorIdxRef)
-
-
-def buildSinglePlaceSearchRequest(placeName):
-    if (len(placeName) == 0):
-        return
-    else:
-        placeName = quote(placeName)
-        return googlePlacesAPI['urlPrefix'] + googlePlacesAPI['searchPlaceURLSuffix'] + f"inputtype=textquery&input={placeName}&fields=formatted_address,name,place_id"
-
-def buildCityLocationSearchRequest(cityName):
-    if (len(cityName) == 0):
-        return
-    else:
-        cityName = quote(cityName)
-        return geocodeXYZAPI['latLongFromPlaceNameURL'].format(cityName=cityName)
-
-def buildForAreaSearchRequest(lat, long, pagetoken):
-    suffix = None
-    if (pagetoken != None):
-        suffix = f"pagetoken={pagetoken}"
-    else:
-        suffix = f"location={lat},{long}&rankby=distance&type=cafe"
-    return googlePlacesAPI['urlPrefix'] + googlePlacesAPI['searchAreaURLSuffix'] + suffix
-
-def get60ResultsNearLocation(lat, long):
-    pageToken = None
-    resultsArray = []
-    for i in range(3):
-        areaRequest = None
-        if i == 0:
-            areaRequest = buildForAreaSearchRequest(lat, long, None)
-        else:
-            areaRequest = buildForAreaSearchRequest(None, None, pageToken)
-        response = requests.get(areaRequest).json()
-        areaResults = response['results']
-        resultsArray.extend(areaResults)
-        pageToken = response.get('next_page_token', 0)
-        if pageToken == 0:
-            break
-    return resultsArray
-
-# getFirstNReviews - use multiples of 10
-def givenCafesRetrieveReviews(cafeArr, getFirstNReviews):
-    for cafe in cafeArr:
-        reviewArr = []
-        for i in range(0, getFirstNReviews, 10):
-            detailsRequest = buildWextractorDetailsRequest(cafe['place_id'], i)
-            detailsRes = requests.get(detailsRequest).json()
-            reviewArr.extend(detailsRes['reviews'])
-        cafe['reviews'] = reviewArr
-    return cafeArr
-
-def buildWextractorDetailsRequest(placeId, offset):
-    if(len(placeId) == 0):
-        return
-    else:
-        return wextractorAPI['detailsURLPrefix'] + wextractorAPI['detailsURLSuffix'].format(id=placeId, offset=offset)
 
 def processAreaSearch(rawCafeArr):
     arrayOfCafeObjects = []
@@ -174,18 +112,20 @@ def findClosestCentroids(X, centroids):
     reviewCount = X.shape[0]
     centroidNum = centroids.shape[0]
     closestCentroidVector = np.zeros(reviewCount, dtype=np.int8)
+    cost = 0
     for i in range(reviewCount):
         dupedReview = np.repeat(X[i], centroidNum, 0)
         bitwiseDistance = np.square(dupedReview - centroids).sum(axis=1)
         idxOfClosest = np.argmin(bitwiseDistance)
+        cost += bitwiseDistance[idxOfClosest]
         closestCentroidVector[i] = idxOfClosest
-    return closestCentroidVector
+    return (closestCentroidVector, cost)
 
 def computeNewCentroids(X, membership, K):
     m, n = X.shape
 
     arrMembership = membership.reshape(-1,1)
-    intComparator = np.arange(5).reshape(1,-1)
+    intComparator = np.arange(K).reshape(1,-1)
     logicalFilter = np.equal(arrMembership, intComparator)
 
     vectorSum = np.transpose(logicalFilter) * X
@@ -195,24 +135,22 @@ def computeNewCentroids(X, membership, K):
 
 def runKMeans(X, K, maxIterations):
     m, n = X.shape
-
+    cost = np.zeros(maxIterations)
     centroids = initCentroids(X, K)
     prevCentroids = centroids
     centroidMembership = np.zeros(m, dtype=np.int8)
 
     for i in range(maxIterations):
-        centroidMembership = findClosestCentroids(X, centroids)
+        centroidMembership, cost[i] = findClosestCentroids(X, centroids)
         centroids = computeNewCentroids(X, centroidMembership, K)
     
     return (centroidMembership, centroids)
 
 
-cafeArr = None
-with open('trainingSet.txt') as json_file:
-    cafeArr = json.load(json_file)
+cafeArr = getDataFromFileWithName('trainingSet')
 
 X = processCafeArray(cafeArr)
-centroidMembership, centroids = runKMeans(X, 5, 10)
+centroidMembership, centroids = runKMeans(X, 4, 5)
 
 lol = 'hey'
 
