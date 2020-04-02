@@ -12,7 +12,7 @@ def findClosestCentroids(X, centroids):
     closestCentroidVector = np.zeros(reviewCount, dtype=np.int8)
     cost = 0
     for i in range(reviewCount):
-        dupedReview = np.repeat(X[i], centroidNum, 0)
+        dupedReview = np.repeat(X[i].reshape(1,-1), centroidNum, 0)
         bitwiseDistance = np.square(dupedReview - centroids).sum(axis=1)
         idxOfClosest = np.argmin(bitwiseDistance)
         cost += bitwiseDistance[idxOfClosest]
@@ -26,7 +26,7 @@ def computeNewCentroids(X, membership, K):
     intComparator = np.arange(K).reshape(1,-1)
     logicalFilter = np.equal(arrMembership, intComparator)
 
-    vectorSum = np.transpose(logicalFilter) * X
+    vectorSum = np.dot(np.transpose(logicalFilter), X)
     membershipTotal = logicalFilter.sum(axis=0).reshape(-1,1)
     newCentroids = np.divide(vectorSum, membershipTotal)
     return newCentroids
@@ -42,4 +42,4 @@ def runKMeans(X, K, maxIterations):
         centroidMembership, cost[i] = findClosestCentroids(X, centroids)
         centroids = computeNewCentroids(X, centroidMembership, K)
     
-    return (centroidMembership, centroids)
+    return (centroidMembership, centroids, cost[maxIterations - 1])

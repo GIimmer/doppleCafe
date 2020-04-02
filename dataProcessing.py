@@ -31,9 +31,9 @@ def processAreaSearch(rawCafeArr):
 def processCafeArray(cafeArr):
     cafesToStrip = []
     reviewVectors = []
-    for cafe in cafeArr:
+    for idx, cafe in enumerate(cafeArr):
         res = vectorizeCafeReviews(cafe)
-        if len(res) > 0:
+        if len(res) > 0  and (idx != 19 and idx != 29):
             reviewVectors.append(res)
         else:
             cafesToStrip.append(cafe)
@@ -83,7 +83,7 @@ def convertTextToTFVector(text):
     for key, val in freqDict.items():
         idx = vectorIdxRef.get(key, -1)
         if idx != -1:
-            vect[idx] = (val/cafeReviewsLen)     
+            vect[idx] = (val/cafeReviewsLen)   
     return vect
 
 def stemAndRemoveStopwordsFromStringArr(stringArr):
