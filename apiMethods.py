@@ -1,6 +1,7 @@
 import requests
 from urllib.parse import quote
 from constants import googlePlacesAPI, wextractorAPI, geocodeXYZAPI
+from utilities import saveDataToFileWithName
 
 def buildSinglePlaceSearchRequest(placeName):
     if (len(placeName) == 0):
@@ -16,7 +17,7 @@ def buildCityLocationSearchRequest(cityName):
         cityName = quote(cityName)
         return geocodeXYZAPI['latLongFromPlaceNameURL'].format(cityName=cityName)
 
-def buildForAreaSearchRequest(lat, long, pagetoken):
+def buildAreaSearchRequest(lat, long, pagetoken):
     suffix = None
     if (pagetoken != None):
         suffix = f"pagetoken={pagetoken}"
@@ -30,9 +31,9 @@ def get60ResultsNearLocation(lat, long):
     for i in range(3):
         areaRequest = None
         if i == 0:
-            areaRequest = buildForAreaSearchRequest(lat, long, None)
+            areaRequest = buildAreaSearchRequest(lat, long, None)
         else:
-            areaRequest = buildForAreaSearchRequest(None, None, pageToken)
+            areaRequest = buildAreaSearchRequest(None, None, pageToken)
         response = requests.get(areaRequest).json()
         areaResults = response['results']
         resultsArray.extend(areaResults)
@@ -57,3 +58,15 @@ def buildWextractorDetailsRequest(placeId, offset):
         return
     else:
         return wextractorAPI['detailsURLPrefix'] + wextractorAPI['detailsURLSuffix'].format(id=placeId, offset=offset)
+
+
+def get60CafesNearCity(cityName):
+    locationReq = buildCityLocationSearchRequest(cityName)
+    locationRes = requests.get(locationReq).json()
+    latitude = locationRes['latt']
+    longitude = locationRes['longt']
+
+    unfilledCafeArray = get60ResultsNearLocation(latitude, longitude)
+    cafeArray = givenCafesRetrieveReviews(unfilledCafeArray, 80)
+    saveDataToFileWithName(cafeArray, 'temp' + cityName + 'Response')
+    return cafeArray

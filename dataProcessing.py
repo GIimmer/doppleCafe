@@ -33,7 +33,7 @@ def processCafeArray(cafeArr):
     reviewVectors = []
     for idx, cafe in enumerate(cafeArr):
         res = vectorizeCafeReviews(cafe)
-        if len(res) > 0  and (idx != 19 and idx != 29):
+        if len(res) > 0:
             reviewVectors.append(res)
         else:
             cafesToStrip.append(cafe)
@@ -58,7 +58,7 @@ def processReviews(reviewVectors):
 
 def vectorizeCafeReviews(cafeObj):
     reviewText = combineReviewText(cafeObj['reviews'])
-    if len(reviewText) == 0:
+    if len(reviewText) <= 400:
         return []
     vectorizedText = convertTextToTFVector(reviewText)
     cafeObj['reviewVect'] = vectorizedText
@@ -100,9 +100,13 @@ def stemAndRemoveStopwordsFromStringArr(stringArr):
 
     return uniqueWords
 
-def updateWordVector():
+def updateWordVectorWithFile(fileName='processedMostCommonWords.txt', stemWords=False):
     vectorIdxRef = {}
-    wordArray = getDataFromFileWithName('processedMostCommonWords.txt')
+    wordArray = getDataFromFileWithName(fileName)
+    if (stemWords == True):
+        for idx, word in enumerate(wordArray):
+            wordArray[idx] = ps.stem(word)
+        wordArray = list(dict.fromkeys(wordArray)) # remove dupes
     for idx, val in enumerate(wordArray):
         vectorIdxRef[val] = idx
     

@@ -1,1 +1,0 @@
-{"candidates": [{"formatted_address": "8319 Greenwood Ave N, Seattle, WA 98103, United States", "name": "Chocolati Caf\u00e9", "place_id": "ChIJ7_18miEUkFQRaH9WwkOCxdw"}], "status": "OK"}
