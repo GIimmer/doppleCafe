@@ -30,31 +30,36 @@ def processAreaSearch(rawCafeArr):
 
 def processCafeArray(cafeArr):
     cafesToStrip = []
-    reviewVectors = []
-    for idx, cafe in enumerate(cafeArr):
+    reviewVectors = np.zeros(shape=(len(cafeArr), wordBagLen))
+
+    nextVecIdx = 0
+    for cafe in cafeArr:
         res = vectorizeCafeReviews(cafe)
         if len(res) > 0:
-            reviewVectors.append(res)
+            reviewVectors[nextVecIdx] = res
+            nextVecIdx += 1
         else:
             cafesToStrip.append(cafe)
 
     for cafe in cafesToStrip:
         cafeArr.remove(cafe)
 
+    if (len(cafesToStrip) != 0):
+        reviewVectors = reviewVectors[0:-len(cafesToStrip)]
+
     tfIDFVectors = processReviews(reviewVectors)
     return tfIDFVectors
 
 def processReviews(reviewVectors):
-    ReviewVectors = np.matrix(reviewVectors)
-    numReviews = ReviewVectors.shape[0]
-    logicalVectors = ReviewVectors != 0
+    numReviews = len(reviewVectors)
+    logicalVectors = reviewVectors != 0
     docFreq = logicalVectors.sum(axis=0)
 
     def calculateIDF(x):
         return np.log(numReviews/(x + 1)) + 1
     calculateIDF = np.vectorize(calculateIDF)
     idf = calculateIDF(docFreq)
-    return np.multiply(ReviewVectors, idf)
+    return np.multiply(reviewVectors, idf)
 
 def vectorizeCafeReviews(cafeObj):
     reviewText = combineReviewText(cafeObj['reviews'])

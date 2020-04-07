@@ -43,15 +43,18 @@ def get60ResultsNearLocation(lat, long):
     return resultsArray
 
 # getFirstNReviews - use multiples of 10
-def givenCafesRetrieveReviews(cafeArr, getFirstNReviews):
+def givenCafeArrRetrieveReviews(cafeArr, getFirstNReviews):
     for cafe in cafeArr:
-        reviewArr = []
-        for i in range(0, getFirstNReviews, 10):
-            detailsRequest = buildWextractorDetailsRequest(cafe['place_id'], i)
-            detailsRes = requests.get(detailsRequest).json()
-            reviewArr.extend(detailsRes['reviews'])
-        cafe['reviews'] = reviewArr
+        givenCafeRetrieveReviews(cafe, getFirstNReviews)
     return cafeArr
+
+def givenCafeRetrieveReviews(cafe, getFirstNReviews):
+    reviewArr = []
+    for i in range(0, getFirstNReviews, 10):
+        detailsRequest = buildWextractorDetailsRequest(cafe['place_id'], i)
+        detailsRes = requests.get(detailsRequest).json()
+        reviewArr.extend(detailsRes['reviews'])
+    cafe['reviews'] = reviewArr
 
 def buildWextractorDetailsRequest(placeId, offset):
     if(len(placeId) == 0):
@@ -67,6 +70,6 @@ def get60CafesNearCity(cityName):
     longitude = locationRes['longt']
 
     unfilledCafeArray = get60ResultsNearLocation(latitude, longitude)
-    cafeArray = givenCafesRetrieveReviews(unfilledCafeArray, 80)
+    cafeArray = givenCafeArrRetrieveReviews(unfilledCafeArray, 80)
     saveDataToFileWithName(cafeArray, 'temp' + cityName + 'Response')
     return cafeArray

@@ -43,3 +43,10 @@ def runKMeans(X, K, maxIterations):
         centroids = computeNewCentroids(X, centroidMembership, K)
     
     return (centroidMembership, centroids, cost[maxIterations - 1])
+
+
+def nearestNeighbors(cafeVec, cityArrVec, nearestN=10):
+    bitwiseDistance = np.square(cafeVec - cityArrVec).sum(axis=1)
+    distanceWithIdx = list(enumerate(bitwiseDistance)) 
+    closestCafeVecs = sorted(distanceWithIdx, key=lambda cafeTuple: cafeTuple[1])
+    return closestCafeVecs

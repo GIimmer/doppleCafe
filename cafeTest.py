@@ -8,17 +8,17 @@ from sklearn.decomposition import TruncatedSVD
 
 from utilities import saveDataToFileWithName, getDataFromFileWithName
 from apiMethods import (buildSinglePlaceSearchRequest, buildCityLocationSearchRequest, buildAreaSearchRequest,
-get60ResultsNearLocation, givenCafesRetrieveReviews, buildWextractorDetailsRequest, get60CafesNearCity)
+get60ResultsNearLocation, givenCafeArrRetrieveReviews, buildWextractorDetailsRequest, get60CafesNearCity)
 from dataProcessing import processAreaSearch, processCafeArray, processReviews, updateWordVectorWithFile
-from kMeans import initCentroids, findClosestCentroids, computeNewCentroids, runKMeans
+from kMeans import initCentroids, findClosestCentroids, computeNewCentroids, runKMeans, nearestNeighbors
 
 # 
 # MAIN PROGRAM
 # -----------------------------------------------------------------------------------------------------------------
 
 def givenCafesGetVectors(scaleToNDimensions):
-    cafeArr = getDataFromFileWithName('trainingSet.txt')
-    # cafeArr = getDataFromFileWithName('tempPhinneyRidgeWAResponse')
+    # cafeArr = getDataFromFileWithName('trainingSet.txt')
+    cafeArr = getDataFromFileWithName('tempPhinneyRidgeWAResponse')
     denseX = processCafeArray(cafeArr)
     sparseX = csr_matrix(denseX)
 
@@ -48,7 +48,7 @@ def givenCafesRunML(scaleToNDimensions, generateNClusters, showGraph=False):
     for idx, cafe in enumerate(cafeArr):
         cafe = cafeArr[idx]
         centroid = centroidMembership[idx]
-        clusteredCafes[centroid].append(cafe['name'])
+        clusteredCafes[centroid].append(cafe)
     
     return clusteredCafes
 
@@ -69,9 +69,13 @@ def testNDimensionsWithNClusters(scaleToNDimensions, clusterRange):
     cafeArr, X = givenCafesGetVectors(scaleToNDimensions)
     plotCostChangeOverNClusters(X, clusterRange)
 
-# updateWordVectorWithFile('revisedWordBag.txt', True)
-
-# testNDimensionsWithNClusters(5, (1,15))
-cafeDict = givenCafesRunML(5, 9, False)
-
-lol = 'hey'
+def getNearestCafesGivenCafe(cityCafes, cafe):
+    cityCafes.append(cafe)
+    allCafeVecs = processCafeArray(cityCafes)
+    cityCafeVecs = allCafeVecs[0:-1]
+    targetCafeVec = allCafeVecs[-1]
+    mostSimilarCafeTuples = nearestNeighbors(targetCafeVec, cityCafeVecs)
+    similarCafes = []
+    for i in range(10):
+        similarCafes.append(cityCafes[mostSimilarCafeTuples[i][0]])
+    return similarCafes
