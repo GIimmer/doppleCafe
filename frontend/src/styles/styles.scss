@@ -1,0 +1,11 @@
+$primaryColor: rgb(139, 64, 13);
+$secondary: blue;
+$light-grey: rgb(216, 216, 216);
+$highlight: gold;
+
+#NavBar {
+    height: 40px;
+    width: 100%;
+    display: flexbox;
+    background-color: $light-grey;
+}
