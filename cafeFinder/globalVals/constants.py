@@ -1,10 +1,12 @@
 """Constants for use across application"""
-from environment import TESTENV
+from globalVals.environment import TESTENV
 
 GOOGLEPLACESAPI = {
     'urlPrefix': 'https://maps.googleapis.com/maps/api/place/',
     'searchAreaURLSuffix': f"nearbysearch/json?key={TESTENV['googleAPIKey']}&",
-    'searchPlaceURLSuffix': f"findplacefromtext/json?key={TESTENV['googleAPIKey']}&"
+    'searchPlaceURLSuffix': f"findplacefromtext/json?key={TESTENV['googleAPIKey']}&",
+    'placeDetailsURLSuffix': f"details/json?key={TESTENV['googleAPIKey']}&",
+    'placeDetailsRequestedFeatures': "place_id={cafe_id}&fields=type,plus_code,website,opening_hours,price_level,rating,user_ratings_total"
 }
 
 WEXTRACTORAPI = {

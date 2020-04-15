@@ -4,13 +4,10 @@ from scipy.sparse import csr_matrix
 from sklearn.decomposition import TruncatedSVD
 
 from utilities import getDataFromFileWithName
-from apiMethods import (buildSinglePlaceSearchRequest, buildCityLocationSearchRequest, 
-                        buildAreaSearchRequest, get60ResultsNearLocation,
-                        givenCafeArrRetrieveReviews, buildWextractorDetailsRequest,
-                        get60CafesNearCity)
 from dataProcessing import (processAreaSearch, processCafeArray, processReviews,
                         updateWordVectorWithFile)
-from kMeans import initCentroids, findClosestCentroids, computeNewCentroids, runKMeans, nearestNeighbors
+from kMeans import initCentroids, findClosestCentroids, computeNewCentroids, runKMeans
+from nearestNeighbors import nearestNeighbors
 
 # 
 # MAIN PROGRAM
