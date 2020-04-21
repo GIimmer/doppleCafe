@@ -19,18 +19,21 @@ class CountrySerializer(serializers.ModelSerializer):
 
 class PlacetypeSerializer(serializers.ModelSerializer):
     """Placetype Serializer"""
+    cafes = serializers.StringRelatedField(many=True)
     class Meta:
         model = Placetype
-        fields = ["name"]
+        fields = "__all__"
 
 class CafeSerializer(serializers.ModelSerializer):
     """Cafe Serializer"""
+    placetypes = serializers.StringRelatedField(many=True)
     class Meta:
         model = Cafe
         fields = "__all__"
 
 class ReviewSerializer(serializers.ModelSerializer):
     """Review Serializer"""
+    review_id = serializers.CharField(source='id')
     class Meta:
         model = Review
-        fields = ["review_id", "reviewer", "datetime", "rating", "text"]
+        fields = "__all__"

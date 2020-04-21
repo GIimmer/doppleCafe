@@ -1,5 +1,5 @@
-import numpy as np
 import copy
+import numpy as np
 
 def initCentroids(X, K):
     centroid_idxs = np.random.choice(X.shape[0], K, replace=False)
@@ -38,5 +38,5 @@ def runKMeans(X, K, max_iterations):
     for i in range(max_iterations):
         centroid_membership, cost[i] = findClosestCentroids(X, centroids)
         centroids = computeNewCentroids(X, centroid_membership, K)
-  
+
     return (centroid_membership, centroids, cost[max_iterations - 1])

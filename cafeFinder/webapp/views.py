@@ -1,5 +1,6 @@
 import json
 from webapp.models import City, Cafe, Country, Review, Placetype
+from django.core import serializers
 from django.shortcuts import get_object_or_404
 from django.db.models.query import QuerySet
 from webapp.api.serializers import CitySerializer, CafeSerializer
@@ -8,16 +9,22 @@ from rest_framework.parsers import JSONParser
 from django.views.decorators.http import require_http_methods
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from research.apiHandlers import geocodeCityName, getCafeWithQueryString, getCafeDetailsGivenID
+from research.cafeTest import getNearestCafesGivenCafe, givenCityRunML
+from research.apiHandlers import geocodeCityName, getCafeWithQueryString, getCafeDetailsGivenID, givenCafeRetrieveReviews, get60CafesNearCity
 
 class CityViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.CreateModelMixin, mixins.DestroyModelMixin):
     serializer_class = CitySerializer
     queryset = City.objects.all()
 
     def retrieve(self, request, pk):
-        lol = 'hey'
-        # data = self.queryset.get(pk=pk)
-        return JsonResponse({})
+        queryset = self.queryset.filter(pk=pk)
+        city = queryset.first()
+        clustered_cafes = givenCityRunML(city, 5, 7)
+        clustered_cafe_response = []
+        for _, cafe_arr in clustered_cafes.items():
+            clustered_cafe_response.append(CafeSerializer(cafe_arr, many=True).data)
+
+        return JsonResponse(clustered_cafe_response, safe=False)
 
     def get_queryset(self):
         queryset = self.queryset
@@ -49,20 +56,29 @@ def find_similar_cafes(request):
     cafe_id = request_body.get('cafeId', None)
     if (city_id and cafe_id):
         try:
-            city_obj = City.objects.get(pk=city_id)
+            city = City.objects.get(pk=city_id)
         except City.DoesNotExist:
-            return JsonResponse({ "status": "Failed", "Reason": "Country not in database" })
+            return JsonResponse({ "status": "Failed", "Reason": "City not in database" })
 
         try:
-            cafe_obj = Cafe.objects.get(place_id=cafe_id)
+            target_cafe = Cafe.objects.get(place_id=cafe_id)
         except Cafe.DoesNotExist:
             cafe_details_res = getCafeDetailsGivenID(cafe_id)
             cafe_name = request_body.get('cafeName', None)
             cafe_addr = request_body.get('cafeAddr', None)
-            cafe_obj = genCafeFromDetailsRequest(cafe_details_res, cafe_id, cafe_name, cafe_addr)
-        lol = "hey"
+            target_cafe = genCafeFromDetailsRequest(cafe_details_res, cafe_id, cafe_name, cafe_addr)
+        
+        if target_cafe.review_set.count() == 0:
+            givenCafeRetrieveReviews(target_cafe, 80)
 
-    return JsonResponse({})
+        # Cafe.objects.filter(city=city).delete()
+        if city.cafe_set.count() == 0:
+            get60CafesNearCity(city)
+ 
+        if (city.cafe_set.count() > 10):
+            similar_cafes = getNearestCafesGivenCafe(city, target_cafe)
+
+    return JsonResponse(CafeSerializer(similar_cafes, many=True).data, safe=False)
 
 
 def genCityFromAPISuggestion(city_obj):
@@ -78,28 +94,29 @@ def genCafesFromAPICandidates(api_candidates):
 
 def genCafeFromDetailsRequest(cafe_details_obj, cafe_id, cafe_name, cafe_addr):
     if (cafe_name is not None and cafe_addr is not None):
-        place_types = cafe_details_obj['types']
+
         place_type_arr = []
-        for place_type in place_types:
+        for place_type in cafe_details_obj['types']:
             try:
                 placetype_obj = Placetype.objects.get(name=place_type)
             except Placetype.DoesNotExist:
                 placetype_obj = Placetype.objects.create(name=place_type)
             place_type_arr.append(placetype_obj)
-        del cafe_details_obj['types']
+
         compound_code = cafe_details_obj['plus_code']['compound_code']
-        del cafe_details_obj['plus_code']
         cafe_details_obj.update({ "place_id": cafe_id, "name": cafe_name, "address": cafe_addr, "compound_code": compound_code })
+
         cafe_details_obj['hours'] = hoursArrStringFromHoursObj(cafe_details_obj)
+
+        del cafe_details_obj['types']
+        del cafe_details_obj['plus_code']
         del cafe_details_obj['opening_hours']
+
         cafe_obj = CafeSerializer(data=cafe_details_obj)
-        is_valid = cafe_obj.is_valid(raise_exception=True)
-        cafe_obj.place_id = 'lol'
-        cafe_obj.placetypes = 'hey'
-        cafe_obj.save()
-        for place_type in place_type_arr:
-            cafe_obj.placetypes.add(cafe_obj)
-        cafe_obj.save()
+        if cafe_obj.is_valid(raise_exception=True):
+            cafe_model = cafe_obj.save()
+            for place_type in place_type_arr:
+                cafe_model.placetypes.add(place_type)
         return cafe_obj
 
 def hoursArrStringFromHoursObj(hours_obj):
