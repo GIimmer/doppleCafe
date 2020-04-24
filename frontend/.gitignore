@@ -12,7 +12,7 @@
 /build
 
 # private keys
-src.constants.Constants.js
+Constants.js
 
 # misc
 .DS_Store
