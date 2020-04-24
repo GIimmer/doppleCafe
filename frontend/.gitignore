@@ -11,6 +11,9 @@
 # production
 /build
 
+# private keys
+src.constants.Constants.js
+
 # misc
 .DS_Store
 .env.local
