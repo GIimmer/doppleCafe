@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { AppBar, Tabs, Tab } from '@material-ui/core'
+import { AppBar, Tabs, Tab, Button } from '@material-ui/core'
 import '../styles/styles.scss';
 import CONSTS from "../constants/Constants";
 
@@ -23,20 +23,23 @@ export class NavBar extends Component {
     componentWillMount() {
         QueryStore.on("change", () => {
             this.setState({
-                QueryState: QueryStore.getAll()
+                QueryState: QueryStore.getData()
             })
-            this.state.value = this.state.QueryState.currentTab === CONSTS.QUERY_VIEW ? 0 : 1;
+            this.setState({
+                value: this.state.QueryState.currentTab === CONSTS.QUERY_VIEW ? 0 : 1
+            })
         })
     }
 
     render() {
         return (
             <div id="NavBar">
-                <AppBar position="static">
-                    <Tabs value={this.state.value} onChange={this.handleChange} aria-label="simple tabs example">
+                <AppBar position="static" className={'AppBar'}>
+                    <Tabs value={this.state.value} className={'tabs'} onChange={this.handleChange} aria-label="simple tabs example">
                         <Tab label="Find a Matching Cafe" id={CONSTS.QUERY_VIEW}/>
                         <Tab label="View Cafes by City" id={CONSTS.EXPLORE_VIEW}/>
                     </Tabs>
+                    <Button color="inherit" className={'loginButton'}>Login</Button>
                 </AppBar>
             </div>
         )

@@ -17,7 +17,7 @@ export class AppBody extends Component {
     componentWillMount() {
         QueryStore.on("change", () => {
             this.setState({
-                QueryState: QueryStore.getAll()
+                QueryState: QueryStore.getData()
             })
         })
     }

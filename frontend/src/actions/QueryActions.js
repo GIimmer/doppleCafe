@@ -6,6 +6,9 @@ import CONSTS from "../constants/Constants";
 export function searchForCafe(cafeQuery) {
     dispatcher.dispatch({
         type: ACTION_CONSTS.GETTING_CAFE_OPTIONS,
+        payload: {
+            query: cafeQuery
+        }
     });
 
     axios.get(ACTION_CONSTS.URL_BASE + ACTION_CONSTS.SEARCH_CAFE + cafeQuery)

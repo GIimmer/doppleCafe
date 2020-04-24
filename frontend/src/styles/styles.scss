@@ -4,8 +4,49 @@ $light-grey: rgb(216, 216, 216);
 $highlight: gold;
 
 #NavBar {
-    height: 40px;
     width: 100%;
-    display: flexbox;
-    background-color: $light-grey;
+
+    .AppBar {
+        display: flexbox;
+        flex-direction: row;
+
+        .tabs {
+            flex-grow: 3;
+        }
+
+        .loginButton {
+            flex-grow: 1;
+        }
+    }
+}
+
+#QueryView {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    min-height: 80vh;
+
+    .margin30 {
+        margin: 30px 0px;
+    }
+
+    .inputSection {
+        min-width: 500px;
+    }
+
+    #OutcomeSection {
+        display: none;
+    }
+
+
+    .userInput {
+        display: flex;
+        flex-direction: column;
+
+        .messages {
+            min-height: 20vh;
+            margin: 30px 5px;
+            text-align: center;
+        }
+    }
 }

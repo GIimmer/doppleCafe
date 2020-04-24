@@ -1,29 +1,37 @@
 import React, { Component } from 'react';
 
 import QueryStore from "../stores/QueryStore";
+import UserInput from "./UserInput";
 import QueryActions from "../actions/QueryActions";
 
 export class QueryView extends Component {
     constructor() {
         super();
         this.state = {
-            QueryState: QueryStore.getAll()
+            QueryState: QueryStore.getData()
         };
-        console.log(this.state);
     }
 
     componentWillMount() {
         QueryStore.on("change", () => {
             this.setState({
-                QueryState: QueryStore.getAll()
+                QueryState: QueryStore.getData()
             })
         })
     }
 
     render() {
         return (
-            <div>
-                <p>{ this.state.QueryState.lastCityQuery }</p>
+            <div id="QueryView">
+                <div id="CafeSection" className="inputSection">
+                    <UserInput field="cafe"></UserInput>
+                </div>
+                <div id="CitySection" className="inputSection">
+                    <UserInput field="city"></UserInput>
+                </div>
+                <div id="OutcomeSection">
+
+                </div>
             </div>
         )
     }

@@ -5,29 +5,73 @@ import ACTION_CONSTS from "../constants/ActionConstants";
 import CONSTS from "../constants/Constants";
 
 class QueryStore extends EventEmitter {
+    cafeFilter = ({ lastCafeQuery, cafeMessages, cafeResponse }) => ({ lastCafeQuery, cafeMessages, cafeResponse });
+    cityFilter = ({ userCanLoadNewCity, lastCityQuery, possibleCities, cityMessages, cityResponse }) =>
+        ({ userCanLoadNewCity, lastCityQuery, possibleCities, cityMessages, cityResponse })
+
     constructor() {
         super()
         this.state = {
             userCanLoadNewCity: true,
             currentTab: CONSTS.QUERY_VIEW,
             lastCafeQuery: "Chocolati",
-            lastCityQuery: "Hanoi",
-            cafeResponse: [
+            lastCityQuery: "Hanoi, Vietnam",
+            possibleCities: [
                 {
-                    name: "Chocolati Cafe",
-                    formattedAddress: "8319 Greenwood Ave N, Seattle, WA 98103",
-                    photoURL: "https://cdn.kqed.org/wp-content/uploads/sites/24/2012/02/chocolatifront.jpg"
+                    name: "Seattle",
+                    country: "US",
+                    latitude: "47.6062",
+                    longitude: "-122.3321"
                 },
                 {
-                    name: "The Dray",
-                    formattedAddress: "708 NW 65th St, Seattle, WA 98117",
-                    photoURL: "https://media2.fdncms.com/stranger/imager/u/original/23946105/hh_thedray_faustomatic.jpg"
+                    name: "Hanoi",
+                    country: "VN",
+                    latitude: "21.0278",
+                    longitude: "105.8342"
+                },
+                {
+                    name: "Portland",
+                    country: "US",
+                    latitude: "45.5051",
+                    longitude: "-122.6750"
+                }
+            ],
+            cafeMessages: [
+                {
+                    type: 'info',
+                    text: 'this is a message'
+                },
+                {
+                    type: 'warning',
+                    text: 'this is a warning'
+                }
+            ],
+            cityMessages: [
+                {
+                    type: 'info',
+                    text: 'this is a message'
+                },
+                {
+                    type: 'warning',
+                    text: 'this is a warning'
                 }
             ],
             cityResponse: {
-                name: "Hanoi",
-                Latitude: 0,
-                Longitude: 0
+                name: "Seattle",
+                country: "US",
+                latitude: "47.6062",
+                longitude: "-122.3321",
+                photos: [
+                    "https://cdn.pixabay.com/photo/2015/03/26/22/09/city-skyline-693502_960_720.jpg"
+                ]
+            },
+            cafeResponse: {
+                name: "Chocolati",
+                formattedAddr: "8319 Greenwood Ave N, Seattle, WA 98103",
+                compoundCode: "",
+                photos: [
+                    "https://cdn.kqed.org/wp-content/uploads/sites/24/2012/02/chocolatifront.jpg"
+                ]
             }
         }
     }
@@ -40,23 +84,53 @@ class QueryStore extends EventEmitter {
         });
     }
 
+    createCity(city) {
+        this.state.cityResponse = {
+            name: city.name,
+            latitude: city.latitude,
+            longitude: city.longitude,
+            country: city.country
+        }
+    }
+
     switchTabs(tabId) {
         this.state.currentTab = (tabId === 0) ? CONSTS.QUERY_VIEW : CONSTS.EXPLORE_VIEW;
     }
 
-    getAll() {
-        return this.state;
+    getData(filterFor=null) {
+        switch (filterFor) {
+            case 'cafe':
+                return this.cafeFilter(this.state)
+        
+            case 'city':
+                return this.cityFilter(this.state)
+
+            default:
+                return this.state;
+        }
     }
 
     handleActions(action) { 
         console.log("QueryStore recieved an action: ", action);
         switch (action.type) {
-            case ACTION_CONSTS.CAFE_OPTIONS_RETURNED:
-                this.createCafe(action.cafe);
+            case ACTION_CONSTS.GETTING_CAFE_OPTIONS:
+                this.state.lastCafeQuery = action.payload.query;
+                this.emit("cafeUpdate");
                 break;
+
+            case ACTION_CONSTS.CAFE_OPTIONS_RETURNED:
+                this.createCafe(action.payload);
+                this.emit("cafeUpdate");
+                break;
+
+            case ACTION_CONSTS.GETTING_CITY_OPTIONS:
+                this.state.lastCafeQuery = action.payload.query;
+                this.emit("cityUpdate");
+                break; 
 
             case ACTION_CONSTS.CITY_OPTIONS_RETURNED:
                 this.createCity(action.city);
+                this.emit("cityUpdate");
                 break;
 
             case ACTION_CONSTS.PERMISSION_UPDATED:
