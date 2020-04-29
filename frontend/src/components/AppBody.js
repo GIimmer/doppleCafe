@@ -26,9 +26,10 @@ export class AppBody extends Component {
         return (
             <div>
                 { 
-                this.state.QueryState.currentTab === CONSTS.EXPLORE_VIEW ? 
-                <ExploreView></ExploreView> :
-                <QueryView></QueryView>} 
+                    this.state.QueryState.currentTab === CONSTS.EXPLORE_VIEW ? 
+                    <ExploreView /> :
+                    <QueryView />
+                } 
             </div>
         )
     }

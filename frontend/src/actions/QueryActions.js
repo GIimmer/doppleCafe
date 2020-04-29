@@ -26,6 +26,9 @@ export function searchForCafe(cafeQuery) {
 export function searchForCity(cityQuery) {
     dispatcher.dispatch({
         type: ACTION_CONSTS.GETTING_CITY_OPTIONS,
+        payload: {
+            query: cityQuery
+        }
     });
 
     axios.get(CONSTS.URL_BASE + CONSTS.SEARCH_CITY + cityQuery)
@@ -36,6 +39,40 @@ export function searchForCity(cityQuery) {
             payload: res
         });
     });
+}
+
+export function findMostSimilarWithCurrentParams() {
+    dispatcher.dispatch({
+        type: ACTION_CONSTS.FIND_MOST_SIMILAR
+    })
+}
+
+export function clearSearch() {
+    dispatcher.dispatch({
+        type: ACTION_CONSTS.CLEAR_SEARCH
+    })
+}
+
+export function optionLockToggled(isCafe, data) {
+    let unlock = data.locked === true
+    if (unlock) {
+        dispatcher.dispatch({
+            type: isCafe ? ACTION_CONSTS.CAFE_OPTION_UNLOCKED : ACTION_CONSTS.CITY_OPTION_UNLOCKED,
+            payload: data
+        })
+    } else {
+        dispatcher.dispatch({
+            type: isCafe ? ACTION_CONSTS.CAFE_OPTION_LOCKED : ACTION_CONSTS.CITY_OPTION_LOCKED,
+            payload: data
+        })
+    }
+}
+
+export function clearMessages(isCafe, ids) {
+    dispatcher.dispatch({
+        type: isCafe ? ACTION_CONSTS.CLEAR_CAFE_MESSAGES : ACTION_CONSTS.CLEAR_CITY_MESSAGES,
+        payload: ids
+    })
 }
 
 export function tabSwitched(newTab) {

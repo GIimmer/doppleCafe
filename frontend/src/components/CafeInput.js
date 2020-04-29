@@ -17,8 +17,8 @@ export class CafeInput extends Component {
 
     render() {
         return (
-            <div className="margin30">
-                <form autoComplete="off" style={{ textAlign: 'center' }} onSubmit={this.handleSubmit}>
+            <div className="margin50">
+                <form autoComplete="off" style={{ textAlign: 'center', marginTop: 16, marginBottom: 8 }} onSubmit={this.handleSubmit}>
                     <TextField label="Target cafe" style={STYLE} onChange={this.handleChange} variant="outlined" required fullWidth />
                 </form>
             </div>

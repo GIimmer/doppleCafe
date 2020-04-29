@@ -5,8 +5,8 @@ import AppBody from './components/AppBody'
 function App() {
   return (
     <div className="App">
-      <NavBar></NavBar>
-      <AppBody></AppBody>
+      <NavBar />
+      <AppBody />
     </div>
   );
 }
