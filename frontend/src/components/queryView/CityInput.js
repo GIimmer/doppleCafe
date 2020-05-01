@@ -1,12 +1,14 @@
 import React, { Component } from 'react'
 import Autocomplete, { createFilterOptions } from '@material-ui/lab/Autocomplete'
 import TextField from '@material-ui/core/TextField';
-import QueryStore from '../stores/QueryStore'
-import { optionLockToggled, searchForCity } from "../actions/QueryActions";
+import QueryStore from '../../stores/QueryStore'
+import { optionLockToggled, searchForCity } from "../../actions/QueryActions";
 
 const filter = createFilterOptions();
 
 export class CityInput extends Component {
+    _isMounted = true;
+
     constructor(props) {
         super(props);
         this.state = {
@@ -25,15 +27,19 @@ export class CityInput extends Component {
         }
     }
 
-    componentWillMount() {
+    componentDidMount() {
         QueryStore.on('cityUpdate', () => {
-            this.setState({
+            this._isMounted && this.setState({
                 queryState: QueryStore.getData('city')
             })
         })
         this.setState({
             loaded: true
         })
+    }
+
+    componentWillUnmount() {
+        this._isMounted = false;
     }
 
     render() {
@@ -45,7 +51,7 @@ export class CityInput extends Component {
                         id="citySearch"
                         value={this.state.value}
                         autoHighlight
-                        options={this.state.queryState.possibleCities.sort((a, b) => { return a.name > b.name })}
+                        options={this.state.queryState.preLoadedCities.sort((a, b) => { return a.name > b.name })}
                         getOptionDisabled={(option) => option.inputValue !== undefined && !this.state.queryState.userCanLoadNewCity }
                         onChange={(e, newValue) => {
                             if (!newValue) return;

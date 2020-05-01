@@ -20,7 +20,7 @@ export class NavBar extends Component {
         tabSwitched(newValue === 0 ? CONSTS.QUERY_VIEW : CONSTS.EXPLORE_VIEW);
     }
 
-    componentWillMount() {
+    componentDidMount() {
         QueryStore.on("change", () => {
             this.setState({
                 QueryState: QueryStore.getData()

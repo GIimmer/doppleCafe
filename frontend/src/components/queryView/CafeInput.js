@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { searchForCafe } from "../actions/QueryActions";
+import { searchForCafe } from "../../actions/QueryActions";
 import TextField from '@material-ui/core/TextField'
 
 

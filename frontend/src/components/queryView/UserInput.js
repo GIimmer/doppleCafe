@@ -2,11 +2,13 @@ import React, { Component } from 'react'
 import CafeInput from './CafeInput'
 import CityInput from './CityInput'
 import MessageBox from './MessageBox'
-import QueryStore from '../stores/QueryStore'
-import ResponseCard from './ResponseCard'
-import { optionLockToggled } from "../actions/QueryActions";
+import QueryStore from '../../stores/QueryStore'
+import ResponseCard from '../reusable/ResponseCard'
+import { optionLockToggled } from "../../actions/QueryActions";
 
 export class UserInput extends Component {
+    _isMounted = true;
+
     constructor(props) {
         super(props);
         this.state = {
@@ -17,10 +19,14 @@ export class UserInput extends Component {
 
     componentDidMount() {
         QueryStore.on(this.state.field + "Update", () => {
-            this.setState({
+            this._isMounted && this.setState({
                 queryState: QueryStore.getData(this.state.field)
             })
         })
+    }
+
+    componentWillUnmount() {
+        this._isMounted = false;
     }
 
     handleClick(field, data, e) {

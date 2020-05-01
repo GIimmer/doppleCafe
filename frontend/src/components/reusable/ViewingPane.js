@@ -1,9 +1,9 @@
 import React, { Component } from 'react'
-import QueryStore from "../stores/QueryStore";
+import QueryStore from "../../stores/QueryStore";
 import ViewingBox from "./ViewingBox";
 import Button from '@material-ui/core/Button';
-import { isEmpty } from "../utilities/utilities";
-import { findMostSimilarWithCurrentParams, clearSearch } from "../actions/QueryActions";
+import { isEmpty } from "../../utilities/utilities";
+import { findMostSimilarWithCurrentParams, clearSearch } from "../../actions/QueryActions";
 
 export class ViewingPane extends Component {
     constructor() {
@@ -37,13 +37,11 @@ export class ViewingPane extends Component {
         return baseClass;
     }
 
-    handleSearch(e) {
+    handleClick(action, e) {
         e.preventDefault();
-        findMostSimilarWithCurrentParams();
-    }
-
-    handleCancel(e) {
-        e.preventDefault();
+        action === 'search' ? 
+        findMostSimilarWithCurrentParams(this.state.queryState.cityLock, this.state.queryState.cafeLock) 
+        :
         clearSearch();
     }
 
@@ -65,12 +63,12 @@ export class ViewingPane extends Component {
             <div className={this.getContainerClass()}>
                 {
                     this.state.queryState.searchParamsSet ?
-                    <div class="selectionsHolder">
+                    <div className="selectionsHolder">
                         <Button id="cancelButton" 
                         variant="contained" 
                         color="secondary" 
                         size="small"
-                        onClick={this.handleCancel}>
+                        onClick={this.handleClick.bind(this, 'cancel')}>
                             Cancel Search
                         </Button>
                         <ViewingBox field="cafe" photo={cafe.photos[0]} title={cafe.name} subtitle={cafe.formattedAddr} />
@@ -78,7 +76,7 @@ export class ViewingPane extends Component {
                     </div>
                     :
                     <div className="selectionsHolder">
-                        <Button color="primary" onClick={this.handleSearch}>Search?</Button>
+                        <Button color="primary" onClick={this.handleClick.bind(this, 'search')}>Search?</Button>
                     </div>
                 }
             </div>

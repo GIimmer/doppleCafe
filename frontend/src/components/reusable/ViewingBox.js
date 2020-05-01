@@ -11,7 +11,7 @@ const getStyle = (field, photoUrl) => {
 export default function ViewingBox(props) {
     return (
         <div className="viewBox" >
-            <img style={getStyle(props.field, props.photo)}></img>
+            <img style={getStyle(props.field, props.photo)} alt={`${props.field}`}></img>
             <h2>{props.title}</h2>
             <h4>{props.subtitle}</h4>
         </div>

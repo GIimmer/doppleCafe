@@ -1,9 +1,11 @@
 import React, { Component } from 'react'
-import QueryStore from '../stores/QueryStore'
-import { clearMessages } from "../actions/QueryActions";
+import QueryStore from '../../stores/QueryStore'
+import { clearMessages } from "../../actions/QueryActions";
 import { CSSTransition, TransitionGroup } from "react-transition-group";
 
 export class MessageBox extends Component {
+    _isMounted = true;
+
     constructor(props) {
         super(props);
         this.state = {
@@ -15,11 +17,15 @@ export class MessageBox extends Component {
 
     componentDidMount() {
         QueryStore.on(this.state.field + "Update", () => {
-            this.setState({
+            this._isMounted && this.setState({
                 queryState: QueryStore.getData(this.state.field)
             })
         })
         this.setMessageTimouts(this.state.queryState[this.state.messageProp]);
+    }
+
+    componentWillUnmount() {
+        this._isMounted = false;
     }
 
     setMessageTimouts(messages) {
@@ -27,9 +33,11 @@ export class MessageBox extends Component {
             return message.timout === undefined
         }).map((message => message.id));
 
-        setTimeout(() => {
-            clearMessages(this.state.field === 'cafe', genericTimeoutMessages);
-        }, 8000)
+        if (genericTimeoutMessages.length > 0) {
+            setTimeout(() => {
+                clearMessages(this.state.field === 'cafe', genericTimeoutMessages);
+            }, 8000)
+        }
     }
 
     render() {

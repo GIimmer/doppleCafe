@@ -5,9 +5,14 @@ import ACTION_CONSTS from "../constants/ActionConstants";
 import CONSTS from "../constants/Constants";
 
 class QueryStore extends EventEmitter {
-    cafeFilter = ({ lastCafeQuery, cafeMessages, cafeResponse }) => ({ lastCafeQuery, cafeMessages, cafeResponse });
-    cityFilter = ({ userCanLoadNewCity, lastCityQuery, possibleCities, cityMessages, cityResponse }) =>
-        ({ userCanLoadNewCity, lastCityQuery, possibleCities, cityMessages, cityResponse })
+    cafeFilter = ({ lastCafeQuery, cafeMessages, cafeResponse }) =>
+        ({ lastCafeQuery, cafeMessages, cafeResponse });
+
+    cityFilter = ({ userCanLoadNewCity, lastCityQuery, preLoadedCities, cityMessages, cityResponse }) =>
+        ({ userCanLoadNewCity, lastCityQuery, preLoadedCities, cityMessages, cityResponse });
+
+    outcomeFilter = ({ cityLock, cafeLock, similarCafes, similarCafesFound }) => 
+        ({ cityLock, cafeLock, similarCafes, similarCafesFound });
 
     constructor() {
         super()
@@ -16,8 +21,9 @@ class QueryStore extends EventEmitter {
             currentTab: CONSTS.QUERY_VIEW,
             lastCafeQuery: "Chocolati",
             lastCityQuery: "Hanoi, Vietnam",
-            searchParamsSet: false,
-            possibleCities: [
+            searchParamsSet: true,
+            similarCafesFound: true,
+            preLoadedCities: [
                 {
                     id: 1,
                     name: "Seattle",
@@ -81,7 +87,16 @@ class QueryStore extends EventEmitter {
                     "https://cdn.pixabay.com/photo/2015/03/26/22/09/city-skyline-693502_960_720.jpg"
                 ]
             }],
-            cityLock: {},
+            cityLock: {
+                id: 1,
+                name: "Seattle",
+                country: "US",
+                latitude: 47.6062,
+                longitude: -122.3321,
+                photos: [
+                    "https://cdn.pixabay.com/photo/2015/03/26/22/09/city-skyline-693502_960_720.jpg"
+                ]
+            },
             cafeResponse: [
                 {
                     id: 1,
@@ -117,14 +132,93 @@ class QueryStore extends EventEmitter {
                     ]
                 }
             ],
-            cafeLock: {}
+            cafeLock: {
+                id: 1,
+                name: "Chocolati Cafe",
+                formattedAddr: "8319 Greenwood Ave N, Seattle, WA 98103",
+                compoundCode: "MJQV+VQ Seattle, Washington",
+                latitude: 47.689747,
+                longitude: -122.355425,
+                photos: [
+                    "https://cdn.kqed.org/wp-content/uploads/sites/24/2012/02/chocolatifront.jpg"
+                ]
+            },
+            similarCafes: [
+                {
+                    id: 1,
+                    similarityRank: 1,
+                    name: "Chocolati Cafe",
+                    formattedAddr: "8319 Greenwood Ave N, Seattle, WA 98103",
+                    rating: 4.8,
+                    latitude: 47.689747,
+                    longitude: -122.355425,
+                    wordCloud: [
+                        {
+                            text: 'Hello',
+                            value: 26
+                        },
+                        {
+                            text: 'There',
+                            value: 15
+                        }
+                    ],
+                    photos: [
+                        "https://cdn.kqed.org/wp-content/uploads/sites/24/2012/02/chocolatifront.jpg"
+                    ]
+                },
+                {
+                    id: 3,
+                    similarityRank: 2,
+                    name: "Chocolati",
+                    formattedAddr: "7810 East Green Lake Dr N, Seattle, WA 98115",
+                    rating: 3.8,
+                    latitude: 47.685441,
+                    longitude: -122.336002,
+                    wordCloud: [
+                        {
+                            text: 'Hello',
+                            value: 26
+                        },
+                        {
+                            text: 'There',
+                            value: 15
+                        }
+                    ],
+                    photos: [
+                        "https://www.seattlegreenlaker.com/wp-content/uploads/2015/02/Chocolati1-300x199.jpg"
+                    ]
+                },
+                {
+                    id: 2,
+                    similarityRank: 3,
+                    name: "Chocolati Cafe Wallingford",
+                    formattedAddr: "1716 N 45th St, Seattle, WA 98103",
+                    rating: 4.5,
+                    latitude: 47.661505,
+                    longitude: -122.336813,
+                    wordCloud: [
+                        {
+                            text: 'Hello',
+                            value: 26
+                        },
+                        {
+                            text: 'There',
+                            value: 15
+                        }
+                    ],
+                    photos: [
+                        "https://s3-media0.fl.yelpcdn.com/bphoto/7sLuhmRJ_VLfAbvK7cZEuQ/348s.jpg"
+                    ]
+                }
+            ]
         }
     }
 
     createCafe(cafe) {
         this.state.cafeResponse.push({
+            id: cafe.placeId,
             name: cafe.name,
-            formattedAddress: cafe.addr,
+            formattedAddr: cafe.addr,
             photoURL: cafe.photoURL
         });
     }
@@ -140,10 +234,6 @@ class QueryStore extends EventEmitter {
 
     filterMessages(propName, ids) {
         this.state[propName] = this.state[propName].filter((message) => !ids.includes(message.id));
-    }
-
-    switchTabs(tabId) {
-        this.state.currentTab = (tabId === 0) ? CONSTS.QUERY_VIEW : CONSTS.EXPLORE_VIEW;
     }
 
     toggleLockState(objectArr, lockedId=null) {
@@ -164,14 +254,23 @@ class QueryStore extends EventEmitter {
     getData(filterFor=null) {
         switch (filterFor) {
             case 'cafe':
-                return this.cafeFilter(this.state)
+                return this.cafeFilter(this.state);
         
             case 'city':
-                return this.cityFilter(this.state)
+                return this.cityFilter(this.state);
+
+            case 'outcomeFilter':
+                return this.outcomeFilter(this.state);
 
             default:
                 return this.state;
         }
+    }
+
+    clearData(params=null) {
+        this.state.searchParamsSet = this.state.similarCafesFound = false;
+        this.state.cityResponse = []; this.state.cafeResponse = [];
+        this.state.cityLock = {}; this.state.cafeLock = {};
     }
 
     handleActions(action) { 
@@ -231,8 +330,13 @@ class QueryStore extends EventEmitter {
                 this.emit("cityUpdate");
                 break;
             
-            case ACTION_CONSTS.FIND_MOST_SIMILAR:
+            case ACTION_CONSTS.FINDING_MOST_SIMILAR:
                 this.state.searchParamsSet = true;
+                break;
+
+            case ACTION_CONSTS.SIMILAR_CAFES_FOUND:
+                this.state.similarCafes = action.payload;
+                this.state.similarCafesFound = true;
                 break;
 
             case ACTION_CONSTS.CLEAR_SEARCH:
@@ -247,6 +351,7 @@ class QueryStore extends EventEmitter {
                 break;
 
             case ACTION_CONSTS.TAB_SWITCHED:
+                this.clearData();
                 this.state.currentTab = action.payload.newTab;
                 break;
         

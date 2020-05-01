@@ -31,11 +31,65 @@ $highlight: gold;
     }
 }
 
-#queryView {
+#AppBody {
     position: relative;
 
-    #outcomeSection {
-        display: none;
+    #OutcomeSection {
+        position: absolute;
+        transform: translateX(81vw);
+        min-height: 93vh;
+        width: 80vw;
+        left: 20vw;
+        top: 7vh;
+        background-color: white;
+        box-shadow: 0px 0px 4px grey;
+        background-color: rgb(228, 228, 228);
+
+        &.outcomeVisible {
+            animation: slide-from-right 500ms cubic-bezier(.87,1.04,.72,.93);
+            animation-fill-mode: forwards;
+
+            #QueryOutcome {
+                background-color: white;
+                width: 90%;
+                min-height: 900px;
+                margin: 5%;
+                box-shadow: 1px 1px 4px grey;
+
+                .cafePreviewHolder {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+
+                    &>div:first-child {
+                        width: 100%;
+                        position: relative;
+                        background-color: grey;
+                        width: 100%;
+                        height: 400px;
+                    }
+                    
+                    .flexRowParent {
+                        width: 100%;
+                        margin-top: 20px;
+                        display: flex;
+                        justify-content: space-around;
+                        flex-direction: row;
+
+                        .cafePreviewList {
+                            width: 40%;
+                            color: grey;
+                        }
+
+                        .cafeDetails {
+                            width: 40%;
+                            min-height: 50vh;
+                            box-shadow: 2px 2px 3px grey;
+                        }
+                    }
+                }
+            }
+        }
     }
 
     .viewingPane {
@@ -198,35 +252,20 @@ $highlight: gold;
     opacity: 0;
 }
 
-.pane-appear {
-    transform: translateX(-100px);
-}
-.pane-appear.pane-appear-active {
-    transform: translateX(0px);
-    transition: transform 400ms linear;
-}
-.pane-enter {
-    transform: translateX(-100px);
-}
-.pane-enter.pane-enter-active {
-    transform: translateX(0px);
-    transition: transform 400ms ease;
-}
-
-.slideFromRight-appear {
-    transform: translateX(-100px);
-}
-.slideFromRight-appear.slideFromRight-appear-active {
-    transform: translateX(0px);
-    transition: transform 400ms linear;
-}
-.slideFromRight-enter {
-    transform: translateX(-100px);
-}
-.slideFromRight-enter.slideFromRight-enter-active {
-    transform: translateX(0px);
-    transition: transform 400ms ease;
-}
+// .pane-appear {
+//     transform: translateX(-100px);
+// }
+// .pane-appear.pane-appear-active {
+//     transform: translateX(0px);
+//     transition: transform 400ms linear;
+// }
+// .pane-enter {
+//     transform: translateX(-100px);
+// }
+// .pane-enter.pane-enter-active {
+//     transform: translateX(0px);
+//     transition: transform 400ms ease;
+// }
 
 
 // Animations!
@@ -241,3 +280,22 @@ $highlight: gold;
 		box-shadow: 0 0 20px rgba(77, 37, 14, 0.6), inset 0 0 10px rgba(77, 37, 14, .4), 0 2px 0 #000;
     }
 }
+
+
+@keyframes slide-from-right {
+    78% {
+        transform: translateX(0vw);
+    }
+    86% {
+        transform: translateX(2vw);
+    }
+    93% {
+        transform: translateX(0vw);
+    }
+    97% {
+        transform: translateX(1vw);
+    }
+    100% {
+        transform: translateX(0vw);
+    }
+  }
