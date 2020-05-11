@@ -15,6 +15,9 @@ class City(models.Model):
 class Country(models.Model):
     countryCode = models.CharField("CountryCode", max_length=255, default="Unset")
 
+    def __str__(self):
+        return self.countryCode
+
 
 class Placetype(models.Model):
     name = models.CharField("Name", max_length=255)
@@ -29,11 +32,12 @@ class Cafe(models.Model):
     hours = models.CharField("Hours", max_length=255, default="unset", null=True, blank=True)
     rating = models.DecimalField("Rating", max_digits=2, decimal_places=1, null=True, blank=True)
     user_ratings_total = models.IntegerField("UserRatingsTotal", null=True, blank=True)
-    address = models.CharField("Addr", max_length=255, default="unset", null=True, blank=True)
+    formatted_address = models.CharField("Addr", max_length=255, default="unset", null=True, blank=True)
     compound_code = models.CharField('CompoundCode', max_length=255, null=True)
     website = models.CharField('Website', max_length=255, null=True, blank=True)
+    formatted_phone_number = models.CharField('FormattedPhoneNumber', max_length=255, null=True)
     city = models.ForeignKey("City", on_delete=models.CASCADE, null=True, blank=True)
-    placetypes = models.ManyToManyField(Placetype, blank=True)
+    placetypes = models.ManyToManyField(Placetype)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
@@ -61,3 +65,13 @@ class Review(models.Model):
 
     def __str__(self):
         return self.reviewer + " said " + self.text + " regarding cafe: " + self.cafe.name
+
+class Photo(models.Model):
+    photo_ref = models.CharField("ReferenceID", max_length=255)
+    html_attr = models.CharField("PhotographerLink", max_length=255, blank=True)
+    height = models.PositiveSmallIntegerField("Height", blank=True)
+    width = models.PositiveSmallIntegerField("Width", blank=True)
+    cafe = models.ForeignKey("Cafe", on_delete=models.CASCADE, null=True, blank=True)
+
+    def __str__(self):
+        return "Photo for: " + self.cafe.name

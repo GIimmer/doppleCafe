@@ -1,7 +1,7 @@
 """Serializers repository - convert json to models and vice versa"""
 from rest_framework import serializers
 
-from webapp.models import City, Placetype, Cafe, Review, Country
+from webapp.models import City, Placetype, Cafe, Review, Country, Photo
 
 
 class CitySerializer(serializers.ModelSerializer):
@@ -24,16 +24,24 @@ class PlacetypeSerializer(serializers.ModelSerializer):
         model = Placetype
         fields = "__all__"
 
+
+class PhotoSerializer(serializers.ModelSerializer):
+    """Photo Serializer"""
+    class Meta:
+        model = Photo
+        fields = "__all__"
+
+
 class CafeSerializer(serializers.ModelSerializer):
     """Cafe Serializer"""
-    placetypes = serializers.StringRelatedField(many=True)
+    placetypes = serializers.StringRelatedField(many=True, required=False)
+    photos = PhotoSerializer(many=True, source='photo_set')
     class Meta:
         model = Cafe
         fields = "__all__"
 
 class ReviewSerializer(serializers.ModelSerializer):
     """Review Serializer"""
-    review_id = serializers.CharField(source='id')
     class Meta:
         model = Review
         fields = "__all__"

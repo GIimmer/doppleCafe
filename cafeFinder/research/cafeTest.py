@@ -36,10 +36,10 @@ def givenCityGetVectors(city, target_cafe=None):
         all_tf_vectors = city_cafe_tf_vecs
     all_cafe_vecs = getIDFFromTFVectors(all_tf_vectors)
 
-    return city_cafes, city_id, all_cafe_vecs
+    return city_cafes, all_cafe_vecs
 
 def givenCityRunML(city, scale_to_n_dimensions, generate_n_clusters, show_graph=False):
-    city_cafes, city_id, dense_x = givenCityGetVectors(city)
+    city_cafes, dense_x = givenCityGetVectors(city)
     X = givenVecsRunPCA(dense_x, scale_to_n_dimensions)
 
     centroid_membership, centroids, _ = runKMeans(X, generate_n_clusters, 10)
@@ -80,18 +80,25 @@ def plotCostChangeOverNClusters(X, cluster_range):
     plt.show()
 
 def testNDimensionsWithNClusters(city, scale_to_n_dimensions, cluster_range):
-    _, _, dense_x = givenCityGetVectors(city)
+    _, dense_x = givenCityGetVectors(city)
     X = givenVecsRunPCA(dense_x, scale_to_n_dimensions)
     plotCostChangeOverNClusters(X, cluster_range)
 
 def getNearestCafesGivenCafe(city, cafe):
-    city_cafes, _, all_cafe_vecs = givenCityGetVectors(city, cafe)
+    city_cafes, all_cafe_vecs = givenCityGetVectors(city, cafe)
 
     city_cafe_vecs = all_cafe_vecs[0:-1]
     target_cafe_vec = all_cafe_vecs[-1]
 
     most_similar_cafe_tuples = nearestNeighbors(target_cafe_vec, city_cafe_vecs)
     similar_cafes = []
+    word_bag_arr = []
     for i in range(10):
-        similar_cafes.append(city_cafes[most_similar_cafe_tuples[i][0]])
-    return similar_cafes
+        vec_for_cafe = all_cafe_vecs[most_similar_cafe_tuples[i][0]]
+        top_100 = vec_for_cafe.argsort()[-100:][::-1]
+        word_bag_arr.append([(int(val), float(vec_for_cafe[val])) for val in top_100])
+
+        cafe_to_add = city_cafes[most_similar_cafe_tuples[i][0]]
+        similar_cafes.append(cafe_to_add)
+
+    return similar_cafes, word_bag_arr

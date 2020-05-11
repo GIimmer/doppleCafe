@@ -8,7 +8,7 @@ def buildSinglePlaceSearchRequest(place_name):
     else:
         place_name = quote(place_name)
         return GOOGLEPLACESAPI['urlPrefix'] + GOOGLEPLACESAPI['searchPlaceURLSuffix'] + \
-               f"inputtype=textquery&input={place_name}&fields=formatted_address,name,place_id"
+               f"inputtype=textquery&input={place_name}&fields=place_id,name,formatted_address,geometry,photos"
 
 def buildCityLocationSearchRequest(city_name):
     if len(city_name) == 0:

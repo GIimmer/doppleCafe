@@ -97,7 +97,7 @@ def convertTextToTFVector(text):
     for key, val in freq_dict.items():
         idx = VECTOR_IDX_REF.get(key, -1)
         if idx != -1:
-            vect[idx] = (val/cafe_reviews_len)   
+            vect[idx] = (val/cafe_reviews_len)
     return vect
 
 def stemAndRemoveStopwordsFromStringArr(string_arr):
