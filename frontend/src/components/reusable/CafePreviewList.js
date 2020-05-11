@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react'
 import QueryStore from'../../stores/QueryStore'
+import { toggleCafeOptionHover, loadCafeDetails, highlightCafeOnMap } from '../../actions/QueryActions';
 import CafePreview from './CafePreview'
 
 export default class CafePreviewList extends PureComponent {
@@ -21,10 +22,22 @@ export default class CafePreviewList extends PureComponent {
 
     handleClick(action, cafeId, e) {
         e.preventDefault();
-        if (action === 'loadDetails') {
+        switch (action) {
+            case 'loadDetails':
+                loadCafeDetails(cafeId);
+                break;
 
-        } else {
+            case 'mapHighlight':
+                highlightCafeOnMap(cafeId);
+                break;
 
+            case 'hoverOver':
+                toggleCafeOptionHover(cafeId, true);
+                break;
+        
+            default:
+                toggleCafeOptionHover(cafeId, false);
+                break;
         }
     }
 
@@ -34,7 +47,7 @@ export default class CafePreviewList extends PureComponent {
                 <h2>{this.state.group ? `Group #${this.state.group}:` : 'Most similar cafes, ranked in order:'}</h2>
                 {
                     this.state.queryState.similarCafes.map((cafe) => {
-                        return <CafePreview cafe={cafe} handleClick={this.handleClick} />
+                        return <CafePreview cafe={cafe} key={cafe.placeId} handleClick={this.handleClick} />
                     })
                 }
             </div>

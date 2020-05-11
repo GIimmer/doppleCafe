@@ -5,13 +5,13 @@ import CONSTS from "../constants/Constants";
 
 const payload = [
     {
-        id: 1,
+        placeId: 1,
         similarityRank: 1,
         name: "Chocolati Cafe",
-        formattedAddr: "8319 Greenwood Ave N, Seattle, WA 98103",
+        formattedAddress: "8319 Greenwood Ave N, Seattle, WA 98103",
         rating: 4.8,
-        latitude: 47.689747,
-        longitude: -122.355425,
+        lat: 47.689747,
+        lng: -122.355425,
         wordCloud: [
             {
                 text: 'Hello',
@@ -27,13 +27,13 @@ const payload = [
         ]
     },
     {
-        id: 3,
+        placeId: 3,
         similarityRank: 2,
         name: "Chocolati",
-        formattedAddr: "7810 East Green Lake Dr N, Seattle, WA 98115",
+        formattedAddress: "7810 East Green Lake Dr N, Seattle, WA 98115",
         rating: 3.8,
-        latitude: 47.685441,
-        longitude: -122.336002,
+        lat: 47.685441,
+        lng: -122.336002,
         wordCloud: [
             {
                 text: 'Hello',
@@ -49,13 +49,13 @@ const payload = [
         ]
     },
     {
-        id: 2,
+        placeId: 2,
         similarityRank: 3,
         name: "Chocolati Cafe Wallingford",
-        formattedAddr: "1716 N 45th St, Seattle, WA 98103",
+        formattedAddress: "1716 N 45th St, Seattle, WA 98103",
         rating: 4.5,
-        latitude: 47.661505,
-        longitude: -122.336813,
+        lat: 47.661505,
+        lng: -122.336813,
         wordCloud: [
             {
                 text: 'Hello',
@@ -72,7 +72,7 @@ const payload = [
     }
 ]
 
-
+// ----------------------------------- API Actions ------------------------------------ //
 
 export function searchForCafe(cafeQuery) {
     dispatcher.dispatch({
@@ -82,13 +82,14 @@ export function searchForCafe(cafeQuery) {
         }
     });
 
-    API.get(ACTION_CONSTS.SEARCH_CAFE + cafeQuery)
+    API.get(CONSTS.SEARCH_CAFE + cafeQuery)
     .then(res => {
-        console.log("In cafe search option", res);
-        dispatcher.dispatch({
-            type: ACTION_CONSTS.CAFE_OPTIONS_RETURNED,
-            payload: res
-        });
+        if (res.status === 200) {
+            dispatcher.dispatch({
+                type: ACTION_CONSTS.CAFE_OPTIONS_RETURNED,
+                payload: res.data
+            });
+        }
     });
 
 }
@@ -117,29 +118,73 @@ export function findMostSimilarWithCurrentParams(city, cafe) {
         type: ACTION_CONSTS.FINDING_MOST_SIMILAR
     })
 
-    setTimeout( () => {
-        dispatcher.dispatch({
-            type: ACTION_CONSTS.SIMILAR_CAFES_FOUND,
-            payload: payload
-        })
-    }, 2000)
-
-    // API.post(CONSTS.FIND_MOST_SIMILAR, {
-    //     cityId: city.id,
-    //     cafeId: cafe.id,
-    //     cafeName: cafe.name,
-    //     cafeAddr: cafe.formattedAddr
-    // }).then(res => {
+    // setTimeout( () => {
     //     dispatcher.dispatch({
     //         type: ACTION_CONSTS.SIMILAR_CAFES_FOUND,
-    //         payload: res
-    //     });
-    // });
+    //         payload: payload
+    //     })
+    // }, 2000)
+
+    API.post(CONSTS.FIND_MOST_SIMILAR, {
+        cityId: city.id,
+        cafeId: cafe.placeId,
+        cafeName: cafe.name,
+        cafeAddr: cafe.formattedAddress
+    }).then(res => {
+        if (res.status === 200) {
+            dispatcher.dispatch({
+                type: ACTION_CONSTS.SIMILAR_CAFES_FOUND,
+                payload: res.data
+            });
+        }
+    });
 }
 
-export function clearSearch() {
+export function loadCafeDetails(cafeId) {
     dispatcher.dispatch({
-        type: ACTION_CONSTS.CLEAR_SEARCH
+        type: ACTION_CONSTS.GETTING_CAFE_DETAILS,
+        payload: cafeId
+    })
+
+    // setTimeout( () => {
+    //     dispatcher.dispatch({
+    //         type: ACTION_CONSTS.CAFE_DETAILS_RETURNED,
+    //         payload: payload
+    //     })
+    // }, 2000)
+
+    API.get(CONSTS.GET_CAFE_DETAILS + cafeId)
+    .then(res => {
+        if (res.status === 200) {
+            dispatcher.dispatch({
+                type: ACTION_CONSTS.CAFE_DETAILS_RETURNED,
+                payload: res.data
+            });
+        }
+    });
+}
+
+
+// ----------------------------------- Default Section ------------------------------------ //
+
+export function toggleCafeOptionHover(cafeId, isHovered) {
+    dispatcher.dispatch({
+        type: isHovered ? ACTION_CONSTS.CAFE_HOVER : ACTION_CONSTS.CAFE_UNHOVER,
+        payload: cafeId
+    })
+}
+
+export function highlightCafeOnMap(cafeId) {
+    dispatcher.dispatch({
+        type: ACTION_CONSTS.HIGHLIGHT_CAFE,
+        payload: cafeId
+    })
+}
+
+export function selectPreLoadedCity(data) {
+    dispatcher.dispatch({
+        type: ACTION_CONSTS.PRELOADED_CITY_SELECTED,
+        payload: data
     })
 }
 
@@ -158,13 +203,6 @@ export function optionLockToggled(isCafe, data) {
     }
 }
 
-export function clearMessages(isCafe, ids) {
-    dispatcher.dispatch({
-        type: isCafe ? ACTION_CONSTS.CLEAR_CAFE_MESSAGES : ACTION_CONSTS.CLEAR_CITY_MESSAGES,
-        payload: ids
-    })
-}
-
 export function tabSwitched(newTab) {
     dispatcher.dispatch({
         type: ACTION_CONSTS.TAB_SWITCHED,
@@ -172,4 +210,20 @@ export function tabSwitched(newTab) {
             newTab: newTab
         }
     });
+}
+
+
+// ----------------------------------- Clearing Actions ------------------------------------ //
+
+export function clearSearch() {
+    dispatcher.dispatch({
+        type: ACTION_CONSTS.CLEAR_SEARCH
+    })
+}
+
+export function clearMessages(isCafe, ids) {
+    dispatcher.dispatch({
+        type: isCafe ? ACTION_CONSTS.CLEAR_CAFE_MESSAGES : ACTION_CONSTS.CLEAR_CITY_MESSAGES,
+        payload: ids
+    })
 }

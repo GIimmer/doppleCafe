@@ -1,8 +1,8 @@
 import React, { Component } from 'react'
-import QueryStore from "../../stores/QueryStore";
-import ViewingBox from "./ViewingBox";
-import Button from '@material-ui/core/Button';
-import { isEmpty } from "../../utilities/utilities";
+import QueryStore from "../../stores/QueryStore"
+import ViewingBox from "./ViewingBox"
+import Button from '@material-ui/core/Button'
+import { isEmpty, genGooglePlacePhoto } from "../../utilities/utilities"
 import { findMostSimilarWithCurrentParams, clearSearch } from "../../actions/QueryActions";
 
 export class ViewingPane extends Component {
@@ -71,8 +71,8 @@ export class ViewingPane extends Component {
                         onClick={this.handleClick.bind(this, 'cancel')}>
                             Cancel Search
                         </Button>
-                        <ViewingBox field="cafe" photo={cafe.photos[0]} title={cafe.name} subtitle={cafe.formattedAddr} />
-                        <ViewingBox field="city" photo={city.photos[0]} title={city.name} subtitle={city.country} />
+                        <ViewingBox field="cafe" photo={genGooglePlacePhoto(cafe.photo)} title={cafe.name} subtitle={cafe.formattedAddress} />
+                        <ViewingBox field="city" photo={city.photo.src} title={city.name} subtitle={city.country} />
                     </div>
                     :
                     <div className="selectionsHolder">

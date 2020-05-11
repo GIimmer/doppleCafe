@@ -3,6 +3,11 @@ $secondary: blue;
 $light-grey: rgb(216, 216, 216);
 $highlight: gold;
 
+
+html {
+    overflow-x: hidden;
+}
+
 .overlay {
     position: absolute;
     top: 0;
@@ -52,7 +57,7 @@ $highlight: gold;
             #QueryOutcome {
                 background-color: white;
                 width: 90%;
-                min-height: 900px;
+                min-height: 1000px;
                 margin: 5%;
                 box-shadow: 1px 1px 4px grey;
 
@@ -77,14 +82,74 @@ $highlight: gold;
                         flex-direction: row;
 
                         .cafePreviewList {
-                            width: 40%;
+                            width: 45%;
                             color: grey;
+
+                            .cafePreview {
+                                display: flex;
+                                padding: 20px 10px;
+                                flex-direction: row;
+                                justify-items: space-between;
+                                align-items: center;
+                                background-color: rgb(245, 245, 245);
+                                margin: 15px 0px;
+                                box-shadow: 2px 2px 3px grey;
+                                cursor: pointer;
+
+                                &:hover {
+                                    box-shadow: 1px 1px 2px grey;
+                                    background-color: white;
+                                }
+
+                                h1 {
+                                    text-align: center;
+                                    min-width: 15%;
+                                }
+
+                                p {
+                                    margin: 4px 0px;
+                                }
+
+                                div {
+                                    width: 40%;
+                                    height: 100%;
+                                    display: inline-block;
+                                }
+
+                                .cafeInformation {
+                                    p {
+                                        margin: 5px 0px;
+                                    }
+                                    b {
+                                        font-size: 1.1em;
+                                    }
+                                }
+
+                                .cafePreviewButtons {
+                                    display: flex;
+                                    flex-direction: column;
+                                    justify-content: space-between;
+
+                                    button {
+                                        margin: 5px;
+                                    }
+                                    
+                                }
+                            }
                         }
 
-                        .cafeDetails {
-                            width: 40%;
-                            min-height: 50vh;
+                        .cafeDetailsWrapper {
+                            width: 45%;
+                            position: sticky;
+                            min-height: 500px;
+                            height: 87vh;
                             box-shadow: 2px 2px 3px grey;
+                            top: 10vh;
+                            margin-bottom: 15px;
+
+                            .cafeDetails {
+                                
+                            }
                         }
                     }
                 }
@@ -198,6 +263,8 @@ $highlight: gold;
     
             .responseCardHolder {
                 padding: 0px 10px;
+                position: relative;
+                min-height: 200px;
                 display: flex;
                 flex-direction: row;
                 justify-content: space-between;
@@ -251,21 +318,6 @@ $highlight: gold;
 .fade-exit-done {
     opacity: 0;
 }
-
-// .pane-appear {
-//     transform: translateX(-100px);
-// }
-// .pane-appear.pane-appear-active {
-//     transform: translateX(0px);
-//     transition: transform 400ms linear;
-// }
-// .pane-enter {
-//     transform: translateX(-100px);
-// }
-// .pane-enter.pane-enter-active {
-//     transform: translateX(0px);
-//     transition: transform 400ms ease;
-// }
 
 
 // Animations!

@@ -1,18 +1,20 @@
 import React from 'react'
 import Card from '@material-ui/core/Card'
 import CONSTS from '../../constants/Constants'
-import CardContent from '@material-ui/core/CardContent';
-import CardMedia from '@material-ui/core/CardMedia';
+import { genGooglePlacePhoto } from "../../utilities/utilities"
+import CardContent from '@material-ui/core/CardContent'
+import CardMedia from '@material-ui/core/CardMedia'
 
-const cardStyleGenerator = (isCafe, unSelected) => {
+const cardStyleGenerator = (isCafe, unSelected, displaySmall) => {
     let base = {
         root: {
             margin: '10px 0px', 
-            position: 'relative'
+            position: 'relative',
+            width: '100%'
         },
         map: {
             backgroundColor: 'grey',
-            height: 150,
+            height: '300px',
             width: '100%'
         },
         content: {
@@ -29,15 +31,16 @@ const cardStyleGenerator = (isCafe, unSelected) => {
         }
     }
 
-    if (isCafe) {
-        base.root.width = 220;
-        base.media.filter = 'brightness(40%) sepia(100%) hue-rotate(335deg) saturate(200%)';
-    } else {
-        base.root.width = '100%';
-        base.media.filter = 'brightness(40%) sepia(100%) hue-rotate(170deg) saturate(200%)';
-        base.map.height = '300px';
-    }
+    base.media.filter = isCafe ? 
+    'brightness(40%) sepia(100%) hue-rotate(335deg) saturate(200%)'
+    :
+    'brightness(40%) sepia(100%) hue-rotate(170deg) saturate(200%)';
 
+    if (displaySmall) {
+        base.root.width = 220;
+        base.map.height= 150;
+    }
+ 
     if (unSelected) {
         base.root.opacity = .5;
     }
@@ -49,20 +52,23 @@ const cardStyleGenerator = (isCafe, unSelected) => {
 export default function ResponseCard(props) {
     let title, subTitle, image, src, zoom,
         response = props.response,
-        isCafe = props.field === 'cafe';
+        isCafe = props.field === 'cafe',
+        displaySmall = props.displaySmall;
 
     if (isCafe) {
-        subTitle = response.formattedAddr;
+        subTitle = response.formattedAddress;
         zoom = 12;
+        image = genGooglePlacePhoto(response.photo);
     } else {
         subTitle = response.country;
         zoom = 7;
+        image = response.photo ? response.photo.src : CONSTS.CITY_PHOTO_STANDIN;
     }
     title = response.name;
-    image = response.photos[0];
-    src = `${CONSTS.GOOGLE_EMBED_BASE}key=${CONSTS.MAPS_EMBED_KEY}&center=${response.latitude},${response.longitude}&zoom=${zoom}`;
 
-    const cardStyles = cardStyleGenerator(isCafe, response.locked === false)
+    src = `${CONSTS.GOOGLE_EMBED_BASE}key=${CONSTS.MAPS_EMBED_KEY}&center=${response.lat},${response.lng}&zoom=${zoom}`;
+
+    const cardStyles = cardStyleGenerator(isCafe, response.locked === false, displaySmall)
 
     
     return (
@@ -75,8 +81,8 @@ export default function ResponseCard(props) {
                     title={"Picture of " + props.field}
                 />
                 <div className="overlay" style={cardStyles.overlay}>
-                    <h2 style={ isCafe ? { fontSize: '1.1em', margin: '20px 15px' } : { fontSize: '1.7em', margin: '20px 15px' }}>{title}</h2>
-                    <h5 style={isCafe ? { fontSize: '.8em', marginLeft: 15 } : { fontSize: '1em', marginLeft: 15 }}>{subTitle}</h5>
+                    <h2 style={ displaySmall ? { fontSize: '1.1em', margin: '20px 15px' } : { fontSize: '1.7em', margin: '20px 15px' }}>{title}</h2>
+                    <h5 style={ displaySmall ? { fontSize: '.8em', marginLeft: 15 } : { fontSize: '1em', marginLeft: 15 }}>{subTitle}</h5>
                 </div>
             </CardContent>
             {

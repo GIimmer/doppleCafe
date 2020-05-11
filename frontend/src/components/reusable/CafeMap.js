@@ -9,16 +9,24 @@ export class CafeMap extends PureComponent {
     constructor() {
         super();
         this.state = {
-            viewingCafeId: null,
+            highlightedCafeId: null,
             queryState: QueryStore.getData('outcomeFilter')
         }
         console.log(this.state.queryState);
     }
 
     componentDidMount() {
-        QueryStore.on("change", () => {
+        QueryStore.on("detailsUpdate", () => {
+            let queryState = QueryStore.getData('outcomeFilter'),
+                highlightedCafeId = queryState.highlightedCafe;
+
+            if (!this.state.highlightedCafeId && highlightedCafeId) {
+                window.scrollTo(0,0);
+            }
+
             this.setState({
-                queryState: QueryStore.getData()
+                queryState: queryState,
+                highlightCafeId: highlightedCafeId
             })
         })
     }
@@ -33,38 +41,42 @@ export class CafeMap extends PureComponent {
     }
 
     render() {
-        console.log('in render for map: ', this.state.queryState.cityLock)
         return (
-            <div></div>
-            // <Map
-            // google={this.props.google}
-            // initialCenter={{
-            //     lat: this.state.queryState.cityLock.latitude,
-            //     lng: this.state.queryState.cityLock.longitude
-            // }}
-            // zoom={11}>
-            //     {
-            //         this.state.queryState.similarCafes.map((cafe) => {
-            //             return <Marker 
-            //                 onClick={this.onMarkerClick}
-            //                 key={cafe.id}
-            //                 id={cafe.id}
-            //                 name={cafe.name} 
-            //                 title={cafe.name}
-            //                 position={{ lat: cafe.latitude, lng: cafe.longitude }}
-            //                 icon={{
-            //                     url: require(`../../images/${cafe.group === undefined ? '' : GROUPCOLORS[cafe.group] }CafeIcon.png`),
-            //                 }}
-            //             />
-            //         })
-            //     }
+            // <div></div>
+            <Map
+            google={this.props.google}
+            initialCenter={{
+                lat: this.state.queryState.cityLock.lat,
+                lng: this.state.queryState.cityLock.lng
+            }}
+            zoom={11}>
+                {
+                    this.state.queryState.similarCafes.map((cafe) => {
+                        let markerColor = cafe.id === this.state.highlightCafeId ? 
+                            'yellow' :
+                                cafe.group !== undefined ? 
+                                GROUPCOLORS[cafe.group] :
+                                '';
+                        return <Marker 
+                            onClick={this.onMarkerClick}
+                            key={cafe.placeId}
+                            placeId={cafe.placeId}
+                            name={cafe.name} 
+                            title={cafe.name}
+                            position={{ lat: cafe.lat, lng: cafe.lng }}
+                            icon={{
+                                url: require(`../../images/${markerColor}CafeIcon.png`),
+                            }}
+                        />
+                    })
+                }
         
-            //     <InfoWindow onClose={this.onInfoWindowClose}>
-            //         <div>
-            //             <h1>{this.state.queryState.cityLock.name}</h1>
-            //         </div>
-            //     </InfoWindow>
-            // </Map>
+                <InfoWindow onClose={this.onInfoWindowClose}>
+                    <div>
+                        <h1>{this.state.queryState.cityLock.name}</h1>
+                    </div>
+                </InfoWindow>
+            </Map>
         )
     }
 }

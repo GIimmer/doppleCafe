@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import CafeMap from '../reusable/CafeMap'
 import CafePreviewList from '../reusable/CafePreviewList'
-import CafeDetails from '../reusable/CafeDetails'
+import CafeDetailsWrapper from '../reusable/CafeDetailsWrapper'
 import QueryStore from '../../stores/QueryStore'
 import { css } from "@emotion/core";
 import RingLoader from "react-spinners/RingLoader";
@@ -26,7 +26,7 @@ export class QueryOutcome extends Component {
     }
 
     componentDidMount() {
-        QueryStore.on("change", () => {
+        QueryStore.on("detailsUpdate", () => {
             let queryState = QueryStore.getData('outcomeFilter');
 
             this.setState({
@@ -45,7 +45,7 @@ export class QueryOutcome extends Component {
                         <CafeMap />
                         <div className="flexRowParent">
                             <CafePreviewList />
-                            <CafeDetails />
+                            <CafeDetailsWrapper />
                         </div>
                     </div>
                     :

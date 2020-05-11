@@ -6,24 +6,24 @@ export default function CafePreview(props) {
     let onClick = props.handleClick;
 
     return (
-        <div className="cafePreview">
+        <div className="cafePreview" onMouseOver={onClick.bind(this, 'hoverOver', cafe.placeId)}>
             <h1>{cafe.similarityRank}</h1>
             <div className="cafeInformation">
-                <p>Name: {cafe.name}</p>
-                <p>Rating: {cafe.rating}</p>
+                <p><b>{cafe.name}</b></p>
+                <p>{cafe.rating} stars</p>
             </div>
             <div className="cafePreviewButtons">
                 <Button 
                     variant="contained" 
-                    color="secondary" 
+                    color="default" 
                     size="small"
-                    onClick={onClick.bind(this, 'loadDetails', cafe.id)}
-                >Load more details</Button>
+                    onClick={onClick.bind(this, 'loadDetails', cafe.placeId)}
+                >{cafe.website ? 'View ' : 'Load '}more details</Button>
                 <Button 
                     variant="contained" 
-                    color="secondary" 
+                    color="default" 
                     size="small"
-                    onClick={onClick.bind(this, 'mapHighlight', cafe.id)}
+                    onClick={onClick.bind(this, 'mapHighlight', cafe.placeId)}
                 >Highlight on map</Button>
             </div>
         </div>
