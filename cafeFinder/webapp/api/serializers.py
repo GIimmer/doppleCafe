@@ -35,7 +35,13 @@ class PhotoSerializer(serializers.ModelSerializer):
 class CafeSerializer(serializers.ModelSerializer):
     """Cafe Serializer"""
     placetypes = serializers.StringRelatedField(many=True, required=False)
-    photos = PhotoSerializer(many=True, source='photo_set')
+
+    photos = serializers.SerializerMethodField()
+
+    def get_photos(self, obj):
+        # get 10 similar stores for this store
+        photos = obj.photo_set.all()[:1]
+        return PhotoSerializer(photos, many=True).data
     class Meta:
         model = Cafe
         fields = "__all__"

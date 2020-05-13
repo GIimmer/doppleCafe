@@ -74,7 +74,8 @@ def get_cafe_details(request, cafe_id):
 
     cafe_data = CafeSerializer(cafe).data
     cafe_data['reviews'] = top_3_reviews
-    cafe_data['hours'] = json.loads(cafe_data['hours'])
+    if cafe_data['hours'] != 'unset':
+        cafe_data['hours'] = json.loads(cafe_data['hours'])
 
     return JsonResponse(cafe_data, safe=False)
 
