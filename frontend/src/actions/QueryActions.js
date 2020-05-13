@@ -118,13 +118,6 @@ export function findMostSimilarWithCurrentParams(city, cafe) {
         type: ACTION_CONSTS.FINDING_MOST_SIMILAR
     })
 
-    // setTimeout( () => {
-    //     dispatcher.dispatch({
-    //         type: ACTION_CONSTS.SIMILAR_CAFES_FOUND,
-    //         payload: payload
-    //     })
-    // }, 2000)
-
     API.post(CONSTS.FIND_MOST_SIMILAR, {
         cityId: city.id,
         cafeId: cafe.placeId,
@@ -146,13 +139,6 @@ export function loadCafeDetails(cafeId) {
         payload: cafeId
     })
 
-    // setTimeout( () => {
-    //     dispatcher.dispatch({
-    //         type: ACTION_CONSTS.CAFE_DETAILS_RETURNED,
-    //         payload: payload
-    //     })
-    // }, 2000)
-
     API.get(CONSTS.GET_CAFE_DETAILS + cafeId)
     .then(res => {
         if (res.status === 200) {
@@ -162,6 +148,13 @@ export function loadCafeDetails(cafeId) {
             });
         }
     });
+}
+
+export function setViewingDetails(cafe) {
+    dispatcher.dispatch({
+        type: ACTION_CONSTS.CAFE_DETAILS_RETURNED,
+        payload: cafe
+    })
 }
 
 

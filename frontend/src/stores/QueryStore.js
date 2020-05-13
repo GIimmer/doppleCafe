@@ -65,171 +65,14 @@ class QueryStore extends EventEmitter {
                     lng: "-70.2568"
                 }
             ],
-            cafeMessages: [
-                // {
-                //     id: 4,
-                //     type: 'info',
-                //     text: 'this is a message',
-                //     visible: true
-                // },
-                // {
-                //     id: 5,
-                //     type: 'warning',
-                //     text: 'this is a warning',
-                //     visible: true
-                // }
-            ],
-            cityMessages: [
-                // {
-                //     id: 6,
-                //     type: 'info',
-                //     text: 'this is a message',
-                //     visible: true
-                // },
-                // {
-                //     id: 7,
-                //     type: 'warning',
-                //     text: 'this is a warning',
-                //     visible: true
-                // }
-            ],
-            cityResponse: [
-            // {
-            //     id: 1,
-            //     name: "Seattle",
-            //     country: "US",
-            //     latitude: "47.6062",
-            //     longitude: "-122.3321",
-            //     photos: [
-            //         "https://cdn.pixabay.com/photo/2015/03/26/22/09/city-skyline-693502_960_720.jpg"
-            //     ]
-            // }
-            ],
-            cityLock: {
-                // id: 1,
-                // name: "Seattle",
-                // country: "US",
-                // latitude: 47.6062,
-                // longitude: -122.3321,
-                // photos: [
-                //     "https://cdn.pixabay.com/photo/2015/03/26/22/09/city-skyline-693502_960_720.jpg"
-                // ]
-            },
-            cafeResponse: [
-                // {
-                //     id: 1,
-                //     name: "Chocolati Cafe",
-                //     formattedAddress: "8319 Greenwood Ave N, Seattle, WA 98103",
-                //     compoundCode: "MJQV+VQ Seattle, Washington",
-                //     latitude: "47.689747",
-                //     longitude: "-122.355425",
-                //     photos: [
-                //         "https://cdn.kqed.org/wp-content/uploads/sites/24/2012/02/chocolatifront.jpg"
-                //     ]
-                // },
-                // {
-                //     id: 2,
-                //     name: "Chocolati Cafe Wallingford",
-                //     formattedAddress: "1716 N 45th St, Seattle, WA 98103",
-                //     compoundCode: "MM67+J7 Seattle, Washington",
-                //     latitude: "47.661505",
-                //     longitude: "-122.336813",
-                //     photos: [
-                //         "https://s3-media0.fl.yelpcdn.com/bphoto/7sLuhmRJ_VLfAbvK7cZEuQ/348s.jpg"
-                //     ]
-                // },
-                // {
-                //     id: 3,
-                //     name: "Chocolati",
-                //     formattedAddress: "7810 East Green Lake Dr N, Seattle, WA 98115",
-                //     compoundCode: "MMP7+5J Seattle, Washington",
-                //     latitude: "47.685441",
-                //     longitude: "-122.336002",
-                //     photos: [
-                //         "https://www.seattlegreenlaker.com/wp-content/uploads/2015/02/Chocolati1-300x199.jpg"
-                //     ]
-                // }
-            ],
-            cafeLock: {
-                // id: 1,
-                // name: "Chocolati Cafe",
-                // formattedAddress: "8319 Greenwood Ave N, Seattle, WA 98103",
-                // compoundCode: "MJQV+VQ Seattle, Washington",
-                // latitude: 47.689747,
-                // longitude: -122.355425,
-                // photos: [
-                //     "https://cdn.kqed.org/wp-content/uploads/sites/24/2012/02/chocolatifront.jpg"
-                // ]
-            },
+            cafeMessages: [],
+            cityMessages: [],
+            cityResponse: [],
+            cityLock: {},
+            cafeResponse: [],
+            cafeLock: {},
             cafeDetails: {},
-            similarCafes: [
-                // {
-                //     id: 1,
-                //     similarityRank: 1,
-                //     name: "Chocolati Cafe",
-                //     formattedAddress: "8319 Greenwood Ave N, Seattle, WA 98103",
-                //     rating: 4.8,
-                //     latitude: 47.689747,
-                //     longitude: -122.355425,
-                //     wordCloud: [
-                //         {
-                //             text: 'Hello',
-                //             value: 26
-                //         },
-                //         {
-                //             text: 'There',
-                //             value: 15
-                //         }
-                //     ],
-                //     photos: [
-                //         "https://cdn.kqed.org/wp-content/uploads/sites/24/2012/02/chocolatifront.jpg"
-                //     ]
-                // },
-                // {
-                //     id: 3,
-                //     similarityRank: 2,
-                //     name: "Chocolati",
-                //     formattedAddress: "7810 East Green Lake Dr N, Seattle, WA 98115",
-                //     rating: 3.8,
-                //     latitude: 47.685441,
-                //     longitude: -122.336002,
-                //     wordCloud: [
-                //         {
-                //             text: 'Hello',
-                //             value: 26
-                //         },
-                //         {
-                //             text: 'There',
-                //             value: 15
-                //         }
-                //     ],
-                //     photos: [
-                //         "https://www.seattlegreenlaker.com/wp-content/uploads/2015/02/Chocolati1-300x199.jpg"
-                //     ]
-                // },
-                // {
-                //     id: 2,
-                //     similarityRank: 3,
-                //     name: "Chocolati Cafe Wallingford",
-                //     formattedAddress: "1716 N 45th St, Seattle, WA 98103",
-                //     rating: 4.5,
-                //     latitude: 47.661505,
-                //     longitude: -122.336813,
-                //     wordCloud: [
-                //         {
-                //             text: 'Hello',
-                //             value: 26
-                //         },
-                //         {
-                //             text: 'There',
-                //             value: 15
-                //         }
-                //     ],
-                //     photos: [
-                //         "https://s3-media0.fl.yelpcdn.com/bphoto/7sLuhmRJ_VLfAbvK7cZEuQ/348s.jpg"
-                //     ]
-                // }
-            ]
+            similarCafes: []
         }
     }
 
@@ -416,6 +259,7 @@ class QueryStore extends EventEmitter {
                 let cafeInQuestion = this.state.cafeDetails[this.state.cafeDetails.cafeId];
                 this.imbueCafeDetails(cafeInQuestion, action.payload);
                 cafeInQuestion.photos = this.prepareDetailsPhotos(cafeInQuestion.photos);
+                cafeInQuestion.detailsLoaded = true;
                 this.state.cafeDetails.state = action.type;
                 this.emit("detailsUpdate");
                 break;

@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 import QueryStore from'../../stores/QueryStore'
-import { toggleCafeOptionHover, loadCafeDetails, highlightCafeOnMap } from '../../actions/QueryActions';
+import { toggleCafeOptionHover, loadCafeDetails, highlightCafeOnMap, setViewingDetails } from '../../actions/QueryActions';
 import CafePreview from './CafePreview'
 
 export default class CafePreviewList extends PureComponent {
@@ -13,18 +13,23 @@ export default class CafePreviewList extends PureComponent {
     }
 
     componentDidMount() {
-        QueryStore.on("change", () => {
+        QueryStore.on("detailsUpdate", () => {
             this.setState({
                 queryState: QueryStore.getData('outcomeFilter')
             })
         })
     }
 
-    handleClick(action, cafeId, e) {
+    handleClick(action, cafe, e) {
         e.preventDefault();
+        let cafeId = cafe.placeId;
         switch (action) {
             case 'loadDetails':
-                loadCafeDetails(cafeId);
+                if (cafe.detailsLoaded) {
+                    setViewingDetails(cafe);
+                } else {
+                    loadCafeDetails(cafeId);
+                }
                 break;
 
             case 'mapHighlight':
