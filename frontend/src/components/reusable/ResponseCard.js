@@ -93,7 +93,7 @@ export default function ResponseCard(props) {
             }
             {
                 response.locked === true &&
-                <i className={`fas fa-lock ${props.field === 'cafe' ? 'fa-2x' : 'fa-3x'}`}></i>
+                <i className={`fas fa-lock ${displaySmall ? 'fa-2x' : 'fa-3x'}`}></i>
             }
         </Card>
     )

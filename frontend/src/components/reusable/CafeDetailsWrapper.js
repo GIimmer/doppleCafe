@@ -40,16 +40,15 @@ export class CafeDetailsWrapper extends PureComponent {
     render() {
         return (
             <div className="cafeDetailsWrapper">
+                <CafeDetails />
                 {
-                    !this.state.loading ?
-                    <CafeDetails />
-                    :
-                    <RingLoader
-                        css={override}
-                        size={60}
-                        color={"#123abc"}
-                        loading={this.state.loading}
-                    />
+                    this.state.loading &&
+                        <RingLoader
+                            css={override}
+                            size={60}
+                            color={"#123abc"}
+                            loading={this.state.loading}
+                        />
                 }
             </div>
         )

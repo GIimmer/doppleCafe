@@ -20,10 +20,6 @@ export class CafeMap extends PureComponent {
             let queryState = QueryStore.getData('outcomeFilter'),
                 highlightedCafeId = queryState.highlightedCafe;
 
-            if (!this.state.highlightedCafeId && highlightedCafeId) {
-                window.scrollTo(0,0);
-            }
-
             this.setState({
                 queryState: queryState,
                 highlightCafeId: highlightedCafeId
@@ -49,10 +45,10 @@ export class CafeMap extends PureComponent {
                 lat: this.state.queryState.cityLock.lat,
                 lng: this.state.queryState.cityLock.lng
             }}
-            zoom={11}>
+            zoom={13}>
                 {
                     this.state.queryState.similarCafes.map((cafe) => {
-                        let markerColor = cafe.id === this.state.highlightCafeId ? 
+                        let markerColor = cafe.placeId === this.state.highlightCafeId ? 
                             'yellow' :
                                 cafe.group !== undefined ? 
                                 GROUPCOLORS[cafe.group] :

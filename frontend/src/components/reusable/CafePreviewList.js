@@ -22,7 +22,7 @@ export default class CafePreviewList extends PureComponent {
 
     handleClick(action, cafe, e) {
         e.preventDefault();
-        let cafeId = cafe.placeId;
+        let cafeId = cafe ? cafe.placeId : null;
         switch (action) {
             case 'loadDetails':
                 if (cafe.detailsLoaded) {
@@ -34,6 +34,7 @@ export default class CafePreviewList extends PureComponent {
 
             case 'mapHighlight':
                 highlightCafeOnMap(cafeId);
+                window.scrollTo(0,0);
                 break;
 
             case 'hoverOver':
@@ -48,7 +49,7 @@ export default class CafePreviewList extends PureComponent {
 
     render() {
         return (
-            <div className="cafePreviewList">
+            <div className="cafePreviewList" onMouseLeave={this.handleClick.bind(this, 'hoverOut', null)}>
                 <h2>{this.state.group ? `Group #${this.state.group}:` : 'Most similar cafes, ranked in order:'}</h2>
                 {
                     this.state.queryState.similarCafes.map((cafe) => {

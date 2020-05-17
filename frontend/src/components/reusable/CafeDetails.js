@@ -9,20 +9,22 @@ import { Carousel } from 'react-responsive-carousel'
 import { genGooglePlacePhoto } from '../../utilities/utilities'
 import CafeHours from './CafeHours'
 
-const options = {
-    colors: ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b'],
-    enableTooltip: true,
-    deterministic: false,
-    fontFamily: 'impact',
-    fontSizes: [10, 60],
-    fontStyle: 'normal',
-    fontWeight: 'normal',
-    padding: 1,
-    rotations: 5,
-    rotationAngles: [-90, 90],
-    scale: 'sqrt',
-    spiral: 'archimedean',
-    transitionDuration: 1000,
+const options = (stateIsDetailsReturned) => {
+    return {
+        colors: ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b'],
+        enableTooltip: true,
+        deterministic: false,
+        fontFamily: 'impact',
+        fontSizes: [10, 60],
+        fontStyle: 'normal',
+        fontWeight: 'normal',
+        padding: 1,
+        rotations: 5,
+        rotationAngles: [-90, 90],
+        scale: 'sqrt',
+        spiral: 'archimedean',
+        transitionDuration: stateIsDetailsReturned ? 0 : 1000,
+    }
   };
 
 export class CafeDetails extends PureComponent {
@@ -40,6 +42,7 @@ export class CafeDetails extends PureComponent {
     }
 
     componentWillUnmount() {
+
         this._isMounted = false;
     }
 
@@ -50,7 +53,7 @@ export class CafeDetails extends PureComponent {
                 :
                 queryState.similarCafes.find((cafe) => cafe.placeId === queryState.cafeDetails.cafeId);
 
-        if (viewingCafe.wordCloud === undefined) {
+        if (viewingCafe && viewingCafe.wordCloud === undefined) {
             viewingCafe.wordCloud = viewingCafe.rawWordCloud.map((tuple) => {
                 return { text: queryState.wordBagRef[tuple[0]], value: tuple[1] }
             })
@@ -58,9 +61,14 @@ export class CafeDetails extends PureComponent {
 
         return {
             queryState: queryState,
+            readyToDisplay: !!viewingCafe,
             cafe: viewingCafe,
             userActionState: queryState.cafeDetails.state
         }
+    }
+
+    getCarouselHeight(showDetails) {
+        return showDetails ? '150px' : '100%';
     }
 
     prepareLink(link) {
@@ -74,72 +82,81 @@ export class CafeDetails extends PureComponent {
     }
 
     render() {
-        let cafe = this.state.cafe;
+        let cafe = this.state.cafe,
+            stateIsDetailsReturned = (this.state.userActionState === ACTION_CONSTS.CAFE_DETAILS_RETURNED),
+            showDetails = (stateIsDetailsReturned || (cafe && !!cafe.detailsLoaded));
         return (
             <div className="cafeDetails">
                 {
-                    this.state.userActionState === ACTION_CONSTS.CAFE_DETAILS_RETURNED || cafe.detailsLoaded ?
+                    this.state.readyToDisplay ?
                         <div>
-                            <Carousel showThumbs={false}>
-                                <ReactWordcloud words={cafe.wordCloud} options={options} />
+                            <Carousel showThumbs={false}
+                                showArrows={showDetails}
+                                showStatus={showDetails}
+                                showIndicators={showDetails}>
+                                <div style={{ width: '100%', height: showDetails ? '300px' : '87vh', backgroundColor: showDetails ? 'black' : 'white' }}>
+                                    <ReactWordcloud words={cafe.wordCloud} options={options(stateIsDetailsReturned)} />
+                                </div>
                                 {
+                                    showDetails &&
                                     cafe.photos.map((photo) => {
-                                        return <div className="carouselImage">
-                                            <img src={genGooglePlacePhoto(photo)} />
+                                        return <div className="carouselImage"
+                                            style={{ backgroundImage: 'url(' + genGooglePlacePhoto(photo) + ')' }}>
                                             <span className="legend" dangerouslySetInnerHTML={{__html: this.prepareLink(photo.attr)}}></span>
                                         </div>
                                     })
                                 }
                             </Carousel>
-                            <div className="cafeInformation">
-                                <div className="infoSection">
-                                    <div>
-                                        <h2>{cafe.name}</h2>
-                                        <h5>{cafe.formattedAddress}</h5>
-                                    </div>
-                                    <div>
-                                        <p>rating: <strong>{cafe.rating}</strong></p>
-                                        <p>price level: <strong>{cafe.priceLevel}/5</strong></p>
-                                    </div>                                
-                                </div>
-                                <div className="infoSection contactSection">
-                                    <div>
-                                        <a href={cafe.website} target="_blank">
-                                            {cafe.website}
-                                            </a>
-                                        <a href={'tel:' + cafe.formattedPhoneNumber}>
-                                            {cafe.formattedPhoneNumber}
-                                        </a>
-                                    </div>
-                                    <div>
-                                        <CafeHours hours={cafe.hours} />
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="cafeReviews">
-                                <div className="highlightBar"></div>
-                                <h2>Some sample reviews</h2>
-                                {
-                                    cafe.reviews.map((review) => {
-                                        return <div className="review">
-                                            <div className="reviewContent">
-                                                <div className="starRating">
-                                                    <span>{review.rating}</span> <i className="fa fa-star fa-2x" aria-hidden="true"></i>
-                                                </div>
-                                                <p>{review.text}</p>
-                                            </div>
-                                            <div className="reviewDetails">
-                                                <p>- {review.reviewer},</p>
-                                                <p>{this.formatReviewDate(review.datetime)}</p>
-                                            </div>
+                            {
+                                showDetails &&
+                                <div className="cafeInformation">
+                                    <div className="infoSection">
+                                        <div>
+                                            <h2>{cafe.name}</h2>
+                                            <h5>{cafe.formattedAddress}</h5>
                                         </div>
-                                    })
-                                }
-                            </div>    
+                                        <div>
+                                            <p>rating: <strong>{cafe.rating}</strong></p>
+                                            <p>price level: <strong>{cafe.priceLevel}/5</strong></p>
+                                        </div>                                
+                                    </div>
+                                    <div className="infoSection contactSection">
+                                        <div>
+                                            <a href={cafe.website} target="_blank">
+                                                {cafe.website}
+                                            </a>
+                                            <span>{cafe.formattedPhoneNumber}</span>
+                                        </div>
+                                        <div>
+                                            <CafeHours hours={cafe.hours} />
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                            {
+                                showDetails &&
+                                <div className="cafeReviews">
+                                    <div className="highlightBar"></div>
+                                    <h2>Some sample reviews</h2>
+                                    {
+                                        cafe.reviews.map((review) => {
+                                            return <div className="review">
+                                                <div className="reviewContent">
+                                                    <div className="starRating">
+                                                        <span>{review.rating}</span> <i className="fa fa-star fa-2x" aria-hidden="true"></i>
+                                                    </div>
+                                                    <p>{review.text}</p>
+                                                </div>
+                                                <div className="reviewDetails">
+                                                    <p>- {review.reviewer},</p>
+                                                    <p>{this.formatReviewDate(review.datetime)}</p>
+                                                </div>
+                                            </div>
+                                        })
+                                    }
+                                </div>
+                            }
                         </div>
-                        :
-                        this.state.userActionState === ACTION_CONSTS.CAFE_HOVER ?
-                            <ReactWordcloud words={cafe.wordCloud} options={options} />
                         :
                         <div></div>
                 }

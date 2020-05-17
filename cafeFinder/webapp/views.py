@@ -63,6 +63,9 @@ def get_cafe_details(request, cafe_id):
         cafe_details_res = getCafeDetailsGivenID(cafe_id)
         cafe.hours = hoursArrStringFromHoursObj(cafe_details_res)
         createPhotosForCafe(cafe_details_res['photos'], cafe)
+        cafe_loc = cafe_details_res['geometry']['location']
+        cafe.lat = cafe_loc['lat']
+        cafe.lng = cafe_loc['lng']
 
         attrs = ['formatted_phone_number', 'formatted_address', 'website', 'price_level']
         for attr in attrs:
