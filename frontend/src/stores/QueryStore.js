@@ -275,7 +275,8 @@ class QueryStore extends EventEmitter {
                 break;
              
             case ACTION_CONSTS.CAFE_UNHOVER:
-                if (this.state.cafeDetails.state !== ACTION_CONSTS.CAFE_DETAILS_RETURNED) {
+                let viewingCafe = this.state.cafeDetails[this.state.cafeDetails.cafeId];
+                if (this.state.cafeDetails.state !== ACTION_CONSTS.CAFE_DETAILS_RETURNED && (!viewingCafe || !viewingCafe.detailsLoaded)) {
                     this.state.cafeDetails.state = this.state.cafeDetails.cafeId = null;
                     this.emit('detailsUpdate');
                 }
