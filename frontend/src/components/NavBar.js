@@ -1,41 +1,40 @@
-import React, { Component } from 'react';
+import React, { Component } from 'react'
+import { connect } from 'react-redux'
 import { AppBar, Tabs, Tab, Button } from '@material-ui/core'
-import '../styles/styles.scss';
-import CONSTS from "../constants/Constants";
+import '../styles/styles.scss'
+import CONSTS from "../constants/Constants"
 
+import { tabSwitchedFunc } from "../actions/stateActions";
 
-import QueryStore from "../stores/QueryStore";
-import { tabSwitched } from "../actions/QueryActions";
+function mapStateToProps(state) {
+    return {
+        value: state.get('currentTab') === CONSTS.QUERY_VIEW ? 0 : 1
+    }
+}
+
+function mapDispatchToProps(dispatch) {
+    return {
+        tabSwitched: tabSwitchedFunc(dispatch)
+    }
+}
 
 export class NavBar extends Component {
     constructor() {
         super();
         this.state = {
-            value: 0,
             QueryState: {}
         }
     }
 
     handleChange(e, newValue) {
-        tabSwitched(newValue === 0 ? CONSTS.QUERY_VIEW : CONSTS.EXPLORE_VIEW);
-    }
-
-    componentDidMount() {
-        QueryStore.on("change", () => {
-            this.setState({
-                QueryState: QueryStore.getData()
-            })
-            this.setState({
-                value: this.state.QueryState.currentTab === CONSTS.QUERY_VIEW ? 0 : 1
-            })
-        })
+        this.props.tabSwitched(newValue === 0 ? CONSTS.QUERY_VIEW : CONSTS.EXPLORE_VIEW);
     }
 
     render() {
         return (
             <div id="NavBar">
-                <AppBar position="static" className={'AppBar'}>
-                    <Tabs value={this.state.value} className={'tabs'} onChange={this.handleChange} aria-label="simple tabs example">
+                <AppBar position="static" className="AppBar">
+                    <Tabs value={this.props.value} className="tabs" onChange={this.handleChange.bind(this)} aria-label="simple tabs example">
                         <Tab label="Find a Matching Cafe" id={CONSTS.QUERY_VIEW}/>
                         <Tab label="View Cafes by City" id={CONSTS.EXPLORE_VIEW}/>
                     </Tabs>
@@ -46,4 +45,4 @@ export class NavBar extends Component {
     }
 }
 
-export default NavBar
+export default connect(mapStateToProps, mapDispatchToProps)(NavBar)

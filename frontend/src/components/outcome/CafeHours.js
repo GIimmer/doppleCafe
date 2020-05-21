@@ -23,7 +23,7 @@ export default function CafeHours(props) {
             {
                 hours !== 'unset' &&
                 hours.map((day, idx) => {
-                    return <li><span>{DAYIDS[idx]}: </span><span>{hourStringGen(day)}</span></li>
+                    return <li key={idx}><span>{DAYIDS[idx]}: </span><span>{hourStringGen(day)}</span></li>
                 })
             }
         </ul>

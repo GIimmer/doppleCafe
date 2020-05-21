@@ -1,13 +1,14 @@
 import React, { Component } from 'react'
+import { connect } from 'react-redux'
+import { Map, List } from 'immutable'
 import CafeInput from './CafeInput'
 import CityInput from './CityInput'
 import MessageBox from './MessageBox'
-import QueryStore from '../../stores/QueryStore'
-import ResponseCard from '../reusable/ResponseCard'
-import { optionLockToggled } from "../../actions/QueryActions";
+import ResponseCard from './ResponseCard'
+import { optionLockToggledFunc } from "../../../actions/queryActions";
 import { css } from "@emotion/core";
 import RingLoader from "react-spinners/RingLoader";
-import ACTION_CONSTS from '../../constants/ActionConstants'
+import { GETTING_CAFE_OPTIONS, GETTING_CITY_OPTIONS } from '../../../constants/ActionConstants'
 
 
 const override = css`
@@ -19,42 +20,47 @@ const override = css`
     margin: auto;
 `;
 
-export class UserInput extends Component {
-    _isMounted = true;
+function mapDispatchToProps(dispatch) {
+    return {
+        optionLockToggled: optionLockToggledFunc(dispatch)
+    }
+}
 
+function mapStateToProps(state=Map()) {
+    return {
+        cafeResponse: state.get('cafeResponse'),
+        cafeQueryState: state.get('cafeQuerystate'),
+        cityResponse: state.get('cityResponse'),
+        cityQueryState: state.get('cityQuerystate'),
+        loading: state.get('loading')
+    }
+}
+
+export class UserInput extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            field: props.field,
-            queryState: QueryStore.getData(props.field)
+            field: props.field
         }
     }
 
-    componentDidMount() {
-        QueryStore.on(this.state.field + "Update", () => {
-            this._isMounted && this.setState({
-                queryState: QueryStore.getData(this.state.field)
-            })
-        })
-
-    }
-
     componentWillUnmount() {
-        this._isMounted = false;
+        let lol = 'hey';
     }
 
     handleClick(field, data, e) {
         e.preventDefault();
         if (data.locked !== false) {
-            optionLockToggled(field === 'cafe', data);
+            this.props.optionLockToggled(field === 'cafe', data);
         }
     }
 
     render() {
-        let fieldOptions = this.state.queryState[this.state.field + 'Response'],
-            smallResCard = fieldOptions.length > 1;
-        const responseState = this.state.queryState[this.state.field + 'QueryState'],
-            showLoading = [ACTION_CONSTS.GETTING_CAFE_OPTIONS, ACTION_CONSTS.GETTING_CITY_OPTIONS].includes(responseState);
+        let fieldOptions = this.props[this.props.field + 'Response'],
+            jsFieldOptions = List.isList(fieldOptions) ? fieldOptions.toJS() : fieldOptions,
+            smallResCard = jsFieldOptions.length > 1;
+        const responseState = this.props[this.props.field + 'QueryState'],
+            showLoading = [GETTING_CAFE_OPTIONS, GETTING_CITY_OPTIONS].includes(responseState);
             
         return (
             <div className="userInput">
@@ -72,7 +78,7 @@ export class UserInput extends Component {
                             loading={this.state.loading}
                         />
                         :
-                        fieldOptions.map((searchRes) => {
+                        jsFieldOptions.map((searchRes) => {
                             return <ResponseCard field={this.state.field} response={searchRes} displaySmall={smallResCard}
                                     handleClick={this.handleClick.bind(this, this.state.field, searchRes)} />
                         })
@@ -84,4 +90,4 @@ export class UserInput extends Component {
     }
 }
 
-export default UserInput
+export default connect(mapStateToProps, mapDispatchToProps)(UserInput);

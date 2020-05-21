@@ -1,31 +1,19 @@
 import React, { PureComponent } from 'react'
+import { connect } from 'react-redux'
 import { GoogleApiWrapper, Map, InfoWindow, Marker } from 'google-maps-react'
-import QueryStore from "../../stores/QueryStore"
 import { CONSTS } from "../../constants/Constants"
 
 const GROUPCOLORS = ['red', 'orange', 'yellow', 'green', 'blue', 'purple'];
 
+function mapStateToProps(state=Map()) {
+    return {
+        highlightCafeId: state.get('highlightedCafe'),
+        similarCafes: state.get('similarCafes'),
+        cityLock: state.get('cityLock')
+    }
+}
+
 export class CafeMap extends PureComponent {
-    constructor() {
-        super();
-        this.state = {
-            highlightedCafeId: null,
-            queryState: QueryStore.getData('outcomeFilter')
-        }
-        console.log(this.state.queryState);
-    }
-
-    componentDidMount() {
-        QueryStore.on("detailsUpdate", () => {
-            let queryState = QueryStore.getData('outcomeFilter'),
-                highlightedCafeId = queryState.highlightedCafe;
-
-            this.setState({
-                queryState: queryState,
-                highlightCafeId: highlightedCafeId
-            })
-        })
-    }
 
     onMarkerClick(marker) {
         let place_id = marker.id;
@@ -37,18 +25,19 @@ export class CafeMap extends PureComponent {
     }
 
     render() {
+        const similarCafes = this.props.similarCafes.toJS()
         return (
             // <div></div>
             <Map
             google={this.props.google}
             initialCenter={{
-                lat: this.state.queryState.cityLock.lat,
-                lng: this.state.queryState.cityLock.lng
+                lat: this.props.cityLock.get('lat'),
+                lng: this.props.cityLock.get('lng')
             }}
             zoom={13}>
                 {
-                    this.state.queryState.similarCafes.map((cafe) => {
-                        let markerColor = cafe.placeId === this.state.highlightCafeId ? 
+                    similarCafes.map((cafe) => {
+                        let markerColor = cafe.placeId === this.props.highlightCafeId ? 
                             'yellow' :
                                 cafe.group !== undefined ? 
                                 GROUPCOLORS[cafe.group] :
@@ -69,7 +58,7 @@ export class CafeMap extends PureComponent {
         
                 <InfoWindow onClose={this.onInfoWindowClose}>
                     <div>
-                        <h1>{this.state.queryState.cityLock.name}</h1>
+                        <h1>{this.props.cityLock.get('name')}</h1>
                     </div>
                 </InfoWindow>
             </Map>
@@ -77,6 +66,11 @@ export class CafeMap extends PureComponent {
     }
 }
 
-export default GoogleApiWrapper({
+export default connect(mapStateToProps)(GoogleApiWrapper({
     apiKey: (CONSTS.MAPS_EMBED_KEY)
-})(CafeMap)
+})(CafeMap))
+
+
+// export default GoogleApiWrapper({
+//     apiKey: (CONSTS.MAPS_EMBED_KEY)
+// })(CafeMap)

@@ -1,7 +1,21 @@
 import React, { Component } from 'react'
-import QueryStore from '../../stores/QueryStore'
-import { clearMessages } from "../../actions/QueryActions";
+import { connect } from 'react-redux'
+import { clearMessagesFunc } from "../../../actions/queryActions";
 import { CSSTransition, TransitionGroup } from "react-transition-group";
+
+
+function mapStateToProps(state) {
+    return {
+        cityMessages: [...state.get('cityMessages')],
+        cafeMessages: [...state.get('cafeMessages')]
+    }
+}
+
+function mapDispatchToProps(dispatch) {
+    return {
+        clearMessages: clearMessagesFunc(dispatch)
+    }
+}
 
 export class MessageBox extends Component {
     _isMounted = true;
@@ -10,18 +24,12 @@ export class MessageBox extends Component {
         super(props);
         this.state = {
             field: props.field,
-            messageProp: props.messageProp,
-            queryState: QueryStore.getData(props.field)
+            messageProp: props.messageProp
         }
     }
 
     componentDidMount() {
-        QueryStore.on(this.state.field + "Update", () => {
-            this._isMounted && this.setState({
-                queryState: QueryStore.getData(this.state.field)
-            })
-        })
-        this.setMessageTimouts(this.state.queryState[this.state.messageProp]);
+        this.setMessageTimouts(this.props[this.state.messageProp]);
     }
 
     componentWillUnmount() {
@@ -35,7 +43,7 @@ export class MessageBox extends Component {
 
         if (genericTimeoutMessages.length > 0) {
             setTimeout(() => {
-                clearMessages(this.state.field === 'cafe', genericTimeoutMessages);
+                this.props.clearMessages(this.state.field === 'cafe', genericTimeoutMessages);
             }, 8000)
         }
     }
@@ -45,7 +53,7 @@ export class MessageBox extends Component {
             <div className="messageSection">
                 <TransitionGroup component="div" className="messages">
                     {
-                        this.state.queryState[this.state.field + 'Messages'].map(message => {
+                        this.props[this.state.messageProp].map(message => {
                             return <CSSTransition
                                 key={message.id}
                                 timeout={400}
@@ -63,4 +71,4 @@ export class MessageBox extends Component {
     }
 }
 
-export default MessageBox
+export default connect(mapStateToProps, mapDispatchToProps)(MessageBox);

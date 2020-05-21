@@ -1,7 +1,7 @@
 import React from 'react'
 import Card from '@material-ui/core/Card'
-import CONSTS from '../../constants/Constants'
-import { genGooglePlacePhoto } from "../../utilities/utilities"
+import CONSTS from '../../../constants/Constants'
+import { genGooglePlacePhoto } from "../../../utilities/utilities"
 import CardContent from '@material-ui/core/CardContent'
 import CardMedia from '@material-ui/core/CardMedia'
 

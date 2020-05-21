@@ -1,8 +1,23 @@
 import React, { Component } from 'react'
+import { connect } from 'react-redux'
+import { Map } from 'immutable'
 import Autocomplete, { createFilterOptions } from '@material-ui/lab/Autocomplete'
 import TextField from '@material-ui/core/TextField';
-import QueryStore from '../../stores/QueryStore'
-import { searchForCity, selectPreLoadedCity } from "../../actions/QueryActions";
+import { searchForCityFunc, selectPreLoadedCityFunc } from "../../../actions/queryActions";
+
+function mapDispatchToProps(dispatch) {
+    return {
+        searchForCity: searchForCityFunc(dispatch),
+        selectPreLoadedCity: selectPreLoadedCityFunc(dispatch)
+    }
+}
+
+function mapStateToProps(state=Map()) {
+    return {
+        preLoadedCities: state.get('preLoadedCities'),
+        userCanLoadNewCity: state.get('userCanLoadNewCity')
+    }
+}
 
 const filter = createFilterOptions();
 
@@ -13,17 +28,16 @@ export class CityInput extends Component {
         super(props);
         this.state = {
             value: null,
-            handleClick: props.handleClick,
-            queryState: QueryStore.getData('city')
+            handleClick: props.handleClick
         }
-        this.state.preparedCityOptions = this.prepareCityOptions(this.state.queryState.preLoadedCities);
+        this.state.preparedCityOptions = this.prepareCityOptions(this.props.preLoadedCities.toJS());
     }
 
     handleSearchRequest(requestObj) {
         if (requestObj && requestObj.inputValue) {
-            searchForCity(requestObj.inputValue);
+            this.props.searchForCity(requestObj.inputValue);
         } else {
-            selectPreLoadedCity(requestObj);
+            this.props.selectPreLoadedCity(requestObj);
         }
     }
 
@@ -45,14 +59,6 @@ export class CityInput extends Component {
                 return true;
             }
         })
-    } 
-
-    componentDidMount() {
-        QueryStore.on('cityUpdate', () => {
-            this._isMounted && this.setState({
-                queryState: QueryStore.getData('city')
-            })
-        })
     }
 
     componentWillUnmount() {
@@ -67,7 +73,7 @@ export class CityInput extends Component {
                     value={this.state.value}
                     autoHighlight
                     options={this.state.preparedCityOptions.sort((a, b) => { return a.name > b.name })}
-                    getOptionDisabled={(option) => option.inputValue !== undefined && !this.state.queryState.userCanLoadNewCity }
+                    getOptionDisabled={(option) => option.inputValue !== undefined && !this.props.userCanLoadNewCity }
                     onChange={(e, newValue) => {
                         if (!newValue) return;
 
@@ -105,4 +111,4 @@ export class CityInput extends Component {
     }
 }
 
-export default CityInput
+export default connect(mapStateToProps, mapDispatchToProps)(CityInput)

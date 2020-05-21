@@ -1,6 +1,17 @@
-import dispatcher from "../dispatcher";
 import API from "../utilities/API";
-import ACTION_CONSTS from "../constants/ActionConstants";
+import {
+    GETTING_CAFE_OPTIONS,
+    CAFE_OPTIONS_RETURNED,
+    GETTING_CITY_OPTIONS,
+    CITY_OPTIONS_RETURNED,
+    PRELOADED_CITY_SELECTED,
+    CAFE_OPTION_LOCKED,
+    CAFE_OPTION_UNLOCKED,
+    CITY_OPTION_LOCKED,
+    CITY_OPTION_UNLOCKED,
+    CLEAR_CAFE_MESSAGES,
+    CLEAR_CITY_MESSAGES
+} from "../constants/ActionConstants";
 import CONSTS from "../constants/Constants";
 
 const payload = [
@@ -74,149 +85,84 @@ const payload = [
 
 // ----------------------------------- API Actions ------------------------------------ //
 
-export function searchForCafe(cafeQuery) {
-    dispatcher.dispatch({
-        type: ACTION_CONSTS.GETTING_CAFE_OPTIONS,
-        payload: {
-            query: cafeQuery
-        }
-    });
-
-    API.get(CONSTS.SEARCH_CAFE + cafeQuery)
-    .then(res => {
-        if (res.status === 200) {
-            dispatcher.dispatch({
-                type: ACTION_CONSTS.CAFE_OPTIONS_RETURNED,
-                payload: res.data
-            });
-        }
-    });
-
-}
-
-
-export function searchForCity(cityQuery) {
-    dispatcher.dispatch({
-        type: ACTION_CONSTS.GETTING_CITY_OPTIONS,
-        payload: {
-            query: cityQuery
-        }
-    });
-
-    API.get(CONSTS.SEARCH_CITY + cityQuery)
-    .then(res => {
-        console.log("In city search option", res);
-        dispatcher.dispatch({
-            type: ACTION_CONSTS.CITY_OPTIONS_RETURNED,
-            payload: res
+export function searchForCafeFunc(dispatch) {
+    return (cafeQuery) => {
+        dispatch({
+            type: GETTING_CAFE_OPTIONS,
+            payload: {
+                query: cafeQuery
+            }
         });
-    });
+    
+        API.get(CONSTS.SEARCH_CAFE + cafeQuery)
+        .then(res => {
+            if (res.status === 200) {
+                dispatch({
+                    type: CAFE_OPTIONS_RETURNED,
+                    payload: res.data
+                });
+            }
+        });
+    }
 }
 
-export function findMostSimilarWithCurrentParams(city, cafe) {
-    dispatcher.dispatch({
-        type: ACTION_CONSTS.FINDING_MOST_SIMILAR
-    })
 
-    API.post(CONSTS.FIND_MOST_SIMILAR, {
-        cityId: city.id,
-        cafeId: cafe.placeId,
-        cafeName: cafe.name,
-        cafeAddr: cafe.formattedAddress
-    }).then(res => {
-        if (res.status === 200) {
-            dispatcher.dispatch({
-                type: ACTION_CONSTS.SIMILAR_CAFES_FOUND,
-                payload: res.data
+export function searchForCityFunc(dispatch) {
+    return (cityQuery) => {
+        dispatch({
+            type: GETTING_CITY_OPTIONS,
+            payload: {
+                query: cityQuery
+            }
+        });
+    
+        API.get(CONSTS.SEARCH_CITY + cityQuery)
+        .then(res => {
+            dispatch({
+                type: CITY_OPTIONS_RETURNED,
+                payload: res
             });
-        }
-    });
-}
-
-export function loadCafeDetails(cafeId) {
-    dispatcher.dispatch({
-        type: ACTION_CONSTS.GETTING_CAFE_DETAILS,
-        payload: cafeId
-    })
-
-    API.get(CONSTS.GET_CAFE_DETAILS + cafeId)
-    .then(res => {
-        if (res.status === 200) {
-            dispatcher.dispatch({
-                type: ACTION_CONSTS.CAFE_DETAILS_RETURNED,
-                payload: res.data
-            });
-        }
-    });
-}
-
-export function setViewingDetails(cafe) {
-    dispatcher.dispatch({
-        type: ACTION_CONSTS.CAFE_DETAILS_RETURNED,
-        payload: cafe
-    })
+        });
+    }
 }
 
 
 // ----------------------------------- Default Section ------------------------------------ //
 
-export function toggleCafeOptionHover(cafeId, isHovered) {
-    dispatcher.dispatch({
-        type: isHovered ? ACTION_CONSTS.CAFE_HOVER : ACTION_CONSTS.CAFE_UNHOVER,
-        payload: cafeId
-    })
-}
-
-export function highlightCafeOnMap(cafeId) {
-    dispatcher.dispatch({
-        type: ACTION_CONSTS.HIGHLIGHT_CAFE,
-        payload: cafeId
-    })
-}
-
-export function selectPreLoadedCity(data) {
-    dispatcher.dispatch({
-        type: ACTION_CONSTS.PRELOADED_CITY_SELECTED,
-        payload: data
-    })
-}
-
-export function optionLockToggled(isCafe, data) {
-    let unlock = data.locked === true
-    if (unlock) {
-        dispatcher.dispatch({
-            type: isCafe ? ACTION_CONSTS.CAFE_OPTION_UNLOCKED : ACTION_CONSTS.CITY_OPTION_UNLOCKED,
-            payload: data
-        })
-    } else {
-        dispatcher.dispatch({
-            type: isCafe ? ACTION_CONSTS.CAFE_OPTION_LOCKED : ACTION_CONSTS.CITY_OPTION_LOCKED,
+export function selectPreLoadedCityFunc(dispatch) {
+    return (data) => {
+        dispatch({
+            type: PRELOADED_CITY_SELECTED,
             payload: data
         })
     }
 }
 
-export function tabSwitched(newTab) {
-    dispatcher.dispatch({
-        type: ACTION_CONSTS.TAB_SWITCHED,
-        payload: {
-            newTab: newTab
+export function optionLockToggledFunc(dispatch) {
+    return (isCafe, data) => {
+        let unlock = data.locked === true
+        if (unlock) {
+            dispatch({
+                type: isCafe ? CAFE_OPTION_UNLOCKED : CITY_OPTION_UNLOCKED,
+                payload: data
+            })
+        } else {
+            dispatch({
+                type: isCafe ? CAFE_OPTION_LOCKED : CITY_OPTION_LOCKED,
+                payload: data
+            })
         }
-    });
+    }
 }
 
 
 // ----------------------------------- Clearing Actions ------------------------------------ //
 
-export function clearSearch() {
-    dispatcher.dispatch({
-        type: ACTION_CONSTS.CLEAR_SEARCH
-    })
-}
-
-export function clearMessages(isCafe, ids) {
-    dispatcher.dispatch({
-        type: isCafe ? ACTION_CONSTS.CLEAR_CAFE_MESSAGES : ACTION_CONSTS.CLEAR_CITY_MESSAGES,
-        payload: ids
-    })
+export function clearMessagesFunc() {
+    return (isCafe, ids) => {
+        return {
+            type: isCafe ? CLEAR_CAFE_MESSAGES : CLEAR_CITY_MESSAGES,
+            payload: ids
+        }
+    }
 }

@@ -1,9 +1,9 @@
 import React, { PureComponent } from 'react'
+import { connect } from 'react-redux'
 import ReactWordcloud from 'react-wordcloud'
 import { format } from 'timeago.js'
 import DOMPurify from 'dompurify'
-import QueryStore from '../../stores/QueryStore'
-import ACTION_CONSTS from '../../constants/ActionConstants'
+import { CAFE_DETAILS_RETURNED } from '../../constants/ActionConstants'
 import "react-responsive-carousel/lib/styles/carousel.min.css" // requires a loader
 import { Carousel } from 'react-responsive-carousel'
 import { genGooglePlacePhoto } from '../../utilities/utilities'
@@ -25,46 +25,39 @@ const options = (stateIsDetailsReturned) => {
         spiral: 'archimedean',
         transitionDuration: stateIsDetailsReturned ? 0 : 1000,
     }
-  };
+};
+
+function mapStateToProps(state) {
+    return {
+        cafeDetails: state.get('cafeDetails'),
+        similarCafes: state.get('similarCafes'),
+        wordBagRef: state.get('wordBagRef')
+    }
+}
 
 export class CafeDetails extends PureComponent {
     _isMounted = true;
 
-    constructor() {
-        super();
-        this.state = this.returnState();
-    }
-
-    componentDidMount() {
-        QueryStore.on("detailsUpdate", () => {
-            this._isMounted && this.setState(this.returnState());
-        })
-    }
-
     componentWillUnmount() {
-
         this._isMounted = false;
     }
 
-    returnState() {
-        let queryState = QueryStore.getData('outcomeFilter'),
-            viewingCafe = queryState.cafeDetails.cafeId ?
-                queryState.cafeDetails[queryState.cafeDetails.cafeId]
-                :
-                queryState.similarCafes.find((cafe) => cafe.placeId === queryState.cafeDetails.cafeId);
+    getPreparedCafe() {
+        const cafeDetails = this.props.cafeDetails, 
+            cafeId = cafeDetails.get('cafeId');
 
-        if (viewingCafe && viewingCafe.wordCloud === undefined) {
-            viewingCafe.wordCloud = viewingCafe.rawWordCloud.map((tuple) => {
-                return { text: queryState.wordBagRef[tuple[0]], value: tuple[1] }
+        let viewingCafe = cafeDetails.get(cafeId);
+        if (!viewingCafe && !!cafeId) {
+            viewingCafe = this.props.similarCafes.find(cafe => cafe.get('placeId') === cafeId );
+        }
+
+        if (viewingCafe && viewingCafe.size && viewingCafe.get('wordCloud') === undefined) {
+            const jsViewingCafe = viewingCafe.toJS()
+            jsViewingCafe.wordCloud = jsViewingCafe.rawWordCloud.map((tuple) => {
+                return { text: this.props.wordBagRef.get(tuple[0]), value: tuple[1] }
             })
-        }
-
-        return {
-            queryState: queryState,
-            readyToDisplay: !!viewingCafe,
-            cafe: viewingCafe,
-            userActionState: queryState.cafeDetails.state
-        }
+            return jsViewingCafe;
+        };
     }
 
     getCarouselHeight(showDetails) {
@@ -82,13 +75,13 @@ export class CafeDetails extends PureComponent {
     }
 
     render() {
-        let cafe = this.state.cafe,
-            stateIsDetailsReturned = (this.state.userActionState === ACTION_CONSTS.CAFE_DETAILS_RETURNED),
+        let cafe = this.getPreparedCafe(),
+            stateIsDetailsReturned = (this.props.cafeDetails.get('userActionState') === CAFE_DETAILS_RETURNED),
             showDetails = (stateIsDetailsReturned || (cafe && !!cafe.detailsLoaded));
         return (
             <div className="cafeDetails">
                 {
-                    this.state.readyToDisplay ?
+                    !!cafe ?
                         <div>
                             <Carousel showThumbs={false}
                                 showArrows={showDetails}
@@ -99,8 +92,8 @@ export class CafeDetails extends PureComponent {
                                 </div>
                                 {
                                     showDetails &&
-                                    cafe.photos.map((photo) => {
-                                        return <div className="carouselImage"
+                                    cafe.photos.map((photo, idx) => {
+                                        return <div key={idx} className="carouselImage"
                                             style={{ backgroundImage: 'url(' + genGooglePlacePhoto(photo) + ')' }}>
                                             <span className="legend" dangerouslySetInnerHTML={{__html: this.prepareLink(photo.attr)}}></span>
                                         </div>
@@ -139,8 +132,9 @@ export class CafeDetails extends PureComponent {
                                     <div className="highlightBar"></div>
                                     <h2>Some sample reviews</h2>
                                     {
-                                        cafe.reviews.map((review) => {
-                                            return <div className="review">
+                                        cafe.reviews &&
+                                        cafe.reviews.map((review, idx) => {
+                                            return <div key={idx} className="review">
                                                 <div className="reviewContent">
                                                     <div className="starRating">
                                                         <span>{review.rating}</span> <i className="fa fa-star fa-2x" aria-hidden="true"></i>
@@ -165,4 +159,4 @@ export class CafeDetails extends PureComponent {
     }
 }
 
-export default CafeDetails
+export default connect(mapStateToProps)(CafeDetails)
