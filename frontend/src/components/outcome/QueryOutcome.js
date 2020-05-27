@@ -2,10 +2,11 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Map } from 'immutable'
 import CafeMap from './CafeMap'
-import CafePreviewList from './CafePreviewList'
+import CafePreviewListHolder from './CafePreviewListHolder'
 import CafeDetailsWrapper from './CafeDetailsWrapper'
 import { css } from "@emotion/core"
 import RingLoader from "react-spinners/RingLoader"
+import { getWordBagRefFunc } from '../../actions/outcomeActions'
 
 
 const override = css`
@@ -17,13 +18,24 @@ const override = css`
     margin: auto;
 `;
 
+function mapDispatchToProps(dispatch) {
+    return {
+        getWordBagRef: getWordBagRefFunc(dispatch)
+    }
+}
+
 function mapStateToProps(state=Map()) {
     return {
-        loading: !state.get('similarCafesFound')
+        loading: !state.get('cafesReturned'),
+        returnedCafes: state.get('returnedCafes')
     }
 }
 
 export class QueryOutcome extends Component {
+
+    componentDidMount() {
+        this.props.getWordBagRef();
+    }
 
     render() {
         return (
@@ -39,7 +51,7 @@ export class QueryOutcome extends Component {
                     <div className="cafePreviewHolder">
                         <CafeMap />
                         <div className="flexRowParent">
-                            <CafePreviewList />
+                            <CafePreviewListHolder />
                             <CafeDetailsWrapper />
                         </div>
                     </div>
@@ -49,4 +61,4 @@ export class QueryOutcome extends Component {
     }
 }
 
-export default connect(mapStateToProps)(QueryOutcome)
+export default connect(mapStateToProps, mapDispatchToProps)(QueryOutcome)

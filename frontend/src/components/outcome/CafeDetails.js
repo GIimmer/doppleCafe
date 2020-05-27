@@ -30,7 +30,8 @@ const options = (stateIsDetailsReturned) => {
 function mapStateToProps(state) {
     return {
         cafeDetails: state.get('cafeDetails'),
-        similarCafes: state.get('similarCafes'),
+        returnedCafes: state.get('returnedCafes'),
+        cafeLocMap: state.get('cafeLocMap'),
         wordBagRef: state.get('wordBagRef')
     }
 }
@@ -48,7 +49,7 @@ export class CafeDetails extends PureComponent {
 
         let viewingCafe = cafeDetails.get(cafeId);
         if (!viewingCafe && !!cafeId) {
-            viewingCafe = this.props.similarCafes.find(cafe => cafe.get('placeId') === cafeId );
+            viewingCafe = this.props.returnedCafes.getIn(this.props.cafeLocMap.get(cafeId).toJS());
         }
 
         if (viewingCafe && viewingCafe.size && viewingCafe.get('wordCloud') === undefined) {

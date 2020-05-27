@@ -3,12 +3,12 @@ import { connect } from 'react-redux'
 import { GoogleApiWrapper, Map, InfoWindow, Marker } from 'google-maps-react'
 import { CONSTS } from "../../constants/Constants"
 
-const GROUPCOLORS = ['red', 'orange', 'yellow', 'green', 'blue', 'purple'];
+const GROUPCOLORS = ['grey', 'red', 'orange', 'yellow', 'green', 'blue', 'purple'];
 
 function mapStateToProps(state=Map()) {
     return {
         highlightCafeId: state.get('highlightedCafe'),
-        similarCafes: state.get('similarCafes'),
+        returnedCafes: state.get('returnedCafes'),
         cityLock: state.get('cityLock')
     }
 }
@@ -25,7 +25,9 @@ export class CafeMap extends PureComponent {
     }
 
     render() {
-        const similarCafes = this.props.similarCafes.toJS()
+        const returnedCafes = this.props.returnedCafes.toJS(),
+            idxToColorRef = returnedCafes.map((group, idx) => new Array(group.length).fill(GROUPCOLORS[idx], 0, group.length)).flat(),
+            flatCafes = returnedCafes.flat()
         return (
             // <div></div>
             <Map
@@ -36,12 +38,10 @@ export class CafeMap extends PureComponent {
             }}
             zoom={13}>
                 {
-                    similarCafes.map((cafe) => {
+                    flatCafes.map((cafe, cafeIdx) => {
                         let markerColor = cafe.placeId === this.props.highlightCafeId ? 
-                            'yellow' :
-                                cafe.group !== undefined ? 
-                                GROUPCOLORS[cafe.group] :
-                                '';
+                            'black' :
+                            idxToColorRef[cafeIdx];
                         return <Marker 
                             onClick={this.onMarkerClick}
                             key={cafe.placeId}
@@ -53,7 +53,7 @@ export class CafeMap extends PureComponent {
                                 url: require(`../../images/${markerColor}CafeIcon.png`),
                             }}
                         />
-                    })
+                    }) 
                 }
         
                 <InfoWindow onClose={this.onInfoWindowClose}>

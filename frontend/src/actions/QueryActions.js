@@ -10,7 +10,9 @@ import {
     CITY_OPTION_LOCKED,
     CITY_OPTION_UNLOCKED,
     CLEAR_CAFE_MESSAGES,
-    CLEAR_CITY_MESSAGES
+    CLEAR_CITY_MESSAGES,
+    GETTING_CITY_DATA,
+    CITY_DATA_RETURNED
 } from "../constants/ActionConstants";
 import CONSTS from "../constants/Constants";
 
@@ -123,6 +125,25 @@ export function searchForCityFunc(dispatch) {
                 payload: res
             });
         });
+    }
+}
+
+export function exploreCityFunc(dispatch) {
+    return (cityId) => {
+        dispatch({
+            type: GETTING_CITY_DATA,
+            payload: cityId
+        })
+
+        API.get(CONSTS.GET_CITIES + cityId + '/')
+        .then(res => {
+            if (res.status === 200) {
+                dispatch({
+                    type: CITY_DATA_RETURNED,
+                    payload: res.data
+                })
+            }
+        })
     }
 }
 
