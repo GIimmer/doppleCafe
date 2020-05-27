@@ -3,7 +3,8 @@ import {
     CAFE_UNHOVER,
     GETTING_CAFE_DETAILS,
     CAFE_DETAILS_RETURNED,
-    HIGHLIGHT_CAFE
+    HIGHLIGHT_CAFE,
+    WORD_BAG_REF_RETURNED
   } from '../constants/ActionConstants'
   
 import { snakeToCamel } from '../utilities/utilities'
@@ -36,13 +37,20 @@ function imbueCafeDetails(cafe, newDetails) {
 export default (state = Map({}), action) => {
     const cafeDetails = state.get('cafeDetails');
     switch (action.type) {
+        case WORD_BAG_REF_RETURNED:
+            let wordBagRef = action.payload.word_bag_ref;
+            const intKeyValPair = Object.keys(wordBagRef).map(function (key) { 
+                return [Number(key), wordBagRef[key]]; 
+            }); 
+            return state.set('wordBagRef', Map(intKeyValPair))
+
         case CAFE_HOVER:
             const cafeId = action.payload;
             if (cafeDetails.get('cafeId') !== cafeId) {
                 const cafeinQuestion = !!cafeDetails.get(cafeId) ?
                 cafeDetails.get(cafeId)
                 :
-                state.get('similarCafes').find(cafe => cafe.get('placeId') === cafeId);
+                state.get('returnedCafes').getIn(state.getIn(['cafeLocMap', cafeId]).toJS());
                 
                 return state.mergeIn(['cafeDetails'], {
                     'state': CAFE_HOVER,

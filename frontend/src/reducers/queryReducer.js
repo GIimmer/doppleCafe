@@ -9,7 +9,7 @@ import {
     CAFE_OPTION_UNLOCKED,
     CITY_OPTION_UNLOCKED,
     CLEAR_CAFE_MESSAGES,
-    CLEAR_CITY_MESSAGES,
+    CLEAR_CITY_MESSAGES
   } from '../constants/ActionConstants'
   import { Map, List, fromJS } from 'immutable'
 

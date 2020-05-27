@@ -7,11 +7,11 @@ import CONSTS from "./constants/Constants"
 
 export const InitialState = Immutable.fromJS({
     userCanLoadNewCity: true,
-    currentTab: CONSTS.QUERY_VIEW,
+    currentTab: CONSTS.EXPLORE_VIEW,
     cafeQueryState: null,
     cityQueryState: null,
     searchParamsSet: false,
-    similarCafesFound: false,
+    cafesReturned: false,
     highlightedCafe: null,
     wordBagRef: null,
     preLoadedCities: [
@@ -60,7 +60,8 @@ export const InitialState = Immutable.fromJS({
     cafeResponse: [],
     cafeLock: {},
     cafeDetails: {},
-    similarCafes: []
+    returnedCafes: [],
+    idToCafeMapper: {}
 })
 
 export default reduceReducers(
