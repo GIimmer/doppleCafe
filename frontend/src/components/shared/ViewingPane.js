@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import ViewingBox from "./ViewingBox"
+import CONSTS from '../../constants/Constants'
 import Button from '@material-ui/core/Button'
 import { genGooglePlacePhoto } from "../../utilities/utilities"
 import { findMostSimilarFunc, clearSearchFunc } from '../../actions/stateActions'
@@ -17,6 +18,7 @@ function mapStateToProps(state=Map()) {
     const baseMap = {
         cafeLock: state.get('cafeLock'),
         cityLock: state.get('cityLock'),
+        currentTab: state.get('currentTab'),
         searchParamsSet: state.get('searchParamsSet')
     }
     return Object.assign(baseMap, {
@@ -27,9 +29,9 @@ function mapStateToProps(state=Map()) {
 
 export class ViewingPane extends Component {
 
-    getContainerClass() {
+    getContainerClass(isExploreView) {
         let baseClass = 'viewingPane';
-        if (this.props.searchParamsLocked) {
+        if (this.props.searchParamsLocked || (isExploreView && this.props.searchParamsSet)) {
             baseClass += ' paneMounted';
         }
         if (this.props.searchParamsSet) {
@@ -40,12 +42,15 @@ export class ViewingPane extends Component {
 
     render() {
         let cafe = this.props.cafeLock, city = this.props.cityLock;
+        let isExploreView = this.props.currentTab === CONSTS.EXPLORE_VIEW;
         if (this.props.searchParamsLocked) {
             cafe = cafe.size ? cafe.toJS() : cafe;
             city = city.size ? city.toJS() : city;
+        } else if (isExploreView) {
+            city = city.size ? city.toJS() : city;
         }
         return (
-            <div className={this.getContainerClass()}>
+            <div className={this.getContainerClass(isExploreView)}>
                 {
                     this.props.searchParamsSet ?
                     <div className="selectionsHolder">
@@ -56,7 +61,10 @@ export class ViewingPane extends Component {
                         onClick={this.props.clearSearch}>
                             Cancel Search
                         </Button>
-                        <ViewingBox field="cafe" photo={genGooglePlacePhoto(cafe.photo)} title={cafe.name} subtitle={cafe.formattedAddress} />
+                        {
+                            this.props.currentTab === CONSTS.QUERY_VIEW &&
+                            <ViewingBox field="cafe" photo={genGooglePlacePhoto(cafe.photo)} title={cafe.name} subtitle={cafe.formattedAddress} />
+                        }
                         <ViewingBox field="city" photo={city.photo.src} title={city.name} subtitle={city.country} />
                     </div>
                     :
