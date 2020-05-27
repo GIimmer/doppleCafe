@@ -86,59 +86,62 @@ a {
                         justify-content: space-around;
                         flex-direction: row;
 
-                        .cafePreviewList {
+                        .cafePreviewListHolder {
                             width: 45%;
-                            color: grey;
 
-                            .cafePreview {
-                                display: flex;
-                                padding: 20px 10px;
-                                flex-direction: row;
-                                justify-items: space-between;
-                                align-items: center;
-                                background-color: rgb(245, 245, 245);
-                                margin: 15px 0px;
-                                box-shadow: 2px 2px 3px grey;
-                                cursor: pointer;
-
-                                &:hover {
-                                    box-shadow: 1px 1px 2px grey;
-                                    background-color: white;
-                                }
-
-                                h1 {
-                                    text-align: center;
-                                    min-width: 15%;
-                                }
-
-                                p {
-                                    margin: 4px 0px;
-                                }
-
-                                div {
-                                    width: 40%;
-                                    height: 100%;
-                                    display: inline-block;
-                                }
-
-                                .cafeInformation {
-                                    p {
-                                        margin: 5px 0px;
-                                    }
-                                    b {
-                                        font-size: 1.1em;
-                                    }
-                                }
-
-                                .cafePreviewButtons {
+                            .cafePreviewList {
+                                color: grey;
+    
+                                .cafePreview {
                                     display: flex;
-                                    flex-direction: column;
-                                    justify-content: space-between;
-
-                                    button {
-                                        margin: 5px;
+                                    padding: 20px 10px;
+                                    flex-direction: row;
+                                    justify-items: space-between;
+                                    align-items: center;
+                                    background-color: rgb(245, 245, 245);
+                                    margin: 15px 0px;
+                                    box-shadow: 2px 2px 3px grey;
+                                    cursor: pointer;
+    
+                                    &:hover {
+                                        box-shadow: 1px 1px 2px grey;
+                                        background-color: white;
                                     }
-                                    
+    
+                                    h1 {
+                                        text-align: center;
+                                        min-width: 15%;
+                                    }
+    
+                                    p {
+                                        margin: 4px 0px;
+                                    }
+    
+                                    div {
+                                        width: 40%;
+                                        height: 100%;
+                                        display: inline-block;
+                                    }
+    
+                                    .cafeInformation {
+                                        p {
+                                            margin: 5px 0px;
+                                        }
+                                        b {
+                                            font-size: 1.1em;
+                                        }
+                                    }
+    
+                                    .cafePreviewButtons {
+                                        display: flex;
+                                        flex-direction: column;
+                                        justify-content: space-between;
+    
+                                        button {
+                                            margin: 5px;
+                                        }
+                                        
+                                    }
                                 }
                             }
                         }
@@ -344,10 +347,11 @@ a {
 
             .viewBox {
                 display: flex;
+                flex: 1;
                 flex-direction: column;
                 justify-content: flex-end;
                 width: 20vw;
-                height: 50%;
+                min-height: 50%;
                 color: white;
                 position: relative;
                 overflow-wrap: normal;
@@ -382,6 +386,14 @@ a {
             transform: translateX(0vw);
             transition: transform 400ms linear;
         }
+    }
+
+    #exploreView {
+        width: 100%;
+        height: 93vh;
+        position: absolute;
+        top: 7vh;
+        background-image: radial-gradient(circle, #031d47, #02132c, #010a18);
     }
 
     #inputsSection {
