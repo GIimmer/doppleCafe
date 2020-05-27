@@ -6,6 +6,8 @@ from webapp.models import City, Placetype, Cafe, Review, Country, Photo
 
 class CitySerializer(serializers.ModelSerializer):
     """City Serializer"""
+    country = serializers.StringRelatedField()
+
     class Meta:
         model = City
         # fields = ["name", "latitude", "longitude"]
@@ -35,8 +37,14 @@ class PhotoSerializer(serializers.ModelSerializer):
 class CafeSerializer(serializers.ModelSerializer):
     """Cafe Serializer"""
     placetypes = serializers.StringRelatedField(many=True, required=False)
-
     photos = serializers.SerializerMethodField()
+    raw_word_cloud = serializers.SerializerMethodField('get_word_cloud', required=False)
+
+    def get_word_cloud(self, model):
+        if hasattr(model, 'raw_word_cloud'):
+            return model.raw_word_cloud
+        else:
+            return None
 
     def get_photos(self, obj):
         # get 10 similar stores for this store

@@ -38,9 +38,11 @@ def getTFVectorsFromCafeArr(cafe_arr, city_id=None):
     review_vectors = np.zeros(shape=(len(cafe_arr), WORD_BAG_LEN))
 
     next_vec_idx = 0
+    usable_cafe_map = {}
     for cafe in cafe_arr:
         res = vectorizeCafeReviews(cafe)
         if len(res) > 0:
+            usable_cafe_map[cafe.place_id] = True
             review_vectors[next_vec_idx] = res
             next_vec_idx += 1
         else:
@@ -53,7 +55,7 @@ def getTFVectorsFromCafeArr(cafe_arr, city_id=None):
         review_vectors = review_vectors[0:-len(cafes_to_strip)]
 
     CACHE.set('vector_for_' + city_id, review_vectors, None)
-    CACHE.set(("cafe_ids_for_" + city_id), [getattr(cafe, 'place_id') for cafe in cafe_arr], None)
+    CACHE.set(("cafe_ids_for_" + city_id), usable_cafe_map, None)
 
     return review_vectors
 

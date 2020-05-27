@@ -28,6 +28,9 @@ def givenCityGetVectors(city, target_cafe=None):
     city_cafe_tf_vecs = CACHE.get('vector_for_' + city_id)
     if city_cafe_tf_vecs is None:
         city_cafe_tf_vecs = getTFVectorsFromCafeArr(city_cafes, city_id)
+    else:
+        usable_cafe_map = CACHE.get("cafe_ids_for_" + city_id)
+        city_cafes = [x for x in city_cafes if usable_cafe_map.get(x.place_id, False)]
 
     if target_cafe is not None:
         target_cafe_tf_vec = vectorizeCafeReviews(target_cafe).reshape(1, -1)
@@ -39,8 +42,12 @@ def givenCityGetVectors(city, target_cafe=None):
     return city_cafes, all_cafe_vecs
 
 def givenCityRunML(city, scale_to_n_dimensions, generate_n_clusters, show_graph=False):
-    city_cafes, dense_x = givenCityGetVectors(city)
-    X = givenVecsRunPCA(dense_x, scale_to_n_dimensions)
+    city_cafes, sparse_x = givenCityGetVectors(city)
+    for idx, cafe_vec in enumerate(sparse_x):
+        top_100 = cafe_vec.argsort()[-100:][::-1]
+        setattr(city_cafes[idx], 'raw_word_cloud', [(int(val), float(cafe_vec[val])) for val in top_100])
+
+    X = givenVecsRunPCA(sparse_x, scale_to_n_dimensions)
 
     centroid_membership, centroids, _ = runKMeans(X, generate_n_clusters, 10)
 
@@ -92,13 +99,12 @@ def getNearestCafesGivenCafe(city, cafe):
 
     most_similar_cafe_tuples = nearestNeighbors(target_cafe_vec, city_cafe_vecs)
     similar_cafes = []
-    word_bag_arr = []
     for i in range(10):
         vec_for_cafe = all_cafe_vecs[most_similar_cafe_tuples[i][0]]
         top_100 = vec_for_cafe.argsort()[-100:][::-1]
-        word_bag_arr.append([(int(val), float(vec_for_cafe[val])) for val in top_100])
 
         cafe_to_add = city_cafes[most_similar_cafe_tuples[i][0]]
+        setattr(cafe_to_add, 'raw_word_cloud', [(int(val), float(vec_for_cafe[val])) for val in top_100])
         similar_cafes.append(cafe_to_add)
 
-    return similar_cafes, word_bag_arr
+    return similar_cafes

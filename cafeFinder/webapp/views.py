@@ -5,6 +5,7 @@ from django.views.decorators.http import require_http_methods
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models.query import QuerySet
+from django.db.models import Count
 from webapp.models import City, Cafe, Country, Placetype, Photo
 from webapp.api.serializers import CitySerializer, CafeSerializer, ReviewSerializer
 from research.cafeTest import getNearestCafesGivenCafe, givenCityRunML
@@ -26,7 +27,7 @@ class CityViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.CreateM
         for _, cafe_arr in clustered_cafes.items():
             clustered_cafe_response.append(CafeSerializer(cafe_arr, many=True).data)
 
-        return JsonResponse(clustered_cafe_response, safe=False)
+        return JsonResponse({ 'cafe_list_of_lists': clustered_cafe_response })
 
     def get_queryset(self):
         queryset = self.queryset
@@ -40,8 +41,10 @@ class CityViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.CreateM
             if (len(queryset) == 0):
                 city_obj = geocodeCityName(name)
                 queryset = [genCityFromAPISuggestion(city_obj)]
+        else:
+            queryset = queryset.annotate(cafe_count=Count('cafe')).filter(cafe_count__gt=4)
 
-        return queryset
+        return CitySerializer(queryset, many=True).data
 
 @csrf_exempt
 def cafe_search(request):
@@ -77,6 +80,7 @@ def get_cafe_details(request, cafe_id):
 
     cafe_data = CafeSerializer(cafe).data
     cafe_data['reviews'] = top_3_reviews
+    del cafe_data['raw_word_cloud']
     if cafe_data['hours'] != 'unset':
         cafe_data['hours'] = json.loads(cafe_data['hours'])
 
@@ -110,21 +114,23 @@ def find_similar_cafes(request):
             get60CafesNearCity(city)
 
         if (city.cafe_set.count() > 10):
-            similar_cafes, word_bag_arr = getNearestCafesGivenCafe(city, target_cafe)
+            similar_cafes = getNearestCafesGivenCafe(city, target_cafe)
 
         cafe_response = CafeSerializer(similar_cafes, many=True).data
-        for idx, cafe in enumerate(cafe_response):
-            cafe['raw_word_cloud'] = word_bag_arr[idx]
+        for cafe in cafe_response:
             if (cafe['hours'] != 'unset'):
                 cafe['hours'] = json.loads(cafe['hours'])
 
-        response_obj = {
-            'word_bag_ref': REVERSE_IDX_WORD_REF,
-            'cafe_list': cafe_response
-        }
+    return JsonResponse({ 'cafe_list': cafe_response })
 
-    return JsonResponse(response_obj)
 
+@csrf_exempt
+@require_http_methods(["GET"])
+def get_word_bag_ref(request):
+    return JsonResponse({
+        'word_bag_ref': REVERSE_IDX_WORD_REF
+    })
+    
 
 def genCityFromAPISuggestion(city_obj):
     try:
