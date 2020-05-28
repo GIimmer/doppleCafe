@@ -35,10 +35,10 @@ class Cafe(models.Model):
     formatted_address = models.CharField("Addr", max_length=255, default="unset", null=True, blank=True)
     compound_code = models.CharField('CompoundCode', max_length=255, null=True)
     website = models.CharField('Website', max_length=255, null=True, blank=True)
-    formatted_phone_number = models.CharField('FormattedPhoneNumber', max_length=255, null=True)
+    formatted_phone_number = models.CharField('FormattedPhoneNumber', max_length=255, null=True, blank=True)
     city = models.ForeignKey("City", on_delete=models.CASCADE, null=True, blank=True)
-    lat = models.DecimalField('Latitude', decimal_places=8, max_digits=10, null=True)
-    lng = models.DecimalField('Longitude', decimal_places=8, max_digits=11, null=True)
+    lat = models.DecimalField('Latitude', decimal_places=8, max_digits=10, null=True, blank=True)
+    lng = models.DecimalField('Longitude', decimal_places=8, max_digits=11, null=True, blank=True)
     placetypes = models.ManyToManyField(Placetype)
     updated_at = models.DateTimeField(auto_now=True)
 

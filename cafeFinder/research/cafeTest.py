@@ -42,14 +42,18 @@ def givenCityGetVectors(city, target_cafe=None):
     return city_cafes, all_cafe_vecs
 
 def givenCityRunML(city, scale_to_n_dimensions, generate_n_clusters, show_graph=False):
+    centroid_membership = CACHE.get('centroid_membership_for_' + str(getattr(city, 'id')))
+
     city_cafes, sparse_x = givenCityGetVectors(city)
     for idx, cafe_vec in enumerate(sparse_x):
         top_100 = cafe_vec.argsort()[-100:][::-1]
         setattr(city_cafes[idx], 'raw_word_cloud', [(int(val), float(cafe_vec[val])) for val in top_100])
 
-    X = givenVecsRunPCA(sparse_x, scale_to_n_dimensions)
+    if centroid_membership is None:
+        X = givenVecsRunPCA(sparse_x, scale_to_n_dimensions)
 
-    centroid_membership, centroids, _ = runKMeans(X, generate_n_clusters, 10)
+        centroid_membership, centroids, _ = runKMeans(X, generate_n_clusters, 10)
+        CACHE.set('centroid_membership_for_' + str(getattr(city, 'id')), centroid_membership, None)
 
     if (show_graph and scale_to_n_dimensions == 2):
         for idx, item in enumerate(X):

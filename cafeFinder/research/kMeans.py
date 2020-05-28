@@ -31,12 +31,24 @@ def computeNewCentroids(X, membership, K):
 
 def runKMeans(X, K, max_iterations):
     m, n = X.shape
-    cost = np.zeros(max_iterations)
-    centroids = initCentroids(X, K)
-    centroid_membership = np.zeros(m, dtype=np.int8)
+    best_cost = 1
+    best_centroids = None
+    best_centroid_membership = None
 
-    for i in range(max_iterations):
-        centroid_membership, cost[i] = findClosestCentroids(X, centroids)
-        centroids = computeNewCentroids(X, centroid_membership, K)
+    for seed in range(max_iterations):
+        cost = np.zeros(max_iterations)
+        centroids = initCentroids(X, K)
+        centroid_membership = np.zeros(m, dtype=np.int8)
 
-    return (centroid_membership, centroids, cost[max_iterations - 1])
+        for i in range(10):
+            centroid_membership, cost[i] = findClosestCentroids(X, centroids)
+            if (i > 0 and cost[i] == cost[i-1]):
+                break
+            centroids = computeNewCentroids(X, centroid_membership, K)
+
+        if cost[i] < best_cost:
+            best_cost = cost[i]
+            best_centroids = centroids
+            best_centroid_membership = centroid_membership
+
+    return (best_centroid_membership, best_centroids, best_cost)
