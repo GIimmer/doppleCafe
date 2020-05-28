@@ -13,4 +13,4 @@ React with Redux - after pivoting from basic flux architecture (I wanted to shar
 
 ###### Query View
 Upon searching a cafe or city, the api uses google or geocoding to provide options in response. User must then lock correct options, setting search params. 
-https://drive.google.com/file/d/1lQ1wHTfFaJzt6wNibzXFxeiuK12xgPpu/view?usp=sharing
+![Query Input View](https://drive.google.com/file/d/1lQ1wHTfFaJzt6wNibzXFxeiuK12xgPpu/view?usp=sharing)
