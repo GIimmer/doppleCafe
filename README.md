@@ -6,9 +6,9 @@
 The goal of the application is to allow digital nomads to find cafes great for remote work while travelling abroad. At present users can either explore cafes grouped by similarity within cities which have already been loaded, or input a target cafe (one that they would like to find a doppleganger of) and the city to which they are exploring. 
 
 ## Technology used
-Python on Django (Great for Machine Learning)
-React with Redux - after pivoting from basic flux architecture (I wanted to share a single store object)
-KMeans, PCA, Text processing
+* Python on Django (Great for Machine Learning)
+* React with Redux - after pivoting from basic flux architecture (I wanted to share a single store object)
+* KMeans, PCA, Text processing
 
 
 ## Next Steps
@@ -40,8 +40,7 @@ User can peruse preloaded cities across the globe, and select the one which they
 ![Explore Input View](https://i.imgur.com/pHI78ej.jpg)
 
 Once the city is selected the backend API...
-1. Checks if the cites cafes have been vectorized and cached
-  * If not processes using above described steps
+1. Checks if the cites cafes have been vectorized and cached -> if not process using steps described above
 1. Because K-Means does not work well with sparse high-dimensional data, run PCA to compress cafe text to 5d representations
 1. Run K-Means to group cafes by similarity
 
