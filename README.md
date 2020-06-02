@@ -12,7 +12,7 @@ The goal of the application is to allow digital nomads to find cafes great for r
 
 
 ## Next Steps
-- [ ] On Cache miss, run k-means n times and vectorize best outcome. (Currently only text vectors are cached)
+- [x] On Cache miss, run k-means n times and vectorize best outcome. (Currently only text vectors are cached)
 - [ ] Weight atmosphere and food terminology higher than other words, optionally allow user-informed weighting
 - [ ] User authorization flow - allow one newly loaded city per user
 - [ ] Updates to cafes when they become out of date (not a worry at this stage)
