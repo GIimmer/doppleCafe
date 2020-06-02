@@ -12,6 +12,13 @@
             "console": "integratedTerminal"
         },      
         {
+            "name": "Edit Word Bag",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceRoot}/cafeFinder/research/wordBagFiles/editWordBag.py",
+            "console": "integratedTerminal"
+        },   
+        {
             "name": "Django",
             "type": "python",
             "request": "launch",

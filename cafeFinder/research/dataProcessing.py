@@ -15,7 +15,7 @@ CACHE = caches['city_vecs']
 ps = PorterStemmer()
 SW = stopwords.words("english")
 
-VECTOR_IDX_REF = getDataFromFileWithName(os.path.join(BASE, "wordVectorIdxRef"))
+VECTOR_IDX_REF = getDataFromFileWithName(os.path.join(BASE, "wordBagFiles/wordVectorIdxRef"))
 WORD_BAG_LEN = len(VECTOR_IDX_REF)
 
 def processAreaSearch(raw_cafe_arr):
@@ -93,7 +93,7 @@ def convertTextToTFVector(text):
     text = text.lower()
     word_arr = regexp_tokenize(text, r"\w+")
     freq_dict = stemAndRemoveStopwordsFromStringArr(word_arr)
-    cafe_reviews_len = functools.reduce(lambda a, b : a+b, freq_dict.values())
+    cafe_reviews_len = functools.reduce(lambda a, b: a+b, freq_dict.values())
 
     vect = np.zeros(WORD_BAG_LEN)
     for key, val in freq_dict.items():
@@ -115,19 +115,3 @@ def stemAndRemoveStopwordsFromStringArr(string_arr):
             del unique_words[stop_word] 
 
     return unique_words
-
-def updateWordVectorWithFile(file_name='processedMostCommonWords.txt', stem_words=False):
-    global VECTOR_IDX_REF
-    global WORD_BAG_LEN
-    VECTOR_IDX_REF = {}
-    word_array = getDataFromFileWithName(file_name)
-    if (stem_words):
-        for idx, word in enumerate(word_array):
-            word_array[idx] = ps.stem(word)
-        word_array = list(dict.fromkeys(word_array)) # remove dupes
-    for idx, val in enumerate(word_array):
-        VECTOR_IDX_REF[val] = idx
-    
-    saveDataToFileWithName(VECTOR_IDX_REF, 'wordVectorIdxRef')
-    WORD_BAG_LEN = len(VECTOR_IDX_REF)
-    
