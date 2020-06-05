@@ -32,9 +32,9 @@ const cardStyleGenerator = (isCafe, unSelected, displaySmall) => {
     }
 
     base.media.filter = isCafe ? 
-    'brightness(40%) sepia(100%) hue-rotate(335deg) saturate(200%)'
+    'brightness(40%) sepia(100%) hue-rotate(330deg) saturate(180%)'
     :
-    'brightness(40%) sepia(100%) hue-rotate(170deg) saturate(200%)';
+    'brightness(40%) sepia(100%) hue-rotate(150deg) saturate(180%)';
 
     if (displaySmall) {
         base.root.width = 220;
@@ -58,11 +58,11 @@ export default function ResponseCard(props) {
     if (isCafe) {
         subTitle = response.formattedAddress;
         zoom = 12;
-        image = genGooglePlacePhoto(response.photo);
+        image = genGooglePlacePhoto(response.photos[0]);
     } else {
         subTitle = response.country;
         zoom = 7;
-        image = response.photo ? response.photo.src : CONSTS.CITY_PHOTO_STANDIN;
+        image = response.photo_src ? response.photo_src : CONSTS.CITY_PHOTO_STANDIN;
     }
     title = response.name;
 
