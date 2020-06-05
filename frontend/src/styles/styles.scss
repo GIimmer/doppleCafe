@@ -1,8 +1,20 @@
-$primaryColor: rgb(139, 64, 13);
-$secondary: blue;
-$light-grey: rgb(216, 216, 216);
-$highlight: gold;
+$primary: #562425;
+$secondary: #89A894;
+$light-teal: #ABD1B5;
+$mint-cream: #EDF4ED;
+$peach: #FCB97D;
 
+$mint-cream-light: #f0f6f0;
+
+$mint-cream-dark: #a5aaa5;
+
+:export {
+    primary: $primary;
+    secondary: $secondary;
+    lightTeal: $light-teal;
+    mintCream: $mint-cream;
+    peach: $peach;
+}
 
 html {
     overflow-x: hidden;
@@ -10,7 +22,7 @@ html {
 
 a { 
     text-decoration: none;
-    color: #7463ef;
+    color: $peach;
 }
 
 .overlay {
@@ -43,6 +55,8 @@ a {
 
 #AppBody {
     position: relative;
+    min-height: 100vh;
+    background-color: $mint-cream;
 
     #OutcomeSection {
         position: absolute;
@@ -51,260 +65,263 @@ a {
         width: 80vw;
         left: 20vw;
         top: 7vh;
-        background-color: white;
         box-shadow: 0px 0px 4px grey;
         background-color: rgb(228, 228, 228);
+        animation: slide-from-right 500ms cubic-bezier(.87,1.04,.72,.93);
+        animation-fill-mode: forwards;
 
-        &.outcomeVisible {
-            animation: slide-from-right 500ms cubic-bezier(.87,1.04,.72,.93);
-            animation-fill-mode: forwards;
+        #QueryOutcome {
+            background-color: white;
+            width: 90%;
+            min-height: 1000px;
+            margin: 5%;
+            box-shadow: 1px 1px 4px grey;
 
-            #QueryOutcome {
-                background-color: white;
-                width: 90%;
-                min-height: 1000px;
-                margin: 5%;
-                box-shadow: 1px 1px 4px grey;
+            .cafePreviewHolder {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
 
-                .cafePreviewHolder {
+                &>div:first-child {
+                    width: 100%;
+                    position: relative;
+                    background-color: grey;
+                    width: 100%;
+                    height: 400px;
+                }
+                
+                .flexRowParent {
+                    width: 100%;
+                    margin-top: 20px;
                     display: flex;
-                    flex-direction: column;
-                    align-items: center;
+                    justify-content: space-around;
+                    flex-direction: row;
 
-                    &>div:first-child {
-                        width: 100%;
-                        position: relative;
-                        background-color: grey;
-                        width: 100%;
-                        height: 400px;
-                    }
-                    
-                    .flexRowParent {
-                        width: 100%;
-                        margin-top: 20px;
-                        display: flex;
-                        justify-content: space-around;
-                        flex-direction: row;
+                    .cafePreviewListHolder {
+                        width: 45%;
 
-                        .cafePreviewListHolder {
-                            width: 45%;
+                        .cafePreviewList {
+                            color: grey;
+                            padding: 20px 10px;
+                            margin: 10px 0px;
 
-                            .cafePreviewList {
-                                color: grey;
-    
-                                .cafePreview {
-                                    display: flex;
-                                    padding: 20px 10px;
-                                    flex-direction: row;
-                                    justify-items: space-between;
-                                    align-items: center;
-                                    background-color: rgb(245, 245, 245);
-                                    margin: 15px 0px;
-                                    box-shadow: 2px 2px 3px grey;
-                                    cursor: pointer;
-    
-                                    &:hover {
-                                        box-shadow: 1px 1px 2px grey;
-                                        background-color: white;
-                                    }
-    
-                                    h1 {
-                                        text-align: center;
-                                        min-width: 15%;
-                                    }
-    
+                            &:nth-child(odd) {
+                                background-color: $mint-cream;
+                            }
+
+                            .cafePreview {
+                                display: flex;
+                                padding: 15px 7px;
+                                flex-direction: row;
+                                justify-items: space-between;
+                                align-items: center;
+                                color: $mint-cream-light;
+                                background-color: $mint-cream-dark;
+                                margin: 15px 0px;
+                                box-shadow: 2px 2px 3px grey;
+                                cursor: pointer;
+
+                                &:hover {
+                                    box-shadow: 1px 1px 2px grey;
+                                    background-color: inherit;
+                                }
+
+                                h1 {
+                                    text-align: center;
+                                    min-width: 15%;
+                                }
+
+                                p {
+                                    margin: 4px 0px;
+                                }
+
+                                div {
+                                    width: 40%;
+                                    height: 100%;
+                                    display: inline-block;
+                                }
+
+                                .cafeInformation {
                                     p {
-                                        margin: 4px 0px;
+                                        margin: 5px 0px;
                                     }
-    
-                                    div {
-                                        width: 40%;
-                                        height: 100%;
-                                        display: inline-block;
+                                    b {
+                                        font-size: 1.1em;
                                     }
-    
-                                    .cafeInformation {
-                                        p {
-                                            margin: 5px 0px;
-                                        }
-                                        b {
-                                            font-size: 1.1em;
-                                        }
-                                    }
-    
-                                    .cafePreviewButtons {
-                                        display: flex;
-                                        flex-direction: column;
-                                        justify-content: space-between;
-    
-                                        button {
-                                            margin: 5px;
-                                        }
-                                        
+                                }
+
+                                .cafePreviewButtons {
+                                    display: flex;
+                                    flex-direction: column;
+                                    justify-content: space-between;
+
+                                    button {
+                                        margin: 5px;
+                                        background-color: $mint-cream-dark;
                                     }
                                 }
                             }
                         }
+                    }
 
-                        .cafeDetailsWrapper {
-                            width: 45%;
-                            height: 100%;
-                            position: sticky;
-                            min-height: 400px;
-                            
-                            box-shadow: 2px 2px 3px grey;
-                            top: 10vh;
-                            margin-bottom: 15px;
+                    .cafeDetailsWrapper {
+                        width: 45%;
+                        height: 100%;
+                        position: sticky;
+                        min-height: 400px;
+                        
+                        box-shadow: 2px 2px 3px grey;
+                        top: 10vh;
+                        margin-bottom: 15px;
 
-                            .cafeDetails {
-                                overflow-y: scroll;
+                        .cafeDetails {
+                            overflow-y: scroll;
+                            width: 100%;
+                            height: 87vh;
+
+                            h5 {
+                                color: grey;
+                            }
+
+                            .carouselImage {
                                 width: 100%;
-                                height: 87vh;
+                                height: 300px;
+                                background-position: center;
+                                background-size: cover;
+                                background-color: white;
+                                box-shadow: inset 2px 2px 3px grey;
+                            }
 
-                                h5 {
-                                    color: grey;
+                            .cafeInformation {
+
+                                strong {
+                                    font-size: .9em;
+                                }
+                                ul {
+                                    list-style: none;
+                                }
+                                a {
+                                    text-decoration: none;
+                                    color: #7463ef;
+                                    display: block;
+                                    margin: 6px 0px;
                                 }
 
-                                .carouselImage {
-                                    width: 100%;
-                                    height: 300px;
-                                    background-position: center;
-                                    background-size: cover;
-                                    background-color: white;
-                                    box-shadow: inset 2px 2px 3px grey;
-                                }
+                                .infoSection {
+                                    display: flex;
+                                    flex-direction: row;
+                                    margin: 15px 2px 10px;
+                                    align-items: flex-end;
 
-                                .cafeInformation {
-
-                                    strong {
-                                        font-size: .9em;
-                                    }
-                                    ul {
-                                        list-style: none;
-                                    }
-                                    a {
-                                        text-decoration: none;
-                                        color: #7463ef;
-                                        display: block;
-                                        margin: 6px 0px;
+                                    h2, h5, p, ul, a {
+                                        margin: 10px 2px;
                                     }
 
-                                    .infoSection {
-                                        display: flex;
-                                        flex-direction: row;
-                                        margin: 15px 2px 10px;
-                                        align-items: flex-end;
+                                    div {
+                                        display: inline-block;
 
-                                        h2, h5, p, ul, a {
-                                            margin: 10px 2px;
-                                        }
+                                        ul {
+                                            padding: 0px;
 
-                                        div {
-                                            display: inline-block;
+                                            li {
+                                                display: flex;
+                                                flex-direction: row;
+                                                justify-content: space-between;
+                                                align-items: flex-end;
 
-                                            ul {
-                                                padding: 0px;
+                                                span {
+                                                    vertical-align: text-bottom;
 
-                                                li {
-                                                    display: flex;
-                                                    flex-direction: row;
-                                                    justify-content: space-between;
-                                                    align-items: flex-end;
-    
-                                                    span {
-                                                        vertical-align: text-bottom;
-    
-                                                        &:last-child {
-                                                            font-size: .85em;
-                                                        }
+                                                    &:last-child {
+                                                        font-size: .85em;
                                                     }
                                                 }
                                             }
                                         }
-                                        div:first-child {
-                                            flex-basis: 65%;
-                                        }
-                                        div:last-child {
-                                            flex-basis: 28%;
-                                            margin-left: 10px;
-                                        }
                                     }
-                                    .infoSection.contactSection {
-                                        align-items: flex-start;
+                                    div:first-child {
+                                        flex-basis: 65%;
+                                    }
+                                    div:last-child {
+                                        flex-basis: 28%;
+                                        margin-left: 10px;
                                     }
                                 }
-
-                                .cafeReviews {
-                                    border-radius: 5px;
-                                    box-shadow: 2px 1px 5px grey;
-                                    margin: 8px 8px 20px;
-                                    position: relative;
-
-                                    h2 {
-                                        margin: 20px 15px;
-                                        display: inline-block;
-                                    }
-
-                                    .highlightBar {
-                                        position: absolute;
-                                        background-color: #eee;
-                                        width: 40px;
-                                        height: 100%;
-                                        z-index: -1;
-                                        right: 30px;
-                                    }
-
-                                    .review {
-                                        margin: 25px 10px;
-                                        display: inline-block;
-                                        
-
-                                        .reviewContent {
-                                            margin: 10px;
-
-                                            .starRating {
-                                                float: left;
-                                                margin: 5px 10px;
-                                                font-weight: bold;
-    
-                                                span {
-                                                    color: grey;
-                                                    font-size: 2em;
-                                                }
-    
-                                                i {
-                                                    color: rgb(201, 179, 59);
-                                                }
-                                            }
-
-                                            p {
-                                                margin-bottom: 2px;
-                                            }
-                                        }
-
-                                        .reviewDetails {
-                                            display: flex;
-                                            flex-direction: row;
-                                            justify-content: flex-end;
-
-                                            p {
-                                                margin: 5px 2px;
-                                                margin-right: 8px;
-                                                font-style: italic;
-                                            }
-                                        }
-                                    }
+                                .infoSection.contactSection {
+                                    align-items: flex-start;
                                 }
-                                &:after {
-                                    content:'';
+                            }
+
+                            .cafeReviews {
+                                border-radius: 5px;
+                                box-shadow: 2px 1px 5px grey;
+                                margin: 8px 8px 20px;
+                                position: relative;
+
+                                h2 {
+                                    margin: 20px 15px;
+                                    display: inline-block;
+                                }
+
+                                .highlightBar {
                                     position: absolute;
-                                    bottom: 0;
-                                    right: 17px;
-                                    height: 20px;
-                                    width: 100%;
-                                    background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(255,255,255,0.8) 38%, rgba(255,255,255,1) 100%);
-                                    display: block;
+                                    background-color: #eee;
+                                    width: 40px;
+                                    height: 100%;
+                                    z-index: -1;
+                                    right: 30px;
                                 }
+
+                                .review {
+                                    margin: 25px 10px;
+                                    display: inline-block;
+                                    
+
+                                    .reviewContent {
+                                        margin: 10px;
+
+                                        .starRating {
+                                            float: left;
+                                            margin: 5px 10px;
+                                            font-weight: bold;
+
+                                            span {
+                                                color: grey;
+                                                font-size: 2em;
+                                            }
+
+                                            i {
+                                                color: rgb(201, 179, 59);
+                                            }
+                                        }
+
+                                        p {
+                                            margin-bottom: 2px;
+                                        }
+                                    }
+
+                                    .reviewDetails {
+                                        display: flex;
+                                        flex-direction: row;
+                                        justify-content: flex-end;
+
+                                        p {
+                                            margin: 5px 2px;
+                                            margin-right: 8px;
+                                            font-style: italic;
+                                        }
+                                    }
+                                }
+                            }
+                            &:after {
+                                content:'';
+                                position: absolute;
+                                bottom: 0;
+                                right: 17px;
+                                height: 20px;
+                                width: 100%;
+                                background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(255,255,255,0.8) 38%, rgba(255,255,255,1) 100%);
+                                display: block;
                             }
                         }
                     }
@@ -443,7 +460,7 @@ a {
                     position: absolute;
                     top: 6px;
                     left: 6px;
-                    color: red;
+                    color: $primary;
                 }
     
                 .hoverOverlay {
