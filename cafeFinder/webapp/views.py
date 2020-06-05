@@ -13,21 +13,11 @@ from research.apiHandlers import geocodeCityName, getCafeWithQueryString, getCaf
 from research.utilities import getDataFromFileWithName
 
 BASE = os.path.dirname(os.path.abspath(__file__))
-REVERSE_IDX_WORD_REF = getDataFromFileWithName(os.path.join(BASE, "../research/reverseWordVecRef"))
+REVERSE_IDX_WORD_REF = getDataFromFileWithName(os.path.join(BASE, "../research/wordBagFiles/reverseWordVecRef"))
 
 class CityViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.CreateModelMixin, mixins.DestroyModelMixin):
     serializer_class = CitySerializer
     queryset = City.objects.all()
-
-    def retrieve(self, request, pk):
-        queryset = self.queryset.filter(pk=pk)
-        city = queryset.first()
-        clustered_cafes = givenCityRunML(city, 5, 7)
-        clustered_cafe_response = []
-        for _, cafe_arr in clustered_cafes.items():
-            clustered_cafe_response.append(CafeSerializer(cafe_arr, many=True).data)
-
-        return JsonResponse({ 'cafe_list_of_lists': clustered_cafe_response })
 
     def get_queryset(self):
         queryset = self.queryset
@@ -53,7 +43,30 @@ def cafe_search(request):
     data = {}
     if query_string is not None:
         data = getCafeWithQueryString(query_string)
+    if (data.get('status', '400') == 'OK'):
+        for cafe in data.get('candidates'):
+            gencafeFromSearchRes(cafe)
     return JsonResponse(data)
+
+def gencafeFromSearchRes(cafe):
+    try:
+        cafe = Cafe.objects.get(pk=cafe['place_id'])
+    except Cafe.DoesNotExist:
+        location = cafe['geometry']['location']
+        photo_arr = cafe['photos']
+
+        cafe_search_obj = {
+            "place_id": cafe['place_id'],
+            "formatted_address": cafe['formatted_address'],
+            "name": cafe['name'],
+            "lat": location['lat'],
+            "lng": location['lng']
+        }
+        cafe_obj = CafeSerializer(data=cafe_search_obj)
+
+        if cafe_obj.is_valid(raise_exception=True):
+            cafe_model = cafe_obj.save()
+            createPhotosForCafe(photo_arr, cafe_model)
 
 @csrf_exempt
 def get_cafe_details(request, cafe_id):
@@ -64,7 +77,7 @@ def get_cafe_details(request, cafe_id):
     # if True:
     if cafe.photo_set.count() == 0:
         cafe_details_res = getCafeDetailsGivenID(cafe_id)
-        cafe.hours = hoursArrStringFromHoursObj(cafe_details_res)
+        cafe.hours = hoursArrStringFromDetailsRes(cafe_details_res)
         createPhotosForCafe(cafe_details_res['photos'], cafe)
         cafe_loc = cafe_details_res['geometry']['location']
         cafe.lat = cafe_loc['lat']
@@ -87,11 +100,11 @@ def get_cafe_details(request, cafe_id):
     return JsonResponse(cafe_data, safe=False)
 
 @csrf_exempt
-@require_http_methods(["POST"])
+@require_http_methods(["GET"])
 def find_similar_cafes(request):
-    request_body = json.loads(request.body)
-    city_id = request_body.get('cityId', None)
-    cafe_id = request_body.get('cafeId', None)
+    city_id = request.GET.get('city', None)
+    cafe_id = request.GET.get('cafe', None)
+    weighting = request.GET.get('weight', None)
     if (city_id and cafe_id):
         try:
             city = City.objects.get(pk=city_id)
@@ -102,9 +115,7 @@ def find_similar_cafes(request):
             target_cafe = Cafe.objects.get(place_id=cafe_id)
         except Cafe.DoesNotExist:
             cafe_details_res = getCafeDetailsGivenID(cafe_id)
-            cafe_name = request_body.get('cafeName', None)
-            cafe_addr = request_body.get('cafeAddr', None)
-            target_cafe = genCafeFromDetailsRequest(cafe_details_res, cafe_id, cafe_name, cafe_addr)
+            target_cafe = imbueCafeWithDetailsRes(cafe_details_res, cafe_id)
 
         if target_cafe.review_set.count() == 0:
             givenCafeRetrieveReviews(target_cafe, 80)
@@ -114,14 +125,33 @@ def find_similar_cafes(request):
             get60CafesNearCity(city)
 
         if (city.cafe_set.count() > 10):
-            similar_cafes = getNearestCafesGivenCafe(city, target_cafe)
+            similar_cafes = getNearestCafesGivenCafe(city, target_cafe, weighting)
 
-        cafe_response = CafeSerializer(similar_cafes, many=True).data
-        for cafe in cafe_response:
+        target_cafe_model = CafeSerializer(target_cafe).data
+        similar_cafes = CafeSerializer(similar_cafes, many=True).data
+        city = CitySerializer(city).data
+        for cafe in similar_cafes:
             if (cafe['hours'] != 'unset'):
                 cafe['hours'] = json.loads(cafe['hours'])
 
-    return JsonResponse({ 'cafe_list': cafe_response })
+    return JsonResponse({ 'target_cafe': target_cafe_model, 'cafe_list': similar_cafes, 'target_city': city })
+
+@csrf_exempt
+@require_http_methods(["GET"])
+def exploreCity(request):
+    city_id = request.GET.get('city', None)
+    weighting = request.GET.get('weight', None)
+    try:
+        city = City.objects.get(pk=city_id)
+    except City.DoesNotExist:
+        return JsonResponse({"status": "Failed", "Reason": "City not in database"})
+
+    clustered_cafes = givenCityRunML(city, 5, 9, weighting)
+    clustered_cafe_response = []
+    for _, cafe_arr in clustered_cafes.items():
+        clustered_cafe_response.append(CafeSerializer(cafe_arr, many=True).data)
+
+    return JsonResponse({ 'cafe_list_of_lists': clustered_cafe_response })
 
 
 @csrf_exempt
@@ -143,8 +173,13 @@ def genCafesFromAPICandidates(api_candidates):
     for candidate in api_candidates:
         Cafe.objects.create(place_id=candidate['place_id'], name=candidate['name'], formatted_address=candidate['formatted_address'])
 
-def genCafeFromDetailsRequest(cafe_details_obj, cafe_id, cafe_name, cafe_addr):
-    if (cafe_name is not None and cafe_addr is not None):
+def imbueCafeWithDetailsRes(cafe_details_obj, cafe_id):
+    cafe = Cafe.objects.get(pk=cafe_id)
+    if (cafe is not None):
+        cafe.compound_code = cafe_details_obj['plus_code']['compound_code']
+
+        createPhotosForCafe(cafe_details_obj['photos'], cafe)
+        cafe.hours = hoursArrStringFromDetailsRes(cafe_details_obj)
 
         place_type_arr = []
         for place_type in cafe_details_obj['types']:
@@ -154,25 +189,10 @@ def genCafeFromDetailsRequest(cafe_details_obj, cafe_id, cafe_name, cafe_addr):
                 placetype_obj = Placetype.objects.create(name=place_type)
             place_type_arr.append(placetype_obj)
 
-        photo_arr = cafe_details_obj['photos']
+        for place_type in place_type_arr:
+            cafe.placetypes.add(place_type)
 
-        compound_code = cafe_details_obj['plus_code']['compound_code']
-        cafe_details_obj.update({ "place_id": cafe_id, "name": cafe_name, "formatted_adress": cafe_addr, "compound_code": compound_code })
-
-        cafe_details_obj['hours'] = hoursArrStringFromHoursObj(cafe_details_obj)
-
-        for field in ['types', 'plus_code', 'opening_hours', 'photos']:
-            del cafe_details_obj[field]
-
-        cafe_obj = CafeSerializer(data=cafe_details_obj)
-        if cafe_obj.is_valid(raise_exception=True):
-            cafe_model = cafe_obj.save()
-            for place_type in place_type_arr:
-                cafe_model.placetypes.add(place_type)
-
-            createPhotosForCafe(photo_arr, cafe_model)
-
-        return cafe_model
+        return cafe
 
 def createPhotosForCafe(photo_arr, cafe):
     for num, photo in enumerate(photo_arr):
@@ -186,9 +206,9 @@ def createPhotosForCafe(photo_arr, cafe):
     Photo.objects.bulk_create(photo_arr)
 
 
-def hoursArrStringFromHoursObj(hours_obj):
+def hoursArrStringFromDetailsRes(details_res):
     try:
-        hours_arr = hours_obj['opening_hours']['periods']
+        hours_arr = details_res['opening_hours']['periods']
         formatted_arr = []
         for day_obj in hours_arr:
             formatted_arr.append([day_obj['open']['time'], day_obj['close']['time']])
