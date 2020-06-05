@@ -6,11 +6,11 @@ import QueryView from "./queryForming/queryView/QueryView";
 import QueryOutcome from "./outcome/QueryOutcome";
 import ExploreCities from "./queryForming/exploreView/ExploreCities";
 import { CSSTransition } from "react-transition-group";
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 
 function mapStateToProps(state=Map()) {
     return {
         searchParamsSet: state.get('searchParamsSet'),
-        currentTab: state.get('currentTab')
     }
 }
 
@@ -20,25 +20,12 @@ export class AppBody extends Component {
         return (
             <div id="AppBody">
                 <ViewingPane />
-                <CSSTransition
-                in={!this.props.searchParamsSet}
-                timeout={1000}
-                classNames="fade"
-                appear
-                unmountOnExit>
-                    {
-                        this.props.currentTab === CONSTS.EXPLORE_VIEW ?
-                        <ExploreCities />
-                        :
-                        <QueryView />
-                    }
-                </CSSTransition>
-                {
-                    this.props.searchParamsSet &&
-                    <div id="OutcomeSection" className="outcomeVisible">
-                        <QueryOutcome />
-                    </div>
-                }
+                <Switch>
+                    <Route path={['/', `/${CONSTS.QUERY_VIEW}`]} exact component={QueryView} />
+                    <Route path={`/${CONSTS.EXPLORE_VIEW}`} exact component={ExploreCities} />
+                    <Route path={`/${CONSTS.QUERY_OUTCOME_VIEW}`} component={QueryOutcome} />
+                    <Route path={`/${CONSTS.EXPLORE_OUTCOME_VIEW}`} component={QueryOutcome} />
+                </Switch>
             </div>
         )
     }
