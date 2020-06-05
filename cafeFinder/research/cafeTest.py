@@ -5,8 +5,9 @@ import numpy as np
 from scipy.sparse import csr_matrix
 from sklearn.decomposition import TruncatedSVD
 
-from research.dataProcessing import (getTFVectorsFromCafeArr, getIDFFromTFVectors,
-                                     vectorizeCafeReviews)
+from research.dataProcessing import (
+    getTFVectorsFromCafeArr, getIDFFromTFVectors,
+    vectorizeCafeReviews, generateWeightedVecs)
 from research.kMeans import runKMeans
 from research.nearestNeighbors import nearestNeighbors
 
@@ -21,7 +22,10 @@ def givenVecsRunPCA(dense_x, scale_to_n_dimensions):
     svd = TruncatedSVD(n_components=scale_to_n_dimensions, n_iter=10)
     return svd.fit_transform(sparse_x)
 
-def givenCityGetVectors(city, target_cafe=None):
+def givenCityGetVectors(city, target_cafe, weight_balance):
+    ambience_wt = 1.2 if weight_balance != 'ambience' else 1.6
+    food_wt = 1.2 if weight_balance != 'food' else 1.6
+
     city_cafes = list(city.cafe_set.all())
     city_id = str(getattr(city, 'id'))
 
@@ -38,13 +42,15 @@ def givenCityGetVectors(city, target_cafe=None):
     else:
         all_tf_vectors = city_cafe_tf_vecs
     all_cafe_vecs = getIDFFromTFVectors(all_tf_vectors)
+    weight_vec = generateWeightedVecs(ambience_wt, food_wt)
+    weighted_cafe_vecs = all_cafe_vecs * weight_vec
 
-    return city_cafes, all_cafe_vecs
+    return city_cafes, weighted_cafe_vecs
 
-def givenCityRunML(city, scale_to_n_dimensions, generate_n_clusters, show_graph=False):
-    centroid_membership = CACHE.get('centroid_membership_for_' + str(getattr(city, 'id')))
+def givenCityRunML(city, scale_to_n_dimensions, generate_n_clusters, weight_balance, show_graph=False):
+    centroid_membership = CACHE.get('centroid_membership_' + weight_balance + '_' + str(getattr(city, 'id')))
 
-    city_cafes, sparse_x = givenCityGetVectors(city)
+    city_cafes, sparse_x = givenCityGetVectors(city, None, weight_balance)
     for idx, cafe_vec in enumerate(sparse_x):
         top_100 = cafe_vec.argsort()[-100:][::-1]
         setattr(city_cafes[idx], 'raw_word_cloud', [(int(val), float(cafe_vec[val])) for val in top_100])
@@ -53,7 +59,7 @@ def givenCityRunML(city, scale_to_n_dimensions, generate_n_clusters, show_graph=
         X = givenVecsRunPCA(sparse_x, scale_to_n_dimensions)
 
         centroid_membership, centroids, _ = runKMeans(X, generate_n_clusters, 10)
-        CACHE.set('centroid_membership_for_' + str(getattr(city, 'id')), centroid_membership, None)
+        CACHE.set('centroid_membership_' + weight_balance + '_' + str(getattr(city, 'id')), centroid_membership, None)
 
     if (show_graph and scale_to_n_dimensions == 2):
         for idx, item in enumerate(X):
@@ -91,24 +97,30 @@ def plotCostChangeOverNClusters(X, cluster_range):
     plt.show()
 
 def testNDimensionsWithNClusters(city, scale_to_n_dimensions, cluster_range):
-    _, dense_x = givenCityGetVectors(city)
+    _, dense_x = givenCityGetVectors(city, None, 'normal')
     X = givenVecsRunPCA(dense_x, scale_to_n_dimensions)
     plotCostChangeOverNClusters(X, cluster_range)
 
-def getNearestCafesGivenCafe(city, cafe):
-    city_cafes, all_cafe_vecs = givenCityGetVectors(city, cafe)
+def getNearestCafesGivenCafe(city, cafe, weight_balance):
+    city_cafes, all_cafe_vecs = givenCityGetVectors(city, cafe, weight_balance)
 
     city_cafe_vecs = all_cafe_vecs[0:-1]
     target_cafe_vec = all_cafe_vecs[-1]
+
+    setWordCloudForCafe(cafe, target_cafe_vec)
 
     most_similar_cafe_tuples = nearestNeighbors(target_cafe_vec, city_cafe_vecs)
     similar_cafes = []
     for i in range(10):
         vec_for_cafe = all_cafe_vecs[most_similar_cafe_tuples[i][0]]
-        top_100 = vec_for_cafe.argsort()[-100:][::-1]
-
         cafe_to_add = city_cafes[most_similar_cafe_tuples[i][0]]
-        setattr(cafe_to_add, 'raw_word_cloud', [(int(val), float(vec_for_cafe[val])) for val in top_100])
+
+        setWordCloudForCafe(cafe_to_add, vec_for_cafe)
+
         similar_cafes.append(cafe_to_add)
 
     return similar_cafes
+
+def setWordCloudForCafe(cafe, cafe_vec):
+    top_100 = cafe_vec.argsort()[-100:][::-1]
+    setattr(cafe, 'raw_word_cloud', [(int(val), float(cafe_vec[val])) for val in top_100])
