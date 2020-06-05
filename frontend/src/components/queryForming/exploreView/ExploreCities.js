@@ -3,22 +3,24 @@ import { connect } from 'react-redux'
 import ReactGlobe from 'react-globe'
 import earthTexture from '../../../images/2_no_clouds_8k.jpg'
 // import { Marker, defaultDotMarkerOptions } from 'react-globe'
-import { exploreCityFunc } from '../../../actions/queryActions'
+import { optionLockToggledFunc } from '../../../actions/queryActions'
+import theme from '../../../styles/muiTheme'
 
 const markerOptions = {
     getTooltipContent: (marker) => 'Explore ' + marker.name + ', ' + marker.country,
+    
 }
 
 const lightOptions = {
-    pointLightIntensity: 1.1,
-    // pointLightColor: 'red',
-    ambientLightColor: '#69b9ff',
-    ambientLightIntensity: .9,
+    pointLightIntensity: .8,
+    pointLightColor: theme.palette.primary.secondary,
+    ambientLightColor: theme.palette.primary.secondary,
+    ambientLightIntensity: 1.2,
 }
 
 const globeOptions = {
     texture: earthTexture,
-    glowColor: '#abd8ff',
+    glowColor: theme.palette.warning.secondary,
     // enableBackground: false,
 }
 
@@ -30,7 +32,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
     return {
-        exploreCity: exploreCityFunc(dispatch)
+        optionLockToggled: optionLockToggledFunc(dispatch)
     }
 }
 class ExploreCities extends Component {
@@ -49,8 +51,15 @@ class ExploreCities extends Component {
         })
     }
 
+    cityFromMarker(marker) {
+        const { coordinates, value, ...city} = marker;
+        city.lat = coordinates[0]; city.lng = coordinates[1];
+        return city;
+    }
+
     onClickMarker = ((marker) => {
-        this.props.exploreCity(marker.id);
+        const cityInQuestion = this.cityFromMarker(marker);
+        this.props.optionLockToggled(false, cityInQuestion);
     }).bind(this)
 
     render() {
