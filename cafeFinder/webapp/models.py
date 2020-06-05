@@ -4,9 +4,10 @@ from django.db import models
 
 class City(models.Model):
     name = models.CharField("Name", max_length=255)
-    latitude = models.DecimalField("Latitude", max_digits=10, decimal_places=8)
-    longitude = models.DecimalField("Longitude", max_digits=11, decimal_places=8)
+    lat = models.DecimalField("Latitude", max_digits=10, decimal_places=8)
+    lng = models.DecimalField("Longitude", max_digits=11, decimal_places=8)
     country = models.ForeignKey("Country", on_delete=models.CASCADE, null=True)
+    photo_src = models.CharField("PhotoSrc", max_length=255, null=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
