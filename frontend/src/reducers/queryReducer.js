@@ -22,13 +22,14 @@ function createCafes(cafeCandidates) {
             name: cafe.name,
             lat: location.lat,
             lng: location.lng,
-            photo: photo ? {
+            photos: [photo ? {
                 fromGoogle: true,
                 height: photo.height,
                 width: photo.width,
                 ref: photo.photo_reference,
                 attr: photo.html_attributions[0]
-            } : { ref: "https://cdn.pixabay.com/photo/2017/05/11/08/17/coffee-2303271_960_720.jpg", fromGoogle: false }
+                } : { ref: "https://cdn.pixabay.com/photo/2017/05/11/08/17/coffee-2303271_960_720.jpg", fromGoogle: false }
+            ]
         }
     }))
 }
@@ -52,8 +53,8 @@ function createCity(city) {
     return Map({
         id: city.placeId,
         name: city.name,
-        lat: city.latitude,
-        lng: city.longitude,
+        lat: city.lat,
+        lng: city.lng,
         country: city.country
     })
 }
@@ -108,9 +109,9 @@ export default (state = Map({}), action) => {
             });
 
         case CITY_OPTION_LOCKED:
-            const CityResponse = state.get('cityResponse');
+            let CityResponse = state.get('cityResponse');
             if (!CityResponse.size) {
-                CityResponse.push(action.payload);
+                CityResponse = CityResponse.push(createCity(action.payload));
             }
             return state.merge({
                 'cityLock': fromJS(action.payload),

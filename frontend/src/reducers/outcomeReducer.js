@@ -11,7 +11,7 @@ import { snakeToCamel } from '../utilities/utilities'
 import { Map, fromJS } from 'immutable'
 
 
-function prepareDetailsPhotos(photos) {
+export function prepareDetailsPhotos(photos) {
     return photos.map((photo) => {
         return {
             fromGoogle: true,

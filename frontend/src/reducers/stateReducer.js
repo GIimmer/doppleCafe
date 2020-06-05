@@ -8,6 +8,7 @@ import {
     CITY_DATA_RETURNED
 } from '../constants/ActionConstants'
 import { snakeToCamel } from '../utilities/utilities'
+import { prepareDetailsPhotos } from './outcomeReducer'
 import { Map, List, fromJS } from 'immutable'
 
 function processReturnedCafes(candidatesArrArr, cafeLocMap, forMostSimilar) {
@@ -17,7 +18,12 @@ function processReturnedCafes(candidatesArrArr, cafeLocMap, forMostSimilar) {
                 similarityRank: idc + 1
             } : {};
     
-            Object.keys(cafe).forEach(key => jsObj[snakeToCamel(key)] = cafe[key]);
+            Object.keys(cafe).forEach(key => {
+                if (key === 'photos') {
+                    cafe[key] = prepareDetailsPhotos(cafe[key])
+                }
+                jsObj[snakeToCamel(key)] = cafe[key]
+            });
             cafeLocMap[jsObj.placeId] = [idg, idc];
             
             return jsObj;
@@ -57,8 +63,12 @@ export default (state = Map({}), action) => {
             return state.set('searchParamsSet', true);
 
         case SIMILAR_CAFES_FOUND:
+            const update_obj = handleReturnedCafes([[action.payload.target_cafe], action.payload.cafe_list], true)
             return state.merge(
-                handleReturnedCafes([action.payload.cafe_list], true)
+                Object.assign({
+                    'cafeLock': fromJS(action.payload.target_cafe),
+                    'cityLock': fromJS(action.payload.target_city)
+                }, update_obj)
             )
 
         case CLEAR_SEARCH:
@@ -67,18 +77,17 @@ export default (state = Map({}), action) => {
                 'cafeLock': Map(),
                 'searchParamsSet': false,
                 'searchParamsLocked': false,
+                'cafesReturned': false,
+                'returnedCafes': [],
                 'cafeResponse': clearLockState(state.get('cafeResponse')),
-                'cityResponse': clearLockState(state.get('cityResponse')),
+                'cityResponse': clearLockState(state.get('cityResponse'))
             })
 
         case PERMISSION_UPDATED:
             return state.set('userCanLoadNewCity', action.userCanLoadCities > 0);
 
-        case TAB_SWITCHED:
-            return clearData(state).set('currentTab', action.payload.newTab);
-
         case GETTING_CITY_DATA:
-            let cityLock = state.get('preLoadedCities').find(city => city.get('id') === action.payload);
+            let cityLock = state.get('preLoadedCities').find(city => city.get('id') === parseInt(action.payload));
             return state.merge({
                 'searchParamsSet': true,
                 'cityLock': cityLock
@@ -88,6 +97,9 @@ export default (state = Map({}), action) => {
             return state.merge(
                 handleReturnedCafes(action.payload.cafe_list_of_lists, false)
             )
+        
+        case TAB_SWITCHED:
+            return clearData(state);
 
         default:
             return state;
