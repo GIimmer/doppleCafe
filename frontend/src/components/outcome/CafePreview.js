@@ -17,15 +17,13 @@ export default function CafePreview(props) {
             </div>
             <div className="cafePreviewButtons">
                 <Button 
-                    variant="contained" 
-                    color="default" 
+                    variant="contained"
                     size="small"
                     disabled={cafe.detailsLoaded}
                     onClick={onAction.bind(parentSelf, 'loadDetails', cafe)}
                 >{cafe.website ? 'View ' : 'Load '}more details</Button>
                 <Button 
                     variant="contained" 
-                    color="default" 
                     size="small"
                     disabled={!cafeHasLoc}
                     onClick={onAction.bind(parentSelf, 'mapHighlight', cafe)}

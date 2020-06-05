@@ -8,12 +8,14 @@ import "react-responsive-carousel/lib/styles/carousel.min.css" // requires a loa
 import { Carousel } from 'react-responsive-carousel'
 import { genGooglePlacePhoto } from '../../utilities/utilities'
 import CafeHours from './CafeHours'
+import theme from './../../styles/muiTheme'
 
 const options = (stateIsDetailsReturned) => {
+    let pal = theme.palette;
     return {
-        colors: ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b'],
-        enableTooltip: true,
-        deterministic: false,
+        colors: [pal.primary.light, pal.secondary.dark, pal.info.dark, pal.warning.dark, pal.success.dark],
+        enableTooltip: false,
+        deterministic: true,
         fontFamily: 'impact',
         fontSizes: [10, 60],
         fontStyle: 'normal',

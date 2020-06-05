@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { GoogleApiWrapper, Map, InfoWindow, Marker } from 'google-maps-react'
 import { CONSTS } from "../../constants/Constants"
 
-const GROUPCOLORS = ['grey', 'red', 'orange', 'yellow', 'green', 'blue', 'purple'];
+const GROUPCOLORS = ['grey', 'red', 'orange', 'yellow', 'green', 'blue', 'purple', 'grey', 'grey'];
 
 function mapStateToProps(state=Map()) {
     return {
@@ -69,8 +69,3 @@ export class CafeMap extends PureComponent {
 export default connect(mapStateToProps)(GoogleApiWrapper({
     apiKey: (CONSTS.MAPS_EMBED_KEY)
 })(CafeMap))
-
-
-// export default GoogleApiWrapper({
-//     apiKey: (CONSTS.MAPS_EMBED_KEY)
-// })(CafeMap)
