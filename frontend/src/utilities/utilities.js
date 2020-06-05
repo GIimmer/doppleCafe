@@ -9,10 +9,7 @@ export function isEmpty(obj) {
 }
 
 export function genGooglePlacePhoto(photo) {
-    return photo.fromGoogle ? 
-    `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photo.ref}&key=${CONSTS.PHOTOS_EMBED_KEY}`
-    :
-    photo.ref
+    return `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photo.ref}&key=${CONSTS.PHOTOS_EMBED_KEY}`
 }
 
 export function snakeToCamel(str) {
@@ -22,4 +19,16 @@ export function snakeToCamel(str) {
                         .replace('-', '')
                         .replace('_', '')
     );
+}
+
+export function parseQueryString(qs) {
+    const qsValArray = qs.split(/[\&?]/);
+    const qsValMap = {}
+    qsValArray.forEach((str)=> {
+        if (str !== "") {
+            const keyValArr = str.split("=");
+            qsValMap[keyValArr[0]] = keyValArr[1];
+        }
+    })
+    return qsValMap;
 }
