@@ -1,23 +1,30 @@
 import os, sys
+sys.path.append(os.getcwd())
+
 from nltk.stem import PorterStemmer
 from cafeFinder.research.utilities import getDataFromFileWithName, saveDataToFileWithName
 from wordBagData import FOOD_TERMS, AMBIENCE_TERMS, DN_TERMS
 
-sys.path.append(os.getcwd())
 ps = PorterStemmer()
 
-def stemWordsInArrays(arr_arr, remove_dupes=False):
-    for idx, arr in enumerate(arr_arr):
-        arr_arr[idx] = [ps.stem(word) for word in arr]
+def stemWordsInArrays(tuple_arr, remove_dupes=False):
+    res_arr = []
+    for idx, term_tuple in enumerate(tuple_arr):
+        term_arr = term_tuple[1]
+        res_arr.append([ps.stem(word) for word in term_arr])
         if remove_dupes:
-            arr_arr[idx] = list(dict.fromkeys(arr))
-    return arr_arr
+            res_arr[idx] = list(dict.fromkeys(res_arr[idx]))
 
-PREV_WORD_BAG = getDataFromFileWithName('cafeFinder/research/wordBagFiles/wordVectorIdxRef')
-WORD_BAG_DICT = dict.fromkeys(PREV_WORD_BAG)
+        saveDataToFileWithName(res_arr[idx], 'cafeFinder/research/wordBagFiles/' + term_tuple[0] + 'Terms')
 
-FOOD_TERMS_STEMMED, AMBIENCE_TERMS_STEMMED, DN_TERMS_STEMMED = stemWordsInArrays([FOOD_TERMS, AMBIENCE_TERMS, DN_TERMS], True)
-ALL_WEIGHTED_TERMS = FOOD_TERMS_STEMMED + AMBIENCE_TERMS_STEMMED + DN_TERMS_STEMMED
+    return res_arr
+
+PREV_WORD_BAG = getDataFromFileWithName('cafeFinder/research/wordBagFiles/wordBagList')
+WORD_BAG_DICT = dict.fromkeys(PREV_WORD_BAG, True)
+
+term_tuples = [['food', FOOD_TERMS], ['ambience', AMBIENCE_TERMS], ['dn', DN_TERMS]]
+FOOD_STEMMED, AMBIENCE_STEMMED, DN_STEMMED = stemWordsInArrays(term_tuples, True)
+ALL_WEIGHTED_TERMS = FOOD_STEMMED + AMBIENCE_STEMMED + DN_STEMMED
 
 for term in ALL_WEIGHTED_TERMS:
     term_in_dict = WORD_BAG_DICT.get(term, False)
@@ -30,6 +37,7 @@ ALL_TERMS = NEW_WORD_BAG_LIST + ALL_WEIGHTED_TERMS
 NEW_TERM_IDX_REF = {term: idx for idx, term in enumerate(ALL_TERMS)}
 NEW_IDX_TERM_REF = {idx: term for idx, term in enumerate(ALL_TERMS)}
 
+saveDataToFileWithName(NEW_WORD_BAG_LIST, 'cafeFinder/research/wordBagFiles/wordBagList')
 saveDataToFileWithName(NEW_TERM_IDX_REF, 'cafeFinder/research/wordBagFiles/wordVectorIdxRef')
 saveDataToFileWithName(NEW_IDX_TERM_REF, 'cafeFinder/research/wordBagFiles/reverseWordVecRef')
 
