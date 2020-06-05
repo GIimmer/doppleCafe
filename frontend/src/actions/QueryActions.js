@@ -10,80 +10,9 @@ import {
     CITY_OPTION_LOCKED,
     CITY_OPTION_UNLOCKED,
     CLEAR_CAFE_MESSAGES,
-    CLEAR_CITY_MESSAGES,
-    GETTING_CITY_DATA,
-    CITY_DATA_RETURNED
+    CLEAR_CITY_MESSAGES
 } from "../constants/ActionConstants";
 import CONSTS from "../constants/Constants";
-
-const payload = [
-    {
-        placeId: 1,
-        similarityRank: 1,
-        name: "Chocolati Cafe",
-        formattedAddress: "8319 Greenwood Ave N, Seattle, WA 98103",
-        rating: 4.8,
-        lat: 47.689747,
-        lng: -122.355425,
-        wordCloud: [
-            {
-                text: 'Hello',
-                value: 26
-            },
-            {
-                text: 'There',
-                value: 15
-            }
-        ],
-        photos: [
-            "https://cdn.kqed.org/wp-content/uploads/sites/24/2012/02/chocolatifront.jpg"
-        ]
-    },
-    {
-        placeId: 3,
-        similarityRank: 2,
-        name: "Chocolati",
-        formattedAddress: "7810 East Green Lake Dr N, Seattle, WA 98115",
-        rating: 3.8,
-        lat: 47.685441,
-        lng: -122.336002,
-        wordCloud: [
-            {
-                text: 'Hello',
-                value: 26
-            },
-            {
-                text: 'There',
-                value: 15
-            }
-        ],
-        photos: [
-            "https://www.seattlegreenlaker.com/wp-content/uploads/2015/02/Chocolati1-300x199.jpg"
-        ]
-    },
-    {
-        placeId: 2,
-        similarityRank: 3,
-        name: "Chocolati Cafe Wallingford",
-        formattedAddress: "1716 N 45th St, Seattle, WA 98103",
-        rating: 4.5,
-        lat: 47.661505,
-        lng: -122.336813,
-        wordCloud: [
-            {
-                text: 'Hello',
-                value: 26
-            },
-            {
-                text: 'There',
-                value: 15
-            }
-        ],
-        photos: [
-            "https://s3-media0.fl.yelpcdn.com/bphoto/7sLuhmRJ_VLfAbvK7cZEuQ/348s.jpg"
-        ]
-    }
-]
 
 // ----------------------------------- API Actions ------------------------------------ //
 
@@ -125,25 +54,6 @@ export function searchForCityFunc(dispatch) {
                 payload: res
             });
         });
-    }
-}
-
-export function exploreCityFunc(dispatch) {
-    return (cityId) => {
-        dispatch({
-            type: GETTING_CITY_DATA,
-            payload: cityId
-        })
-
-        API.get(CONSTS.GET_CITIES + cityId + '/')
-        .then(res => {
-            if (res.status === 200) {
-                dispatch({
-                    type: CITY_DATA_RETURNED,
-                    payload: res.data
-                })
-            }
-        })
     }
 }
 

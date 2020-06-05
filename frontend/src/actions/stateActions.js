@@ -4,33 +4,18 @@ import {
     TAB_SWITCHED,
     FINDING_MOST_SIMILAR,
     SIMILAR_CAFES_FOUND,
-    CLEAR_SEARCH
+    CLEAR_SEARCH,
+    GETTING_CITY_DATA,
+    CITY_DATA_RETURNED
 } from '../constants/ActionConstants'
 
-
-export function tabSwitchedFunc(dispatch) {
-    return (newTab) => {
-        dispatch({
-            type: TAB_SWITCHED,
-            payload: {
-                newTab: newTab
-            }
-        })
-    }
-}
-
 export function findMostSimilarFunc(dispatch) {
-    return (city, cafe) => {
+    return (queryString) => {
         dispatch({
             type: FINDING_MOST_SIMILAR
         })
 
-        API.post(CONSTS.FIND_MOST_SIMILAR, {
-            cityId: city.id,
-            cafeId: cafe.placeId,
-            cafeName: cafe.name,
-            cafeAddr: cafe.formattedAddress
-        }).then(res => {
+        API.get(CONSTS.FIND_MOST_SIMILAR + queryString).then(res => {
             if (res.status === 200) {
                 dispatch({
                     type: SIMILAR_CAFES_FOUND,
@@ -41,6 +26,32 @@ export function findMostSimilarFunc(dispatch) {
     }
 }
 
+export function exploreCityFunc(dispatch) {
+    return (queryString, cityId) => {
+        dispatch({
+            type: GETTING_CITY_DATA,
+            payload: cityId
+        })
+
+        API.get(CONSTS.EXPLORE_CITY + queryString)
+        .then(res => {
+            if (res.status === 200) {
+                dispatch({
+                    type: CITY_DATA_RETURNED,
+                    payload: res.data
+                })
+            }
+        })
+    }
+}
+
+export function tabSwitchedFunc(dispatch) {
+    return () => {
+        dispatch({
+            type: TAB_SWITCHED,
+        })
+    }
+}
 
 export function clearSearchFunc(dispatch) {
     return () => {
