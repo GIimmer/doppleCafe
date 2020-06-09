@@ -125,16 +125,18 @@ def find_similar_cafes(request):
             get60CafesNearCity(city)
 
         if (city.cafe_set.count() > 10):
-            similar_cafes = getNearestCafesGivenCafe(city, target_cafe, weighting)
+            similar_cafe_wrapper = getNearestCafesGivenCafe(city, target_cafe, weighting)
 
         target_cafe_model = CafeSerializer(target_cafe).data
-        similar_cafes = CafeSerializer(similar_cafes, many=True).data
+        similar_cafes = CafeSerializer(similar_cafe_wrapper['similar_cafes'], many=True).data
+        common_terms_ref = {}
+        common_terms_ref[1] = [REVERSE_IDX_WORD_REF[str(term)] for term in similar_cafe_wrapper['common_terms'].keys()]
         city = CitySerializer(city).data
         for cafe in similar_cafes:
             if (cafe['hours'] != 'unset'):
                 cafe['hours'] = json.loads(cafe['hours'])
 
-    return JsonResponse({ 'target_cafe': target_cafe_model, 'cafe_list': similar_cafes, 'target_city': city })
+    return JsonResponse({ 'target_cafe': target_cafe_model, 'cafe_list': similar_cafes, 'common_terms_ref': common_terms_ref, 'target_city': city })
 
 @csrf_exempt
 @require_http_methods(["GET"])
@@ -148,10 +150,12 @@ def exploreCity(request):
 
     clustered_cafes = givenCityRunML(city, 5, 9, weighting)
     clustered_cafe_response = []
-    for _, cafe_arr in clustered_cafes.items():
-        clustered_cafe_response.append(CafeSerializer(cafe_arr, many=True).data)
+    common_terms_ref = {}
+    for idx, cafe_cluster in clustered_cafes.items():
+        common_terms_ref[idx] = [REVERSE_IDX_WORD_REF[str(term)] for term in cafe_cluster['common_terms'].keys()]
+        clustered_cafe_response.append(CafeSerializer(cafe_cluster['cafes'], many=True).data)
 
-    return JsonResponse({ 'cafe_list_of_lists': clustered_cafe_response })
+    return JsonResponse({ 'cafe_list_of_lists': clustered_cafe_response, 'common_terms_ref': common_terms_ref })
 
 
 @csrf_exempt

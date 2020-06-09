@@ -31,7 +31,7 @@ def computeNewCentroids(X, membership, K):
 
 def runKMeans(X, K, max_iterations):
     m, n = X.shape
-    best_cost = 1
+    best_cost = 20
     best_centroids = None
     best_centroid_membership = None
 
