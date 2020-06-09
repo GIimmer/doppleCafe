@@ -4,9 +4,12 @@ $light-teal: #ABD1B5;
 $mint-cream: #EDF4ED;
 $peach: #FCB97D;
 
+$primary-light: #af4c4e;
 $mint-cream-light: #f0f6f0;
 
 $mint-cream-dark: #a5aaa5;
+
+$mint-cream-contrast-text: rgba(0, 0, 0, 0.67);
 
 :export {
     primary: $primary;
@@ -101,29 +104,31 @@ a {
                         width: 45%;
 
                         .cafePreviewList {
-                            color: grey;
+                            color: $mint-cream-contrast-text;
                             padding: 20px 10px;
                             margin: 10px 0px;
 
                             &:nth-child(odd) {
-                                background-color: $mint-cream;
+                                background-color: $mint-cream-light;
                             }
 
                             .cafePreview {
                                 display: flex;
+                                border: 1px solid $mint-cream-dark;
                                 padding: 15px 7px;
                                 flex-direction: row;
                                 justify-items: space-between;
                                 align-items: center;
-                                color: $mint-cream-light;
-                                background-color: $mint-cream-dark;
+                                color: $mint-cream-contrast-text;
+                                background-color: $mint-cream;
                                 margin: 15px 0px;
-                                box-shadow: 2px 2px 3px grey;
+                                box-shadow: 2px 2px 3px $mint-cream-dark;
                                 cursor: pointer;
 
                                 &:hover {
-                                    box-shadow: 1px 1px 2px grey;
+                                    box-shadow: 1px 1px 2px $mint-cream-dark;
                                     background-color: inherit;
+                                    border-color: $mint-cream;
                                 }
 
                                 h1 {
@@ -157,7 +162,13 @@ a {
 
                                     button {
                                         margin: 5px;
-                                        background-color: $mint-cream-dark;
+                                        color: inherit;
+                                        background-color: $mint-cream;
+
+                                        &:hover {
+                                            box-shadow: 1px 1px 2px grey;
+                                            background-color: inherit;
+                                        }
                                     }
                                 }
                             }
@@ -336,20 +347,30 @@ a {
         max-height: 93vh;
         position: fixed;
         top: 7vh;
-        background-color: white;
+        // background: linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%),
+        background: linear-gradient(25deg, $primary-light 30%, $primary 90%);
         z-index: 2;
-        box-shadow: 2px 2px 4px grey;
+        box-shadow: 2px 2px 4px $primary;
         left: 0px;
 
         .selectionsHolder {
             position: relative;
             display: flex;
-            min-width: 10vw;
             float: right;
             height: 93vh;
             flex-direction: column;
             justify-content: center;
             align-items: center;
+
+            .weightButton {
+                width: 100%;
+                flex-grow: 2;
+                color: $mint-cream;
+                text-align: center;
+            }
+            .largerButton {
+                flex-grow: 3;
+            }
 
             #cancelButton {
                 position: absolute;
@@ -452,10 +473,6 @@ a {
                 justify-content: space-between;
                 flex-wrap: wrap;
     
-                .glow {
-                    animation: glow 1000ms ease-out infinite alternate;
-                }
-    
                 i.fas.fa-lock {
                     position: absolute;
                     top: 6px;
@@ -504,14 +521,16 @@ a {
 
 // Animations!
 
+.glow {
+    animation: glow 1500ms ease-out infinite alternate;
+}
+
 @keyframes glow {
     0% {
-		border-color: rgb(77, 37, 14);
-		box-shadow: 0 0 5px rgba(77, 37, 14, 0.2), inset 0 0 5px rgba(77, 37, 14, .1), 0 2px 0 #000;
+		box-shadow: 0 0 5px $mint-cream;
     }	
     100% {
-		border-color: rgb(77, 37, 14);
-		box-shadow: 0 0 20px rgba(77, 37, 14, 0.6), inset 0 0 10px rgba(77, 37, 14, .4), 0 2px 0 #000;
+		box-shadow: 0 0 15px $mint-cream-dark;
     }
 }
 

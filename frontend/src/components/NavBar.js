@@ -28,12 +28,15 @@ export class NavBar extends Component {
 
     componentDidUpdate(prevProps) {
         if (this.props.location !== prevProps.location) {
-            this.props.tabSwitched();
+            let location = this.props.location.pathname.substr(1);
+            if ([CONSTS.QUERY_VIEW, CONSTS.EXPLORE_VIEW].includes(location)) {
+                this.props.tabSwitched();
+            }
         }
       }
 
     render() {
-        let tabValue = this.props.location.pathname === `/${CONSTS.EXPLORE_VIEW}` ? 1 : 0;
+        let tabValue = [`/${CONSTS.QUERY_VIEW}`, `/${CONSTS.QUERY_OUTCOME_VIEW}`].includes(this.props.location.pathname) ? 0 : 1;
         return (
             <div id="NavBar">
                 <AppBar position="static" className="AppBar">

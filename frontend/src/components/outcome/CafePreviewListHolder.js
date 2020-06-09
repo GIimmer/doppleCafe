@@ -2,7 +2,9 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import CafePreviewList from './CafePreviewList'
 import CONSTS from '../../constants/Constants'
-import { setViewingDetailsFunc, loadCafeDetailsFunc, highlightCafeOnMapFunc, toggleCafeHoverFunc } from '../../actions/outcomeActions';
+import { parseQueryString } from '../../utilities/utilities'
+import { setViewingDetailsFunc, loadCafeDetailsFunc, highlightCafeOnMapFunc, toggleCafeHoverFunc } from '../../actions/outcomeActions'
+import { withRouter } from 'react-router-dom'
 
 
 function mapDispatchToProps(dispatch) {
@@ -14,14 +16,19 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-function mapStateToProps(state=Map()) {
+function mapStateToProps(state=Map(), props) {
+    const currentTab = props.location.pathname.substr(1);
     return {
         returnedCafes: state.get('returnedCafes'),
-        currentTab: state.get('currentTab')
+        currentTab: currentTab
     }
 }
 
 export class CafePreviewListHolder extends Component {
+    constructor(props) {
+        super(props);
+        this.state = parseQueryString(props.location.search);
+    }
 
     handleAction(action, cafe, e) {
         e.preventDefault();
@@ -57,9 +64,10 @@ export class CafePreviewListHolder extends Component {
                         return <CafePreviewList 
                             group={group}
                             groupIdx={idx}
-                            handleAction={this.handleAction} 
+                            handleAction={this.handleAction}
                             parentContext={this}
-                            searchingBySimilar={this.props.currentTab === CONSTS.QUERY_VIEW} 
+                            weight={this.state.weight}
+                            searchingBySimilar={this.props.currentTab === CONSTS.QUERY_OUTCOME_VIEW} 
                         />
                     })
                 }
@@ -68,4 +76,4 @@ export class CafePreviewListHolder extends Component {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(CafePreviewListHolder)
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(CafePreviewListHolder))

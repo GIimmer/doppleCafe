@@ -5,8 +5,8 @@ import CONSTS from '../../constants/Constants'
 import Button from '@material-ui/core/Button'
 import { genGooglePlacePhoto } from "../../utilities/utilities"
 import { findMostSimilarFunc, clearSearchFunc } from '../../actions/stateActions'
-import { Link } from 'react-router-dom'
 import { withRouter } from 'react-router';
+import { Link } from 'react-router-dom'
 
 
 function mapDispatchToProps(dispatch) {
@@ -17,20 +17,21 @@ function mapDispatchToProps(dispatch) {
 }
 
 function mapStateToProps(state=Map(), props) {
+    const pathname = props.location.pathname.substr(1);
     const baseMap = {
         cafeLock: state.get('cafeLock'),
         cityLock: state.get('cityLock'),
-        searchParamsSet: state.get('searchParamsSet'),
-        isExploreView: [CONSTS.EXPLORE_VIEW, CONSTS.EXPLORE_OUTCOME_VIEW].includes(props.location.pathname.substr(1))
+        searchParamsSet: [CONSTS.QUERY_OUTCOME_VIEW, CONSTS.EXPLORE_OUTCOME_VIEW].includes(pathname),
+        isExploreView: [CONSTS.EXPLORE_VIEW, CONSTS.EXPLORE_OUTCOME_VIEW].includes(pathname)
     }
     return Object.assign(baseMap, {
-        searchParamsLocked: (!!baseMap.cityLock.size && (!!baseMap.cafeLock.size || baseMap.isExploreView))
+        searchParamsLocked: (!!baseMap.cityLock.size && (!!baseMap.cafeLock.size || baseMap.isExploreView)),
     })
 }
 
 
 export class ViewingPane extends Component {
-    getContainerClass(isExploreView) {
+    getContainerClass() {
         let baseClass = 'viewingPane';
         if (this.props.searchParamsLocked) {
             baseClass += ' paneMounted';
@@ -47,25 +48,28 @@ export class ViewingPane extends Component {
         return `/${viewSegment}?city=${city.id}${cafeSegment}&weight=`;
     }
 
+    handleCancelClick() {
+        this.props.clearSearch();
+        this.props.history.push(`/${CONSTS.QUERY_VIEW}`);
+    }
+
     render() {
         let cafe = this.props.cafeLock, city = this.props.cityLock;
+        let linkBase;
         if (this.props.searchParamsLocked) {
             cafe = cafe.size ? cafe.toJS() : cafe;
             city = city.size ? city.toJS() : city;
-        } else if (this.props.isExploreView) {
-            city = city.size ? city.toJS() : city;
+            linkBase = this.linkBuilder(this.props.isExploreView, cafe, city);
         }
-        const linkBase = this.linkBuilder(this.props.isExploreView, cafe, city)
         return (
             <div className={this.getContainerClass(this.props.isExploreView)}>
                 {
-                    this.props.searchParamsSet ?
+                    linkBase && this.props.searchParamsSet ?
                     <div className="selectionsHolder">
                         <Button id="cancelButton" 
-                        variant="contained" 
-                        color="secondary" 
+                        variant="contained"
                         size="small"
-                        onClick={this.props.clearSearch}>
+                        onClick={this.handleCancelClick.bind(this)}>
                             Cancel Search
                         </Button>
                         {
@@ -75,13 +79,13 @@ export class ViewingPane extends Component {
                         <ViewingBox field="city" photo={city.photo_src} title={city.name} subtitle={city.country} />
                     </div>
                     :
-                    <div className="selectionsHolder">
+                    <div className="selectionsHolder" style={{ width: '10vw'}}>
                         {
-                            this.props.searchParamsLocked &&
+                            !this.props.searchParamsSet && this.props.searchParamsLocked &&
                             <>
-                                <Button color="secondary"  component={Link} to={linkBase + 'ambience'} >Emphasize ambience?</Button>
-                                <Button color="primary" component={Link} to={linkBase + 'normal'} >Search?</Button>
-                                <Button color="secondary" component={Link} to={linkBase + 'food'}>Emphasize food?</Button>
+                                <Button className="weightButton largerButton" component={Link} to={linkBase + 'ambience'} >Emphasize ambience</Button>
+                                <Button className="weightButton" component={Link} to={linkBase + 'normal'} >Default emphasis</Button>
+                                <Button className="weightButton largerButton" component={Link} to={linkBase + 'food'}>Emphasize food</Button>
                             </>
                         }
                     </div>

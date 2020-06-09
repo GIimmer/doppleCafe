@@ -37,7 +37,6 @@ function clearLockState(objectArr) {
 
 function clearData(state) {
     return state.merge({
-        searchParamsSet: false,
         cafesReturned: false,
         cityResponse: List(),
         cafeResponse: List(),
@@ -46,11 +45,20 @@ function clearData(state) {
     });
 }
 
-function handleReturnedCafes(cafeListOfLists, forSimilar) {
-    let cafeLocMap = {};
+function handleReturnedCafes(cafeListOfLists, rawCommonTermsRefMap, forSimilar) {
+    let cafeLocMap = {},
+        commonTermsRefMap = {}
+        
+    Object.keys(rawCommonTermsRefMap).forEach((key) => {
+        commonTermsRefMap[key] = rawCommonTermsRefMap[key].reduce((o, key) => ({ ...o, [key]: true }), {})
+    });
+    if (forSimilar) {
+        commonTermsRefMap[0] = commonTermsRefMap[1];
+    }
     return {
         'cafesReturned': true,
         'returnedCafes': fromJS(processReturnedCafes(cafeListOfLists, cafeLocMap, forSimilar)),
+        'commonTermsRefMap': fromJS(commonTermsRefMap),
         'cafeLocMap': fromJS(cafeLocMap)
     };
 }
@@ -60,10 +68,10 @@ export default (state = Map({}), action) => {
     console.log("state store recieved an action: ", action);
     switch (action.type) {
         case FINDING_MOST_SIMILAR:
-            return state.set('searchParamsSet', true);
+            return state;
 
         case SIMILAR_CAFES_FOUND:
-            const update_obj = handleReturnedCafes([[action.payload.target_cafe], action.payload.cafe_list], true)
+            const update_obj = handleReturnedCafes([[action.payload.target_cafe], action.payload.cafe_list], action.payload.common_terms_ref, true)
             return state.merge(
                 Object.assign({
                     'cafeLock': fromJS(action.payload.target_cafe),
@@ -75,7 +83,6 @@ export default (state = Map({}), action) => {
             return state.merge({
                 'cityLock': Map(),
                 'cafeLock': Map(),
-                'searchParamsSet': false,
                 'searchParamsLocked': false,
                 'cafesReturned': false,
                 'returnedCafes': [],
@@ -89,13 +96,13 @@ export default (state = Map({}), action) => {
         case GETTING_CITY_DATA:
             let cityLock = state.get('preLoadedCities').find(city => city.get('id') === parseInt(action.payload));
             return state.merge({
-                'searchParamsSet': true,
                 'cityLock': cityLock
             });
 
         case CITY_DATA_RETURNED:
             return state.merge(
-                handleReturnedCafes(action.payload.cafe_list_of_lists, false)
+                handleReturnedCafes(action.payload.cafe_list_of_lists, action.payload.common_terms_ref, false),
+
             )
         
         case TAB_SWITCHED:

@@ -9,50 +9,63 @@ import { Carousel } from 'react-responsive-carousel'
 import { genGooglePlacePhoto } from '../../utilities/utilities'
 import CafeHours from './CafeHours'
 import theme from './../../styles/muiTheme'
+import { List } from 'immutable'
 
 const options = (stateIsDetailsReturned) => {
-    let pal = theme.palette;
-    return {
-        colors: [pal.primary.light, pal.secondary.dark, pal.info.dark, pal.warning.dark, pal.success.dark],
+   return {
         enableTooltip: false,
-        deterministic: true,
         fontFamily: 'impact',
         fontSizes: [10, 60],
         fontStyle: 'normal',
         fontWeight: 'normal',
         padding: 1,
         rotations: 5,
-        rotationAngles: [-90, 90],
+        rotationAngles: [-20, 20],
         scale: 'sqrt',
-        spiral: 'archimedean',
         transitionDuration: stateIsDetailsReturned ? 0 : 1000,
     }
 };
+
+function getColorFunc(targetCafeDict) {
+    const pal = theme.palette,
+        colorChoices = [pal.secondary.main, pal.secondary.dark, pal.info.dark];
+    return ({ text }) => {
+        return targetCafeDict[text] ?
+        pal.primary.main
+        :
+        colorChoices[Math.floor(Math.random() * colorChoices.length)]
+    }
+}
 
 function mapStateToProps(state) {
     return {
         cafeDetails: state.get('cafeDetails'),
         returnedCafes: state.get('returnedCafes'),
         cafeLocMap: state.get('cafeLocMap'),
-        wordBagRef: state.get('wordBagRef')
+        wordBagRef: state.get('wordBagRef'),
+        commonTermsRefMap: state.get('commonTermsRefMap')
     }
 }
 
 export class CafeDetails extends PureComponent {
+    state = {};
     _isMounted = true;
+
+    componentDidMount() {
+        const wordBagRef = this.props.wordBagRef;
+        const targetWordBag = this.props.returnedCafes.getIn([0,0, 'rawWordCloud']),
+            targetCafeWordPresRef = targetWordBag.reduce((o, key) => ({ ...o, [wordBagRef.get(key.get(0))]: true }), {});
+        this.setState({
+            'targetCafeWordPresRef': targetCafeWordPresRef
+        })
+    }
 
     componentWillUnmount() {
         this._isMounted = false;
     }
 
-    getPreparedCafe() {
-        const cafeDetails = this.props.cafeDetails, 
-            cafeId = cafeDetails.get('cafeId');
-
-        let viewingCafe = cafeDetails.get(cafeId);
-        if (!viewingCafe && !!cafeId) {
-            viewingCafe = this.props.returnedCafes.getIn(this.props.cafeLocMap.get(cafeId).toJS());
-        }
+    getPreparedCafe(viewingCafe) {
+        
 
         if (viewingCafe && viewingCafe.size && viewingCafe.get('wordCloud') === undefined) {
             const jsViewingCafe = viewingCafe.toJS()
@@ -78,9 +91,20 @@ export class CafeDetails extends PureComponent {
     }
 
     render() {
-        let cafe = this.getPreparedCafe(),
+        const cafeDetails = this.props.cafeDetails, 
+            cafeId = cafeDetails.get('cafeId'),
+            viewingCafe = cafeDetails.get(cafeId),
+            cafeLoc = !!cafeId ? this.props.cafeLocMap.get(cafeId, List()).toJS() : null;
+
+        if (!viewingCafe && cafeLoc) {
+            viewingCafe = this.props.returnedCafes.getIn(cafeLoc);
+        }
+
+        let cafe = this.getPreparedCafe(viewingCafe),
             stateIsDetailsReturned = (this.props.cafeDetails.get('userActionState') === CAFE_DETAILS_RETURNED),
-            showDetails = (stateIsDetailsReturned || (cafe && !!cafe.detailsLoaded));
+            showDetails = (stateIsDetailsReturned || (cafe && !!cafe.detailsLoaded)),
+            targetCafeWordPresRef = this.state.targetCafeWordPresRef,
+            commonTermsRefMap = !!targetCafeWordPresRef && !!cafeLoc ? this.props.commonTermsRefMap.get(cafeLoc[0].toString()).toJS() : undefined;
         return (
             <div className="cafeDetails">
                 {
@@ -91,7 +115,13 @@ export class CafeDetails extends PureComponent {
                                 showStatus={showDetails}
                                 showIndicators={showDetails}>
                                 <div style={{ width: '100%', height: showDetails ? '300px' : '87vh', backgroundColor: showDetails ? 'black' : 'white' }}>
-                                    <ReactWordcloud words={cafe.wordCloud} options={options(stateIsDetailsReturned)} />
+                                    <ReactWordcloud
+                                        words={cafe.wordCloud}
+                                        options={options(stateIsDetailsReturned)}
+                                        callbacks={{
+                                            getWordColor: !!targetCafeWordPresRef ? getColorFunc(commonTermsRefMap) : undefined,
+                                          }}
+                                        />
                                 </div>
                                 {
                                     showDetails &&

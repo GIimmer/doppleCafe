@@ -3,13 +3,11 @@ import query from './reducers/queryReducer'
 import state from './reducers/stateReducer'
 import reduceReducers from 'reduce-reducers'
 import Immutable from 'immutable'
-import CONSTS from "./constants/Constants"
 
 export const InitialState = Immutable.fromJS({
     userCanLoadNewCity: true,
     cafeQueryState: null,
     cityQueryState: null,
-    searchParamsSet: false,
     cafesReturned: false,
     highlightedCafe: null,
     wordBagRef: null,
@@ -54,7 +52,8 @@ export const InitialState = Immutable.fromJS({
     cafeLock: {},
     cafeDetails: {},
     returnedCafes: [],
-    idToCafeMapper: {}
+    idToCafeMapper: {},
+    commonTermsRefMap: {}
 })
 
 export default reduceReducers(
