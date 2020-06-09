@@ -13,7 +13,7 @@ The goal of the application is to allow digital nomads to find cafes great for r
 
 ## Next Steps
 - [x] On Cache miss, run k-means n times and vectorize best outcome. (Currently only text vectors are cached)
-- [ ] Weight atmosphere and food terminology higher than other words, optionally allow user-informed weighting
+- [x] Weight atmosphere and food terminology higher, optionally allow user-informed weighting
 - [ ] User authorization flow - allow one newly loaded city per user
 - [ ] Updates to cafes when they become out of date (not a worry at this stage)
 - [ ] Flag to signify probably digital nomad ready (mentions of wifi, outlets, laptop, etc. open hours at least 9 - 5)
