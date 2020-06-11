@@ -28,6 +28,10 @@ function imbueCafeDetails(cafe, newDetails) {
         detailsLoaded: true
     };
     for (let key of Object.keys(newDetails)) {
+        if (key === 'photos') {
+            detailedCafeObj[key] = fromJS(prepareDetailsPhotos(newDetails[key]));
+            continue;
+        }
         let newKey = snakeToCamel(key);
         detailedCafeObj[newKey] = fromJS(newDetails[key]);
     }

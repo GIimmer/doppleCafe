@@ -1,14 +1,14 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'react-redux'
 import ReactWordcloud from 'react-wordcloud'
-import { format } from 'timeago.js'
 import DOMPurify from 'dompurify'
-import { CAFE_DETAILS_RETURNED } from '../../constants/ActionConstants'
+import { CAFE_DETAILS_RETURNED } from '../../../constants/ActionConstants'
 import "react-responsive-carousel/lib/styles/carousel.min.css" // requires a loader
 import { Carousel } from 'react-responsive-carousel'
-import { genGooglePlacePhoto } from '../../utilities/utilities'
-import CafeHours from './CafeHours'
-import theme from './../../styles/muiTheme'
+import { genGooglePlacePhoto } from '../../../utilities/utilities'
+import CafeInformation from './CafeInformation'
+import CafeReviews from './CafeReviews'
+import theme from '../../../styles/muiTheme'
 import { List } from 'immutable'
 
 const options = (stateIsDetailsReturned) => {
@@ -25,6 +25,16 @@ const options = (stateIsDetailsReturned) => {
         transitionDuration: stateIsDetailsReturned ? 0 : 1000,
     }
 };
+
+const getCarouselStyle = (showDetails) => {
+    const pal = theme.palette;
+    return {
+        width: '100%',
+        height: showDetails ? '300px' : '87vh',
+        backgroundColor: 'white',
+        borderBottom: showDetails ? `27px solid ${pal.info.dark}` : 'none'
+    }
+}
 
 function getColorFunc(targetCafeDict) {
     const pal = theme.palette,
@@ -65,8 +75,6 @@ export class CafeDetails extends PureComponent {
     }
 
     getPreparedCafe(viewingCafe) {
-        
-
         if (viewingCafe && viewingCafe.size && viewingCafe.get('wordCloud') === undefined) {
             const jsViewingCafe = viewingCafe.toJS()
             jsViewingCafe.wordCloud = jsViewingCafe.rawWordCloud.map((tuple) => {
@@ -85,9 +93,12 @@ export class CafeDetails extends PureComponent {
         return (""+sanitizedString).replace(/<a\s+href=/gi, '<a target="_blank" href=');
     }
 
-    formatReviewDate(date) {
-        let parsedDate = Date.parse(date);
-        return format(parsedDate);
+    getCommonTermsRef(cafeLoc) {
+        console.log('here is state: ', this.state);
+        console.log('here is cafeLoc: ', cafeLoc);
+        if (this.state.targetCafeWordPresRef && cafeLoc && cafeLoc.length) {
+            return this.props.commonTermsRefMap.get(cafeLoc[0].toString()).toJS();
+        }
     }
 
     render() {
@@ -102,11 +113,11 @@ export class CafeDetails extends PureComponent {
 
         let cafe = this.getPreparedCafe(viewingCafe),
             stateIsDetailsReturned = (this.props.cafeDetails.get('userActionState') === CAFE_DETAILS_RETURNED),
-            showDetails = (stateIsDetailsReturned || (cafe && !!cafe.detailsLoaded)),
-            targetCafeWordPresRef = this.state.targetCafeWordPresRef,
-            commonTermsRefMap = !!targetCafeWordPresRef && !!cafeLoc ? this.props.commonTermsRefMap.get(cafeLoc[0].toString()).toJS() : undefined;
+            showDetails = (stateIsDetailsReturned || (cafe && !!cafe.detailsLoaded));
+
+        const commonTermsRefMap = this.getCommonTermsRef(cafeLoc);
         return (
-            <div className="cafeDetails">
+            <div className={`cafeDetails${showDetails ? ' scrollOverflow' : ''}`}>
                 {
                     !!cafe ?
                         <div>
@@ -114,12 +125,12 @@ export class CafeDetails extends PureComponent {
                                 showArrows={showDetails}
                                 showStatus={showDetails}
                                 showIndicators={showDetails}>
-                                <div style={{ width: '100%', height: showDetails ? '300px' : '87vh', backgroundColor: showDetails ? 'black' : 'white' }}>
+                                <div style={getCarouselStyle(showDetails)}>
                                     <ReactWordcloud
                                         words={cafe.wordCloud}
                                         options={options(stateIsDetailsReturned)}
                                         callbacks={{
-                                            getWordColor: !!targetCafeWordPresRef ? getColorFunc(commonTermsRefMap) : undefined,
+                                            getWordColor: getColorFunc(commonTermsRefMap),
                                           }}
                                         />
                                 </div>
@@ -135,53 +146,10 @@ export class CafeDetails extends PureComponent {
                             </Carousel>
                             {
                                 showDetails &&
-                                <div className="cafeInformation">
-                                    <div className="infoSection">
-                                        <div>
-                                            <h2>{cafe.name}</h2>
-                                            <h5>{cafe.formattedAddress}</h5>
-                                        </div>
-                                        <div>
-                                            <p>rating: <strong>{cafe.rating}</strong></p>
-                                            <p>price level: <strong>{cafe.priceLevel}/5</strong></p>
-                                        </div>                                
-                                    </div>
-                                    <div className="infoSection contactSection">
-                                        <div>
-                                            <a href={cafe.website} target="_blank">
-                                                {cafe.website}
-                                            </a>
-                                            <span>{cafe.formattedPhoneNumber}</span>
-                                        </div>
-                                        <div>
-                                            <CafeHours hours={cafe.hours} />
-                                        </div>
-                                    </div>
-                                </div>
-                            }
-                            {
-                                showDetails &&
-                                <div className="cafeReviews">
-                                    <div className="highlightBar"></div>
-                                    <h2>Some sample reviews</h2>
-                                    {
-                                        cafe.reviews &&
-                                        cafe.reviews.map((review, idx) => {
-                                            return <div key={idx} className="review">
-                                                <div className="reviewContent">
-                                                    <div className="starRating">
-                                                        <span>{review.rating}</span> <i className="fa fa-star fa-2x" aria-hidden="true"></i>
-                                                    </div>
-                                                    <p>{review.text}</p>
-                                                </div>
-                                                <div className="reviewDetails">
-                                                    <p>- {review.reviewer},</p>
-                                                    <p>{this.formatReviewDate(review.datetime)}</p>
-                                                </div>
-                                            </div>
-                                        })
-                                    }
-                                </div>
+                                <>
+                                    <CafeInformation cafe={cafe} />
+                                    <CafeReviews reviews={cafe.reviews} />
+                                </>
                             }
                         </div>
                         :

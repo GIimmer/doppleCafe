@@ -6,8 +6,10 @@ function mapStateToProps(state, props) {
     let cafeId = props.cafe.placeId,
         cafeDetails = state.get('cafeDetails'),
         activeCafe = cafeDetails.get('cafeId');
+
     return {
-        isActive: (activeCafe === cafeId)
+        isActive: (activeCafe === cafeId),
+        detailsLoaded: cafeDetails.getIn([cafeId, 'detailsLoaded'])
     }
 }
 
@@ -29,11 +31,11 @@ export class CafePreview extends Component {
                     <Button 
                         variant="contained"
                         size="small"
-                        disabled={cafe.detailsLoaded}
+                        disabled={this.props.detailsLoaded}
                         onClick={onAction.bind(parentSelf, 'loadDetails', cafe)}
                     >{cafe.website ? 'View ' : 'Load '}more details</Button>
                     <Button 
-                        variant="contained" 
+                        variant="contained"
                         size="small"
                         disabled={!cafeHasLoc}
                         onClick={onAction.bind(parentSelf, 'mapHighlight', cafe)}

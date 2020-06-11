@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'react-redux'
-import CafeDetails from './CafeDetails'
+import CafeDetails from './CafeDetails/CafeDetails'
 import { GETTING_CAFE_DETAILS } from '../../constants/ActionConstants'
 import { css } from "@emotion/core"
 import RingLoader from "react-spinners/RingLoader"
