@@ -26,7 +26,7 @@ The goal of the application is to allow digital nomads to find cafes great for r
 ##### Query Input View
 Upon searching a cafe or city, the api uses google or geocoding to provide options in response. User must then lock correct options, setting search params. 
 
-![Query Input View](https://imgur.com/GAbINaM)
+![Query Input View](https://i.imgur.com/GAbINaM.png)
 
 Once the request is received by the backend partially RESTful API it...
 1. Checks if the cafe is already in the db, if not retrieves details and up to 80 reviews via API
@@ -38,7 +38,7 @@ Once the request is received by the backend partially RESTful API it...
 ##### Explore Input View
 User can peruse preloaded cities across the globe, and select the one which they would like to explore further via its grouped cafes.
 
-![Explore Input View](https://imgur.com/W0d4K5f)
+![Explore Input View](https://i.imgur.com/W0d4K5f.png)
 
 Once the city is selected the backend API...
 1. Checks if the cites cafes have been vectorized and cached -> if not process using steps described above
@@ -49,8 +49,7 @@ Once the city is selected the backend API...
 ##### Output View
 The output is similar for both explore and query view. The user is given a series of cafe preview options (either ranked similarity or in groups), and some sparse information about each as well as a word cloud (the top 100 highest value words). The user can load more details about any cafe which interests them (an API call in most cases), or highlight it on the map - found at the top of the page
 
-*Query Outcome Initial View*
-![Outcome Initial View](https://imgur.com/ND97CBy)
-  
-*Explore Outcome Details View*
-![Outcome Details View](https://imgur.com/l9yqi2x)
+![Outcome Initial View](https://i.imgur.com/ND97CBy.png)
+
+
+![Outcome Details View](https://i.imgur.com/l9yqi2x.png)
