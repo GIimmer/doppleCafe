@@ -49,7 +49,8 @@ Once the city is selected the backend API...
 ##### Output View
 The output is similar for both explore and query view. The user is given a series of cafe preview options (either ranked similarity or in groups), and some sparse information about each as well as a word cloud (the top 100 highest value words). The user can load more details about any cafe which interests them (an API call in most cases), or highlight it on the map - found at the top of the page
 
+*Query Outcome initial view*
 ![Outcome Initial View](https://i.imgur.com/ND97CBy.png)
 
-
+*Query Outcome details view*
 ![Outcome Details View](https://i.imgur.com/l9yqi2x.png)
