@@ -59,6 +59,7 @@ function mapStateToProps(state) {
 
 export class CafeDetails extends PureComponent {
     state = {};
+    myRef = React.createRef();
     _isMounted = true;
 
     componentDidMount() {
@@ -94,8 +95,6 @@ export class CafeDetails extends PureComponent {
     }
 
     getCommonTermsRef(cafeLoc) {
-        console.log('here is state: ', this.state);
-        console.log('here is cafeLoc: ', cafeLoc);
         if (this.state.targetCafeWordPresRef && cafeLoc && cafeLoc.length) {
             return this.props.commonTermsRefMap.get(cafeLoc[0].toString()).toJS();
         }
@@ -115,6 +114,10 @@ export class CafeDetails extends PureComponent {
             stateIsDetailsReturned = (this.props.cafeDetails.get('userActionState') === CAFE_DETAILS_RETURNED),
             showDetails = (stateIsDetailsReturned || (cafe && !!cafe.detailsLoaded));
 
+        if (this.myRef.current) {
+            this.myRef.current.setPosition(0);
+        }
+        
         const commonTermsRefMap = this.getCommonTermsRef(cafeLoc);
         return (
             <div className={`cafeDetails${showDetails ? ' scrollOverflow' : ''}`}>
@@ -124,7 +127,8 @@ export class CafeDetails extends PureComponent {
                             <Carousel showThumbs={false}
                                 showArrows={showDetails}
                                 showStatus={showDetails}
-                                showIndicators={showDetails}>
+                                showIndicators={showDetails}
+                                ref={this.myRef}>
                                 <div style={getCarouselStyle(showDetails)}>
                                     <ReactWordcloud
                                         words={cafe.wordCloud}

@@ -17,11 +17,11 @@ const hourStringGen = (openCloseArray) => {
 }
 
 export default function CafeHours(props) {
-    const hours = props.hours;
+    const hours = props.hours !== 'unset' ? JSON.parse(props.hours) : null;
     return (
         <ul>
             {
-                hours !== 'unset' &&
+                hours &&
                 hours.map((day, idx) => {
                     return <li key={idx}><span>{DAYIDS[idx]}: </span><span>{hourStringGen(day)}</span></li>
                 })
