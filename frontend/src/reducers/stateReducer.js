@@ -47,10 +47,10 @@ function clearData(state) {
 
 function handleReturnedCafes(cafeListOfLists, rawCommonTermsRefMap, forSimilar) {
     let cafeLocMap = {},
-        commonTermsRefMap = {}
+        commonTermsRefMap = {};
         
     Object.keys(rawCommonTermsRefMap).forEach((key) => {
-        commonTermsRefMap[key] = rawCommonTermsRefMap[key].reduce((o, key) => ({ ...o, [key]: true }), {})
+        commonTermsRefMap[key] = rawCommonTermsRefMap[key].reduce((o, key, tIdx) => ({ ...o, [key]: tIdx + 1 }), {})
     });
     if (forSimilar) {
         commonTermsRefMap[0] = commonTermsRefMap[1];

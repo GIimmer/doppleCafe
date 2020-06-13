@@ -27,7 +27,7 @@ export class CafePreview extends Component {
                     <p><b>{cafe.name}</b></p>
                     <p>{cafe.rating} stars</p>
                 </div>
-                <div className="cafePreviewButtons">
+                <div className="previewButtons">
                     <Button 
                         variant="contained"
                         size="small"

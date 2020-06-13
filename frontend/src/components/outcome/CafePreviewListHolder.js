@@ -1,10 +1,14 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import CafePreviewList from './CafePreviewList'
+import { withRouter } from 'react-router-dom'
+import CafePreviewList from './CafePreview/CafePreviewList'
 import CONSTS from '../../constants/Constants'
 import { parseQueryString } from '../../utilities/utilities'
-import { setViewingDetailsFunc, loadCafeDetailsFunc, highlightCafeOnMapFunc, toggleCafeHoverFunc } from '../../actions/outcomeActions'
-import { withRouter } from 'react-router-dom'
+import { 
+    setViewingDetailsFunc,
+    loadCafeDetailsFunc,
+    highlightCafeOnMapFunc,
+    toggleCafeHoverFunc } from '../../actions/outcomeActions'
 
 
 function mapDispatchToProps(dispatch) {
@@ -20,6 +24,7 @@ function mapStateToProps(state=Map(), props) {
     const currentTab = props.location.pathname.substr(1);
     return {
         returnedCafes: state.get('returnedCafes'),
+        commonTermsRefMap: state.get('commonTermsRefMap'),
         currentTab: currentTab
     }
 }
@@ -57,6 +62,7 @@ export class CafePreviewListHolder extends Component {
     }
 
     render() {
+        const termsRefMap = this.props.commonTermsRefMap.toJS();
         return (
             <div className="cafePreviewListHolder">
                 {
@@ -64,6 +70,7 @@ export class CafePreviewListHolder extends Component {
                         return <CafePreviewList 
                             group={group}
                             groupIdx={idx}
+                            commonTermsRef={termsRefMap[idx]}
                             handleAction={this.handleAction}
                             parentContext={this}
                             weight={this.state.weight}
