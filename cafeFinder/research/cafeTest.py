@@ -90,22 +90,29 @@ def givenCityRunML(city, scale_to_n_dimensions, generate_n_clusters, weight_bala
         centroid = centroid_membership[idx]
         cafe_cluster = clustered_cafes[centroid]
         cafe_cluster['cafes'].append(cafe)
-        updateCentroidCommonTerms(cafe_cluster, cafe.raw_word_cloud, idx)
+        updateCentroidCommonTerms(cafe_cluster, cafe.raw_word_cloud)
+    
+    for cafe_cluster in clustered_cafes.values():
+        stripLowValCommonTerms(cafe_cluster)
+
   
     return clustered_cafes
+
+def stripLowValCommonTerms(cafe_cluster, min_idf_n=2):
+    common_terms = cafe_cluster['common_terms']
+    stripped_dict = dict(filter(lambda elem: elem[1][0] >= min_idf_n, common_terms.items()))
+    sorted_vals = sorted(stripped_dict.items(), key=lambda x: x[1][1], reverse=True)
+    cafe_cluster['common_terms'] = sorted_vals[:20]
 
 def updateCentroidCommonTerms(cafe_cluster, word_bag, idx=None):
     common_term_map = cafe_cluster.get('common_terms', None)
     if (common_term_map is None):
-        cafe_cluster['common_terms'] = {term_tuple[0]: 0 for term_tuple in word_bag}
+        cafe_cluster['common_terms'] = {term_tuple[0]: (1, term_tuple[1]) for term_tuple in word_bag}
     else:
         for term_tuple in word_bag:
             term = term_tuple[0]
-            if term in common_term_map:
-                common_term_map[term] = idx
-        for key in list(common_term_map):
-            if (common_term_map[key] != idx):
-                del common_term_map[key]
+            current_val = common_term_map.get(term, (0, 0))
+            common_term_map[term] = (current_val[0] + 1, current_val[1] + term_tuple[1])
 
 def plotCostChangeOverNClusters(X, cluster_range):
     x_axis = []

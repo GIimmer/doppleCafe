@@ -94,8 +94,6 @@ def get_cafe_details(request, cafe_id):
     cafe_data = CafeSerializer(cafe).data
     cafe_data['reviews'] = top_3_reviews
     del cafe_data['raw_word_cloud']
-    if cafe_data['hours'] != 'unset':
-        cafe_data['hours'] = json.loads(cafe_data['hours'])
 
     return JsonResponse(cafe_data, safe=False)
 
@@ -152,7 +150,7 @@ def exploreCity(request):
     clustered_cafe_response = []
     common_terms_ref = {}
     for idx, cafe_cluster in clustered_cafes.items():
-        common_terms_ref[idx] = [REVERSE_IDX_WORD_REF[str(term)] for term in cafe_cluster['common_terms'].keys()]
+        common_terms_ref[idx] = [REVERSE_IDX_WORD_REF[str(item[0])] for item in cafe_cluster['common_terms']]
         clustered_cafe_response.append(CafeSerializer(cafe_cluster['cafes'], many=True).data)
 
     return JsonResponse({ 'cafe_list_of_lists': clustered_cafe_response, 'common_terms_ref': common_terms_ref })
