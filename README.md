@@ -52,5 +52,5 @@ The output is similar for both explore and query view. The user is given a serie
 *Query Outcome initial view*
 ![Outcome Initial View](https://i.imgur.com/ND97CBy.png)
 
-*Query Outcome details view*
+*Explore Outcome details view*
 ![Outcome Details View](https://i.imgur.com/l9yqi2x.png)
