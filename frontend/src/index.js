@@ -5,24 +5,14 @@ import { store } from './reduxStore';
 import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
-import { Auth0Provider } from "./react-auth0-spa";
 import config from "./auth_config.json";
-import history from "./utilities/history";
-
-const onRedirectCallback = appState => {
-  history.push(
-    appState && appState.targetUrl
-      ? appState.targetUrl
-      : window.location.pathname
-  );
-};
+import { Auth0Provider } from "@auth0/auth0-react";
 
 ReactDOM.render(
   <Auth0Provider
     domain={config.domain}
-    client_id={config.clientId}
-    redirect_uri={window.location.origin}
-    onRedirectCallback={onRedirectCallback}
+    clientId={config.clientId}
+    redirectUri={window.location.origin}
   >
     <Provider store={store}>
       <App />

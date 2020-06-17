@@ -102,8 +102,8 @@ export class CafeDetails extends PureComponent {
 
     render() {
         const cafeDetails = this.props.cafeDetails, 
-            cafeId = cafeDetails.get('cafeId'),
-            viewingCafe = cafeDetails.get(cafeId),
+            cafeId = cafeDetails.get('cafeId');
+        let viewingCafe = cafeDetails.get(cafeId),
             cafeLoc = !!cafeId ? this.props.cafeLocMap.get(cafeId, List()).toJS() : null;
 
         if (!viewingCafe && cafeLoc) {

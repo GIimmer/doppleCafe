@@ -44,10 +44,6 @@ export class UserInput extends Component {
         }
     }
 
-    componentWillUnmount() {
-        let lol = 'hey';
-    }
-
     handleClick(field, data, e) {
         e.preventDefault();
         if (data.locked !== false) {

@@ -27,5 +27,5 @@ export class AppBody extends Component {
     }
 }
 
-export default connect(() => {})(AppBody)
+export default connect(() => ({}))(AppBody)
 

@@ -22,7 +22,7 @@ export function snakeToCamel(str) {
 }
 
 export function parseQueryString(qs) {
-    const qsValArray = qs.split(/[\&?]/);
+    const qsValArray = qs.split(/[&?]/);
     const qsValMap = {}
     qsValArray.forEach((str)=> {
         if (str !== "") {

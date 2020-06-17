@@ -36,9 +36,6 @@ function mapDispatchToProps(dispatch) {
     }
 }
 class ExploreCities extends Component {
-    constructor(props) {
-        super(props)
-    }
 
     markersFromCities(cityOptions) {
         return cityOptions.map((city) => {
@@ -60,7 +57,8 @@ class ExploreCities extends Component {
     onClickMarker = ((marker) => {
         const cityInQuestion = this.cityFromMarker(marker);
         this.props.optionLockToggled(false, cityInQuestion);
-    }).bind(this)
+    })
+    // }).bind(this)
 
     render() {
         let cityMarkers = this.markersFromCities(this.props.cities.toJS())
