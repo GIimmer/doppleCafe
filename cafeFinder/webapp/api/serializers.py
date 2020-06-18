@@ -39,10 +39,17 @@ class CafeSerializer(serializers.ModelSerializer):
     placetypes = serializers.StringRelatedField(many=True, required=False)
     photos = serializers.SerializerMethodField()
     raw_word_cloud = serializers.SerializerMethodField('get_word_cloud', required=False)
+    dn_score = serializers.SerializerMethodField('get_dn_score', required=False)
 
     def get_word_cloud(self, model):
         if hasattr(model, 'raw_word_cloud'):
             return model.raw_word_cloud
+        else:
+            return None
+
+    def get_dn_score(self, model):
+        if hasattr(model, 'dn_score'):
+            return model.dn_score
         else:
             return None
 

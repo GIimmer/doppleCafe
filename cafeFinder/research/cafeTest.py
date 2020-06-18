@@ -5,9 +5,7 @@ import numpy as np
 from scipy.sparse import csr_matrix
 from sklearn.decomposition import TruncatedSVD
 
-from research.dataProcessing import (
-    getTFVectorsFromCafeArr, getIDFFromTFVectors,
-    vectorizeCafeReviews, generateWeightedVecs)
+from research.dataProcessing import getTFVectorsFromCafeArr, getIDFFromTFVectors, vectorizeCafeReviews, generateWeightedVecs
 from research.kMeans import runKMeans
 from research.nearestNeighbors import nearestNeighbors
 
@@ -48,15 +46,18 @@ def givenCityGetVectors(city, target_cafe, weight_balance):
     else:
         all_tf_vectors = city_cafe_tf_vecs
     all_cafe_vecs = getIDFFromTFVectors(all_tf_vectors)
-    weight_vec = generateWeightedVecs(ambience_wt, food_wt)
+    weight_vec, dn_terms_len = generateWeightedVecs(ambience_wt, food_wt)
+    pos_dn_terms_len = int(dn_terms_len / 2)
+    dn_freq_vecs = all_tf_vectors[:, -(pos_dn_terms_len + 1):-1]
+    dn_sum_vecs = dn_freq_vecs.sum(axis=1) * 100
     weighted_cafe_vecs = all_cafe_vecs * weight_vec
 
-    return city_cafes, weighted_cafe_vecs
+    return city_cafes, weighted_cafe_vecs, dn_sum_vecs
 
 def givenCityRunML(city, scale_to_n_dimensions, generate_n_clusters, weight_balance, show_graph=False):
     centroid_membership = CACHE.get('centroid_membership_' + weight_balance + '_' + str(getattr(city, 'id')))
 
-    city_cafes, sparse_x = givenCityGetVectors(city, None, weight_balance)
+    city_cafes, sparse_x, dn_sum_vecs = givenCityGetVectors(city, None, weight_balance)
     for idx, cafe_vec in enumerate(sparse_x):
         top_100 = cafe_vec.argsort()[-100:][::-1]
         setattr(city_cafes[idx], 'raw_word_cloud', [(int(val), float(cafe_vec[val])) for val in top_100])
@@ -86,7 +87,7 @@ def givenCityRunML(city, scale_to_n_dimensions, generate_n_clusters, weight_bala
         }
 
     for idx, cafe in enumerate(city_cafes):
-        cafe = city_cafes[idx]
+        cafe.dn_score = dn_sum_vecs[idx]
         centroid = centroid_membership[idx]
         cafe_cluster = clustered_cafes[centroid]
         cafe_cluster['cafes'].append(cafe)
@@ -94,7 +95,6 @@ def givenCityRunML(city, scale_to_n_dimensions, generate_n_clusters, weight_bala
     
     for cafe_cluster in clustered_cafes.values():
         stripLowValCommonTerms(cafe_cluster)
-
   
     return clustered_cafes
 
@@ -133,7 +133,7 @@ def testNDimensionsWithNClusters(city, scale_to_n_dimensions, cluster_range):
     plotCostChangeOverNClusters(X, cluster_range)
 
 def getNearestCafesGivenCafe(city, cafe, weight_balance):
-    city_cafes, all_cafe_vecs = givenCityGetVectors(city, cafe, weight_balance)
+    city_cafes, all_cafe_vecs, dn_sum_vecs = givenCityGetVectors(city, cafe, weight_balance)
 
     city_cafe_vecs = all_cafe_vecs[0:-1]
     target_cafe_vec = all_cafe_vecs[-1]
@@ -148,8 +148,10 @@ def getNearestCafesGivenCafe(city, cafe, weight_balance):
 
     most_similar_cafe_tuples = nearestNeighbors(target_cafe_vec, city_cafe_vecs)
     for i in range(10):
-        vec_for_cafe = all_cafe_vecs[most_similar_cafe_tuples[i][0]]
-        cafe_to_add = city_cafes[most_similar_cafe_tuples[i][0]]
+        cafe_idx = most_similar_cafe_tuples[i][0]
+        vec_for_cafe = all_cafe_vecs[cafe_idx]
+        cafe_to_add = city_cafes[cafe_idx]
+        cafe_to_add.dn_score = dn_sum_vecs[cafe_idx]
 
         setWordCloudForCafe(cafe_to_add, vec_for_cafe)
 
