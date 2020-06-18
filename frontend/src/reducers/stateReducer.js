@@ -11,7 +11,7 @@ import { snakeToCamel } from '../utilities/utilities'
 import { prepareDetailsPhotos } from './outcomeReducer'
 import { Map, List, fromJS } from 'immutable'
 
-function processReturnedCafes(candidatesArrArr, cafeLocMap, forMostSimilar) {
+function processReturnedCafes(candidatesArrArr, cafeLocMap, dnScoreLocArr, forMostSimilar) {
     return candidatesArrArr.map((group, idg) => {
         return group.map((cafe, idc) => {
             let jsObj = forMostSimilar ? {
@@ -24,7 +24,9 @@ function processReturnedCafes(candidatesArrArr, cafeLocMap, forMostSimilar) {
                 }
                 jsObj[snakeToCamel(key)] = cafe[key]
             });
-            cafeLocMap[jsObj.placeId] = [idg, idc];
+            let cafeLoc = [idg, idc]
+            cafeLocMap[jsObj.placeId] = cafeLoc;
+            dnScoreLocArr.push([jsObj.dnScore, cafeLoc])
             
             return jsObj;
         })
@@ -47,6 +49,7 @@ function clearData(state) {
 
 function handleReturnedCafes(cafeListOfLists, rawCommonTermsRefMap, forSimilar) {
     let cafeLocMap = {},
+        dnScoreLocArr = [],
         commonTermsRefMap = {};
         
     Object.keys(rawCommonTermsRefMap).forEach((key) => {
@@ -55,9 +58,17 @@ function handleReturnedCafes(cafeListOfLists, rawCommonTermsRefMap, forSimilar) 
     if (forSimilar) {
         commonTermsRefMap[0] = commonTermsRefMap[1];
     }
+    let returnedCafes = processReturnedCafes(cafeListOfLists, cafeLocMap, dnScoreLocArr, forSimilar);
+    dnScoreLocArr.sort((a, b) => b[0] - a[0]);
+
+    for (let i = 0; i < 3; i++) {
+        let loc = dnScoreLocArr[i][1],
+            cafeInQuestion = returnedCafes[loc[0]][loc[1]];
+        cafeInQuestion.dnPodium = i + 1
+    }
     return {
         'cafesReturned': true,
-        'returnedCafes': fromJS(processReturnedCafes(cafeListOfLists, cafeLocMap, forSimilar)),
+        'returnedCafes': fromJS(returnedCafes),
         'commonTermsRefMap': fromJS(commonTermsRefMap),
         'cafeLocMap': fromJS(cafeLocMap)
     };

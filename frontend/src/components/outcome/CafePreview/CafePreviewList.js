@@ -31,9 +31,10 @@ export default function CafePreviewList(props) {
                     />
                 })
                 :
-                props.group.toJS().map(cafe => {
+                props.group.toJS().map((cafe, idx) => {
                     return <SmallPreview 
                         cafe={cafe} 
+                        onLeft={(idx % 2) != 1}
                         key={cafe.placeId} 
                         handleAction={props.handleAction} 
                         parentContext={props.parentContext} 

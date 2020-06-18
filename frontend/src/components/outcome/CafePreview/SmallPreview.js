@@ -8,14 +8,30 @@ import Tooltip from '@material-ui/core/Tooltip';
 // import PlaylistAddIcon from '@material-ui/icons/PlaylistAdd';
 import QueuePlayNextIcon from '@material-ui/icons/QueuePlayNext';
 
+const PODIUMCOLORREF = ['gold', 'silver', 'peru'];
+
+function getIconStyle(onLeft, podium) {
+    return { 
+        fontSize: '24px',
+        color: PODIUMCOLORREF[podium - 1],
+        transform: `rotate(${onLeft ? '-60' : '60'}deg)`,
+        position: 'absolute',
+        top: '-10px',
+        left: onLeft ? '-23px' : undefined,
+        right: onLeft ? undefined : '-23px'
+    }
+}
+
+
 export function SmallPreview(props) {
     const cafe = props.cafe,
         cafeHasLoc = (cafe.lat || cafe.lng),
+        isDNFriendly = cafe.dnScore > 1,
         parentSelf = props.parentContext;
     let onAction = props.handleAction;
 
     return (
-        <div className={`cafePreview smallPreview${props.isActive ? " glow" : ""}`}
+        <div className={`cafePreview smallPreview${props.isActive ? " glow" : ""}${isDNFriendly ? " dnFriendly" : ""}`}
             onMouseEnter={onAction.bind(parentSelf, 'hoverOver', cafe)}>
                 <div className="cafeInformation">
                     <p><b>{cafe.name}</b></p>
@@ -41,6 +57,10 @@ export function SmallPreview(props) {
                         </IconButton>
                     </Tooltip>
                 </div>
+                {
+                    !!cafe.dnPodium &&
+                    <i class='fas fa-crown' style={getIconStyle(props.onLeft, cafe.dnPodium)}></i>
+                }
             </div>
     )
 }

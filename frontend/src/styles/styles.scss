@@ -4,6 +4,8 @@ $light-teal: #ABD1B5;
 $mint-cream: #EDF4ED;
 $peach: #FCB97D;
 
+$dn-color: rgb(0, 209, 105);
+
 $primary-light: #af4c4e;
 $mint-cream-light: #f0f6f0;
 
@@ -117,6 +119,7 @@ a {
 
                             .cafePreview {
                                 width: 100%;
+                                position: relative;
                                 display: flex;
                                 border: 1px solid $mint-cream-dark;
                                 padding: 15px 7px;
@@ -128,6 +131,10 @@ a {
                                 margin: 7px 0px;
                                 box-shadow: 2px 2px 3px $mint-cream-dark;
                                 cursor: pointer;
+
+                                &.dnFriendly {
+                                    border: 1px solid $dn-color;
+                                }
 
                                 &.smallPreview {
                                     height: 100px;
