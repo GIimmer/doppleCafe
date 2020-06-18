@@ -34,7 +34,22 @@ AMBIENCE_TERMS = [
 ]
 
 DN_TERMS = [
-    "internet", "study", "studying", "work", "working", "coworking", "laptop", "telework", "meeting", "remotely", "remote",
+    "internet", "study", "studying", "work", "coworking", "laptop", "telework", "meeting", "remotely", "remote",
     "computer", "outlet", "outlets", "programmer", "programming", "coding", "homework", "high-speed", "electrical", "digital",
-    "nomad"
+    "nomad", "wifi", "wi-fi", "plug", "plugin"
 ]
+
+NEGATION_TERMS_MAP = {
+    "no": True,
+    "not": True,
+    "none": True,
+    "nobody": True,
+    "nothing": True,
+    "neither": True,
+    "nowhere": True,
+    "never": True,
+    "hardly": True,
+    "scarcely": True,
+    "barely": True,
+    "n't": True,
+}

@@ -11,36 +11,39 @@ def stemWordsInArrays(tuple_arr, remove_dupes=False):
     res_arr = []
     for idx, term_tuple in enumerate(tuple_arr):
         term_arr = term_tuple[1]
-        res_arr.append([ps.stem(word) for word in term_arr])
+        stemmed_term_arr = [ps.stem(word) for word in term_arr]
+        pos_and_neg_term_arr = ["not_" + term for term in stemmed_term_arr] + stemmed_term_arr
+
         if remove_dupes:
-            res_arr[idx] = list(dict.fromkeys(res_arr[idx]))
+            pos_and_neg_term_arr = list(dict.fromkeys(pos_and_neg_term_arr))
+        res_arr.append(pos_and_neg_term_arr)
 
         saveDataToFileWithName(res_arr[idx], 'cafeFinder/research/wordBagFiles/' + term_tuple[0] + 'Terms')
 
     return res_arr
 
 def editVectorRefs():
-    PREV_WORD_BAG = getDataFromFileWithName('cafeFinder/research/wordBagFiles/wordBagList')
-    WORD_BAG_DICT = dict.fromkeys(PREV_WORD_BAG, True)
+    prev_word_bag = getDataFromFileWithName('cafeFinder/research/wordBagFiles/wordBagList')
+    word_bag_dict = dict.fromkeys(prev_word_bag, True)
 
-    TERM_TUPLES = [['food', FOOD_TERMS], ['ambience', AMBIENCE_TERMS], ['dn', DN_TERMS]]
-    FOOD_STEMMED, AMBIENCE_STEMMED, DN_STEMMED = stemWordsInArrays(TERM_TUPLES, True)
-    ALL_WEIGHTED_TERMS = FOOD_STEMMED + AMBIENCE_STEMMED + DN_STEMMED
+    term_tuples = [['food', FOOD_TERMS], ['ambience', AMBIENCE_TERMS], ['dn', DN_TERMS]]
+    food_stemmed, ambience_stemmed, dn_stemmed = stemWordsInArrays(term_tuples, True)
+    all_weighted_terms = food_stemmed + ambience_stemmed + dn_stemmed
 
-    for term in ALL_WEIGHTED_TERMS:
-        term_in_dict = WORD_BAG_DICT.get(term, False)
+    for term in all_weighted_terms:
+        term_in_dict = word_bag_dict.get(term, False)
         if term_in_dict:
-            del WORD_BAG_DICT[term]
+            del word_bag_dict[term]
 
-    NEW_WORD_BAG_LIST = list(WORD_BAG_DICT)
-    ALL_TERMS = NEW_WORD_BAG_LIST + ALL_WEIGHTED_TERMS
+    new_word_bag_list = list(word_bag_dict)
+    all_terms = new_word_bag_list + all_weighted_terms
 
-    NEW_TERM_IDX_REF = {term: idx for idx, term in enumerate(ALL_TERMS)}
-    NEW_IDX_TERM_REF = {idx: term for idx, term in enumerate(ALL_TERMS)}
+    new_term_idx_ref = {term: idx for idx, term in enumerate(all_terms)}
+    new_idx_term_ref = {idx: term for idx, term in enumerate(all_terms)}
 
-    saveDataToFileWithName(NEW_WORD_BAG_LIST, 'cafeFinder/research/wordBagFiles/wordBagList')
-    saveDataToFileWithName(NEW_TERM_IDX_REF, 'cafeFinder/research/wordBagFiles/wordVectorIdxRef')
-    saveDataToFileWithName(NEW_IDX_TERM_REF, 'cafeFinder/research/wordBagFiles/reverseWordVecRef')
+    saveDataToFileWithName(new_word_bag_list, 'cafeFinder/research/wordBagFiles/wordBagList')
+    saveDataToFileWithName(new_term_idx_ref, 'cafeFinder/research/wordBagFiles/wordVectorIdxRef')
+    saveDataToFileWithName(new_idx_term_ref, 'cafeFinder/research/wordBagFiles/reverseWordVecRef')
 
 def updateWordVectorWithFile(file_name='processedMostCommonWords.txt', stem_words=False):
     global VECTOR_IDX_REF
@@ -61,18 +64,19 @@ def reverseIdxToProperEnglish():
     term_list = getDataFromFileWithName('currentlyUnusedData/10kMostCommonWords.txt')
     term_idx_ref = getDataFromFileWithName('cafeFinder/research/wordBagFiles/wordVectorIdxRef')
     idx_term_ref = getDataFromFileWithName('cafeFinder/research/wordBagFiles/reverseWordVecRef')
-    ALL_WEIGHTED_TERMS = FOOD_TERMS + AMBIENCE_TERMS + DN_TERMS
-    MOST_TO_LEAST_IMPORTANT = ALL_WEIGHTED_TERMS + term_list
+    all_weighted_terms = FOOD_TERMS + AMBIENCE_TERMS + DN_TERMS
+    most_to_least_important = all_weighted_terms + term_list
 
-    MOST_TO_LEAST_IMPORTANT.reverse()
+    most_to_least_important.reverse()
 
-    for word in MOST_TO_LEAST_IMPORTANT:
+    for word in most_to_least_important:
         stemmed_term = ps.stem(word)
         idx_of_term = term_idx_ref.get(stemmed_term, None)
-        if (idx_of_term != None):
+        if (idx_of_term is not None):
             idx_term_ref[str(idx_of_term)] = word
     
-    saveDataToFileWithName(idx_term_ref, 'cafeFinder/research/wordBagFiles/reverseWordVecRefTest')
+    saveDataToFileWithName(idx_term_ref, 'cafeFinder/research/wordBagFiles/reverseWordVecRef')
     
 
 reverseIdxToProperEnglish()
+# editVectorRefs()
