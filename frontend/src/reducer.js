@@ -6,11 +6,14 @@ import Immutable from 'immutable'
 
 export const InitialState = Immutable.fromJS({
     userCanLoadNewCity: true,
+    highlightRWFriendly: true,
     cafeQueryState: null,
     cityQueryState: null,
     cafesReturned: false,
     highlightedCafe: null,
     wordBagRef: null,
+    weightedTerms: [],
+    filteringByTerms: [],
     preLoadedCities: [
         {
             id: 1,

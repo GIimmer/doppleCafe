@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import CafePreviewList from './CafePreview/CafePreviewList'
+import ResultsFilter from './CafePreview/ResultsFilter'
 import CONSTS from '../../constants/Constants'
 import { parseQueryString } from '../../utilities/utilities'
 import { 
@@ -65,6 +66,7 @@ export class CafePreviewListHolder extends Component {
         const termsRefMap = this.props.commonTermsRefMap.toJS();
         return (
             <div className="cafePreviewListHolder">
+                <ResultsFilter />
                 {
                     this.props.returnedCafes.map((group, idx) => {
                         return <CafePreviewList 

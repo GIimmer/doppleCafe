@@ -105,6 +105,24 @@ a {
                     .cafePreviewListHolder {
                         width: 45%;
 
+                        .resultsFilter {
+                            background-color: #212121;
+                            height: 200px;
+                            display: flex;
+                            align-items: flex-start;
+                            padding: 5px 4px 10px;
+                            color: $mint-cream;
+
+                            .remoteWorkerFilter {
+                                width: 45%;
+                                margin-top: 10px;
+                                text-align: center;
+                            }
+                            .termFilterSection {
+                                width: 50%;
+                            }
+                        }
+
                         .cafePreviewList {
                             color: $mint-cream-contrast-text;
                             padding: 20px 10px;

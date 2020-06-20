@@ -4,11 +4,14 @@ import {
     GETTING_CAFE_DETAILS,
     CAFE_DETAILS_RETURNED,
     HIGHLIGHT_CAFE,
-    WORD_BAG_REF_RETURNED
+    WORD_BAG_REF_RETURNED,
+    TOGGLE_HIGHLIGHT_RW_FRIENDLY,
+    SET_TERM_FILTER,
+    REMOVE_TERM_FILTER
   } from '../constants/ActionConstants'
   
 import { snakeToCamel } from '../utilities/utilities'
-import { Map, fromJS } from 'immutable'
+import { Map, fromJS, List } from 'immutable'
 
 
 export function prepareDetailsPhotos(photos) {
@@ -42,11 +45,16 @@ export default (state = Map({}), action) => {
     const cafeDetails = state.get('cafeDetails');
     switch (action.type) {
         case WORD_BAG_REF_RETURNED:
-            let wordBagRef = action.payload.word_bag_ref;
-            const intKeyValPair = Object.keys(wordBagRef).map(function (key) { 
-                return [Number(key), wordBagRef[key]]; 
+            const wordBagArr = action.payload.word_bag_arr,
+                weightedTermsStartIdx = (wordBagArr.length - action.payload.num_weighted_terms),
+                weightedTerms = wordBagArr.slice(weightedTermsStartIdx);
+            const intKeyValPair = wordBagArr.map((val, idx) => { 
+                return [idx, val]
             }); 
-            return state.set('wordBagRef', Map(intKeyValPair))
+            return state.merge({
+                'wordBagRef': Map(intKeyValPair),
+                'weightedTerms': weightedTerms
+            })
 
         case CAFE_HOVER:
             const cafeId = action.payload;
@@ -91,6 +99,21 @@ export default (state = Map({}), action) => {
 
         case HIGHLIGHT_CAFE:
             return state.set('highlightedCafe', action.payload);
+
+        case TOGGLE_HIGHLIGHT_RW_FRIENDLY:
+            return state.set('highlightRWFriendly', action.payload);
+
+        case SET_TERM_FILTER:
+            if (action.payload === null) {
+                return state.set('filteringByTerms', List());
+            } else {
+                let termFilterList = state.get('filteringByTerms');
+                return state.set('filteringByTerms', termFilterList.push(action.payload));
+            }
+
+        case REMOVE_TERM_FILTER:
+            let trmFilterList = state.get('filteringByTerms');
+            return state.set('filteringByTerms', trmFilterList.filter((term) => term !== action.payload));
                 
         default:
             return state;

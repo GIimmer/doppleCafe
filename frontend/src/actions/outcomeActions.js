@@ -6,7 +6,10 @@ import {
     WORD_BAG_REF_RETURNED,
     CAFE_HOVER,
     CAFE_UNHOVER,
-    HIGHLIGHT_CAFE
+    HIGHLIGHT_CAFE,
+    TOGGLE_HIGHLIGHT_RW_FRIENDLY,
+    SET_TERM_FILTER,
+    REMOVE_TERM_FILTER
 } from '../constants/ActionConstants'
 
 
@@ -35,7 +38,7 @@ export function loadCafeDetailsFunc(dispatch) {
         .then(res => {
             if (res.status === 200) {
                 dispatch({
-                    type:CAFE_DETAILS_RETURNED,
+                    type: CAFE_DETAILS_RETURNED,
                     payload: res.data
                 });
             }
@@ -46,8 +49,35 @@ export function loadCafeDetailsFunc(dispatch) {
 export function setViewingDetailsFunc(dispatch) {
     return (cafe) => {
         dispatch({
-            type:CAFE_DETAILS_RETURNED,
+            type: CAFE_DETAILS_RETURNED,
             payload: cafe
+        })
+    }
+}
+
+export function toggleHighlightRWFriendlyFunc(dispatch) {
+    return (value) => {
+        dispatch({
+            type: TOGGLE_HIGHLIGHT_RW_FRIENDLY,
+            payload: value
+        })
+    }
+}
+
+export function setTermFilterFunc(dispatch) {
+    return (value) => {
+        dispatch({
+            type: SET_TERM_FILTER,
+            payload: value
+        })
+    }
+}
+
+export function removeTermFilterFunc(dispatch) {
+    return (value) => {
+        dispatch({
+            type: REMOVE_TERM_FILTER,
+            payload: value
         })
     }
 }

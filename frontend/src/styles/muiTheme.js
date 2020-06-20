@@ -5,7 +5,6 @@ const theme = createMuiTheme({
     palette: {
         primary: {
             main: variables.primary,
-            
         },
         secondary: {
             main: variables.secondary,
@@ -20,6 +19,25 @@ const theme = createMuiTheme({
             main: variables.peach
         }
     },
+});
+
+
+export const darkTheme = createMuiTheme({
+    palette: {
+        type: 'dark',
+        secondary: {
+            main: variables.secondary,
+        },
+        info: {
+            main: variables.lightTeal,
+        },
+        success: {
+            main: variables.mintCream,
+        },
+        warning: {
+            main: variables.peach
+        }
+    }
 });
 
 export default theme;

@@ -59,7 +59,7 @@ export function SmallPreview(props) {
                 </div>
                 {
                     !!cafe.dnPodium &&
-                    <i class='fas fa-crown' style={getIconStyle(props.onLeft, cafe.dnPodium)}></i>
+                    <i className='fas fa-crown' style={getIconStyle(props.onLeft, cafe.dnPodium)}></i>
                 }
             </div>
     )
