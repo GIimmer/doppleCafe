@@ -23,7 +23,7 @@
             "type": "python",
             "request": "launch",
             "stopOnEntry": false,
-            "pythonPath": "${config:python.interpreterPath}",
+            "pythonPath": "${command:python.interpreterPath}",
             "program": "${workspaceRoot}/cafeFinder/manage.py",
             "args": [
                 "runserver",
