@@ -13,7 +13,9 @@ from research.apiHandlers import geocodeCityName, getCafeWithQueryString, getCaf
 from research.utilities import getDataFromFileWithName
 
 BASE = os.path.dirname(os.path.abspath(__file__))
-REVERSE_IDX_WORD_REF = getDataFromFileWithName(os.path.join(BASE, "../research/wordBagFiles/reverseWordVecRef"))
+IDX_WORD_MAP = getDataFromFileWithName(os.path.join(BASE, "../research/wordBagFiles/reverseWordVecMap"))
+IDX_WORD_ARR = getDataFromFileWithName(os.path.join(BASE, "../research/wordBagFiles/reverseWordVecArr"))
+NUM_WEIGHTED_TERMS = getDataFromFileWithName(os.path.join(BASE, "../research/wordBagFiles/numWeightedTerms"))
 
 class CityViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.CreateModelMixin, mixins.DestroyModelMixin):
     serializer_class = CitySerializer
@@ -128,7 +130,7 @@ def find_similar_cafes(request):
         target_cafe_model = CafeSerializer(target_cafe).data
         similar_cafes = CafeSerializer(similar_cafe_wrapper['similar_cafes'], many=True).data
         common_terms_ref = {}
-        common_terms_ref[1] = [REVERSE_IDX_WORD_REF[str(term)] for term in similar_cafe_wrapper['common_terms'].keys()]
+        common_terms_ref[1] = [IDX_WORD_MAP[str(term)] for term in similar_cafe_wrapper['common_terms'].keys()]
         city = CitySerializer(city).data
         for cafe in similar_cafes:
             if (cafe['hours'] != 'unset'):
@@ -150,7 +152,7 @@ def exploreCity(request):
     clustered_cafe_response = []
     common_terms_ref = {}
     for idx, cafe_cluster in clustered_cafes.items():
-        common_terms_ref[idx] = [REVERSE_IDX_WORD_REF[str(item[0])] for item in cafe_cluster['common_terms']]
+        common_terms_ref[idx] = [IDX_WORD_MAP[str(item[0])] for item in cafe_cluster['common_terms']]
         clustered_cafe_response.append(CafeSerializer(cafe_cluster['cafes'], many=True).data)
 
     return JsonResponse({ 'cafe_list_of_lists': clustered_cafe_response, 'common_terms_ref': common_terms_ref })
@@ -160,9 +162,9 @@ def exploreCity(request):
 @require_http_methods(["GET"])
 def get_word_bag_ref(request):
     return JsonResponse({
-        'word_bag_ref': REVERSE_IDX_WORD_REF
+        'word_bag_arr': IDX_WORD_ARR,
+        'num_weighted_terms': NUM_WEIGHTED_TERMS
     })
-    
 
 def genCityFromAPISuggestion(city_obj):
     try:
