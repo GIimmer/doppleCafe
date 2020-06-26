@@ -1,6 +1,5 @@
 import React from 'react'
 import CafePreview from './CafePreview'
-import SmallPreview from './SmallPreview'
 import ChipsSection from './ChipsSection'
 
 function getTitle(groupIdx, searchingBySimilar, weight) {
@@ -21,20 +20,11 @@ export default function CafePreviewList(props) {
                 <ChipsSection commonTermsRef={props.commonTermsRef} />              
             }
             {
-                props.searchingBySimilar ?
-                props.group.toJS().map(cafe => {
+                props.group.toJS().map((cafe, idx) => {
                     return <CafePreview 
                         cafe={cafe} 
-                        key={cafe.placeId} 
-                        handleAction={props.handleAction} 
-                        parentContext={props.parentContext} 
-                    />
-                })
-                :
-                props.group.toJS().map((cafe, idx) => {
-                    return <SmallPreview 
-                        cafe={cafe} 
-                        onLeft={(idx % 2) !== 1}
+                        fullSizePreview={props.searchingBySimilar}
+                        onLeft={props.searchingBySimilar ? true : (idx % 2) !== 1}
                         key={cafe.placeId} 
                         handleAction={props.handleAction} 
                         parentContext={props.parentContext} 

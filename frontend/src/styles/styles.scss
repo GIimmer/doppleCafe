@@ -139,8 +139,8 @@ a {
                                 width: 100%;
                                 position: relative;
                                 display: flex;
-                                border: 1px solid $mint-cream-dark;
-                                padding: 15px 7px;
+                                border: 2px solid $mint-cream-dark;
+                                padding: 10px 7px;
                                 flex-direction: row;
                                 justify-content: space-between;
                                 align-items: center;
@@ -148,10 +148,14 @@ a {
                                 background-color: $mint-cream;
                                 margin: 7px 0px;
                                 box-shadow: 2px 2px 3px $mint-cream-dark;
-                                cursor: pointer;
 
                                 &.dnFriendly {
-                                    border: 1px solid $dn-color;
+                                    border: 2px solid $dn-color;
+                                }
+
+                                &.filteredOut {
+                                    border: 2px solid rgba(255,255,255,0);
+                                    filter: blur(.5px);
                                 }
 
                                 &.smallPreview {
@@ -195,7 +199,7 @@ a {
                                     }
                                 }
 
-                                &:hover {
+                                &:hover:not(.filteredOut) {
                                     box-shadow: 1px 1px 2px $mint-cream-dark;
                                     background-color: inherit;
                                     border-color: $mint-cream;
@@ -227,17 +231,11 @@ a {
                                 .previewButtons {
                                     display: flex;
                                     flex-direction: column;
+                                    margin: 3px 5px;
                                     justify-content: space-between;
 
-                                    button {
-                                        margin: 5px;
-                                        color: inherit;
-                                        background-color: $mint-cream;
-
-                                        &:hover {
-                                            box-shadow: 1px 1px 2px grey;
-                                            background-color: inherit;
-                                        }
+                                    &>span {
+                                        margin: 5px 0px;
                                     }
                                 }
                             }
