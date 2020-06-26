@@ -6,7 +6,7 @@ import CafePreviewListHolder from './CafePreviewListHolder'
 import CafeDetailsWrapper from './CafeDetailsWrapper'
 import { css } from "@emotion/core"
 import RingLoader from "react-spinners/RingLoader"
-import { getWordBagRefFunc } from '../../actions/outcomeActions'
+import { getWordBagRefFunc, setTermPresenceRefFunc } from '../../actions/outcomeActions'
 import { findMostSimilarFunc, exploreCityFunc } from '../../actions/stateActions'
 import { parseQueryString } from '../../utilities/utilities'
 import { CONSTS } from '../../constants/Constants'
@@ -25,7 +25,8 @@ function mapDispatchToProps(dispatch) {
     return {
         getWordBagRef: getWordBagRefFunc(dispatch),
         findMostSimilar: findMostSimilarFunc(dispatch),
-        exploreCity: exploreCityFunc(dispatch)
+        exploreCity: exploreCityFunc(dispatch),
+        setTermPresenceRef: setTermPresenceRefFunc(dispatch)
     }
 }
 
@@ -47,6 +48,13 @@ export class QueryOutcome extends Component {
 
     componentDidMount() {
         this.props.getWordBagRef();
+    }
+
+    componentDidUpdate() {
+        if (!!this.props.returnedCafes) {
+            this.props.setTermPresenceRef();
+            console.count('setTerms');
+        }
     }
 
     render() {

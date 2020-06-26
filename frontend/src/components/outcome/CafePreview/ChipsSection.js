@@ -13,7 +13,7 @@ export default function ChipsSection(props) {
                     <div className="groupChipsHolder" style={{  }}>
                         {
                             topSixCommonTerms.map(term => {
-                                return <Chip label={term} style={{ margin: '5px 10px 5px 0px' }} />
+                                return <Chip label={term} key={term} style={{ margin: '5px 10px 5px 0px' }} />
                             })
                         }
                     </div>

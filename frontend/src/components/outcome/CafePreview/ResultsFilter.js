@@ -15,8 +15,7 @@ export function ResultsFilter(props) {
                 <div className="remoteWorkerFilter">
                     <FormControlLabel
                         control={
-                            <Switch 
-                                size="large" 
+                            <Switch
                                 checked={isChecked}
                                 onChange={() => props.toggleHighlightRWFriendly(!isChecked)} 
                             />}

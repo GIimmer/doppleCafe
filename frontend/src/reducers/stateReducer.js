@@ -113,7 +113,6 @@ export default (state = Map({}), action) => {
         case CITY_DATA_RETURNED:
             return state.merge(
                 handleReturnedCafes(action.payload.cafe_list_of_lists, action.payload.common_terms_ref, false),
-
             )
         
         case TAB_SWITCHED:

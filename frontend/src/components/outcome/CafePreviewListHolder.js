@@ -69,7 +69,8 @@ export class CafePreviewListHolder extends Component {
                 <ResultsFilter />
                 {
                     this.props.returnedCafes.map((group, idx) => {
-                        return <CafePreviewList 
+                        return <CafePreviewList
+                            key={group.toString() + '_' + idx.toString()} 
                             group={group}
                             groupIdx={idx}
                             commonTermsRef={termsRefMap[idx]}

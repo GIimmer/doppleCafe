@@ -7,7 +7,9 @@ import {
     WORD_BAG_REF_RETURNED,
     TOGGLE_HIGHLIGHT_RW_FRIENDLY,
     SET_TERM_FILTER,
-    REMOVE_TERM_FILTER
+    REMOVE_TERM_FILTER,
+    SET_TERM_PRESENCE_REF,
+    CLEAR_ALL_TERM_FILTERS
   } from '../constants/ActionConstants'
   
 import { snakeToCamel } from '../utilities/utilities'
@@ -41,23 +43,67 @@ function imbueCafeDetails(cafe, newDetails) {
     return cafe.merge(detailedCafeObj);
 }
 
+function getCafeFilter(state, termFilters) {
+    const termToCafesMap = state.get('termToCafesMap');
+    let cafeFilter;
+
+    termFilters.forEach((term, idx) => {
+        let cafesWithTerm = termToCafesMap.get(term).toJS();
+        if (idx === 0) {
+            cafeFilter = cafesWithTerm;
+        } else {
+            cafeFilter = cafeFilter.filter(cafe => cafesWithTerm.includes(cafe));
+        }
+    })
+    return fromJS(cafeFilter);
+}
+
 export default (state = Map({}), action) => {
-    const cafeDetails = state.get('cafeDetails');
+    let cafeDetails,
+        weightedTerms;
     switch (action.type) {
         case WORD_BAG_REF_RETURNED:
             const wordBagArr = action.payload.word_bag_arr,
-                weightedTermsStartIdx = (wordBagArr.length - action.payload.num_weighted_terms),
-                weightedTerms = wordBagArr.slice(weightedTermsStartIdx);
+                weightedTermsStartIdx = (wordBagArr.length - action.payload.num_weighted_terms);
+            weightedTerms = wordBagArr.slice(weightedTermsStartIdx);
+            const dnTerms = weightedTerms.slice(weightedTerms.length - action.payload.num_dn_terms)
             const intKeyValPair = wordBagArr.map((val, idx) => { 
                 return [idx, val]
             }); 
             return state.merge({
                 'wordBagRef': Map(intKeyValPair),
-                'weightedTerms': weightedTerms
+                'weightedTerms': List(weightedTerms),
+                'dnTerms': List(dnTerms)
             })
+
+        case SET_TERM_PRESENCE_REF:
+            const allCafes = state.get('returnedCafes');
+            const termToCafesMap = {};
+            const wordBagRef = state.get('wordBagRef');
+            weightedTerms = state.get('weightedTerms');
+            weightedTerms.forEach((term) => {
+                termToCafesMap[term] = [];
+            });
+    
+            allCafes.forEach((group) => {
+                group.forEach((cafe) => {
+                    let cafeCloud = cafe.get('rawWordCloud');
+                    cafeCloud.forEach((termValArr) => {
+                        let termIdx = termValArr.get(0),
+                            term = wordBagRef.get(termIdx);
+                        
+                        if (termToCafesMap[term]) {
+                            termToCafesMap[term].push(cafe.get('placeId'));
+                        }
+                    })
+                })
+            })
+            return state.set('termToCafesMap', fromJS(termToCafesMap));
 
         case CAFE_HOVER:
             const cafeId = action.payload;
+            cafeDetails = state.get('cafeDetails');
+
             if (cafeDetails.get('cafeId') !== cafeId) {
                 const cafeinQuestion = !!cafeDetails.get(cafeId) ?
                 cafeDetails.get(cafeId)
@@ -73,7 +119,9 @@ export default (state = Map({}), action) => {
             return state;
         
         case CAFE_UNHOVER:
+            cafeDetails = state.get('cafeDetails');
             const viewingCafe = cafeDetails.get(cafeDetails.get('cafeId'));
+
             if (cafeDetails.get('state') !== CAFE_DETAILS_RETURNED && (!viewingCafe || !viewingCafe.get('detailsLoaded'))) {
                 return state.mergeIn(['cafeDetails'],
                     { 'state': null, 'cafeId': null }
@@ -88,8 +136,9 @@ export default (state = Map({}), action) => {
             })
 
         case CAFE_DETAILS_RETURNED:
-            const returnedCafeId = cafeDetails.get('cafeId'),
-                cafeInQuestion = cafeDetails.get(returnedCafeId);
+            cafeDetails = state.get('cafeDetails');
+            const returnedCafeId = cafeDetails.get('cafeId');
+            const cafeInQuestion = cafeDetails.get(returnedCafeId);
             
             return state.mergeIn(['cafeDetails'], {
                 'state': action.type,
@@ -104,16 +153,22 @@ export default (state = Map({}), action) => {
             return state.set('highlightRWFriendly', action.payload);
 
         case SET_TERM_FILTER:
-            if (action.payload === null) {
-                return state.set('filteringByTerms', List());
-            } else {
-                let termFilterList = state.get('filteringByTerms');
-                return state.set('filteringByTerms', termFilterList.push(action.payload));
-            }
+            let termFilters = state.get('filteringByTerms');
+            let updatedTermFilters = termFilters.push(action.payload);
+            return state.merge({
+                'filteringByTerms': updatedTermFilters,
+                'cafeFilter': getCafeFilter(state, updatedTermFilters)
+            })
 
         case REMOVE_TERM_FILTER:
-            let trmFilterList = state.get('filteringByTerms');
-            return state.set('filteringByTerms', trmFilterList.filter((term) => term !== action.payload));
+            let trmFilterList = state.get('filteringByTerms').filter((term) => term !== action.payload);
+            return state.merge({ 'filteringByTerms': trmFilterList, 'cafeFilter': getCafeFilter(state, trmFilterList) });
+
+        case CLEAR_ALL_TERM_FILTERS:
+            return state.merge({
+                'filteringByTerms': List(),
+                'cafeFilter': null
+            })
                 
         default:
             return state;

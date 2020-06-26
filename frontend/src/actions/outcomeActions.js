@@ -9,7 +9,9 @@ import {
     HIGHLIGHT_CAFE,
     TOGGLE_HIGHLIGHT_RW_FRIENDLY,
     SET_TERM_FILTER,
-    REMOVE_TERM_FILTER
+    REMOVE_TERM_FILTER,
+    SET_TERM_PRESENCE_REF,
+    CLEAR_ALL_TERM_FILTERS
 } from '../constants/ActionConstants'
 
 
@@ -24,6 +26,14 @@ export function getWordBagRefFunc(dispatch) {
                 });
             }
         });
+    }
+}
+
+export function setTermPresenceRefFunc(dispatch) {
+    return () => {
+        dispatch({
+            type: SET_TERM_PRESENCE_REF
+        })
     }
 }
 
@@ -78,6 +88,14 @@ export function removeTermFilterFunc(dispatch) {
         dispatch({
             type: REMOVE_TERM_FILTER,
             payload: value
+        })
+    }
+}
+
+export function clearAllTermFiltersFunc(dispatch) {
+    return () => {
+        dispatch({
+            type: CLEAR_ALL_TERM_FILTERS
         })
     }
 }

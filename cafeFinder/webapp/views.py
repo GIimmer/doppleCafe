@@ -15,7 +15,7 @@ from research.utilities import getDataFromFileWithName
 BASE = os.path.dirname(os.path.abspath(__file__))
 IDX_WORD_MAP = getDataFromFileWithName(os.path.join(BASE, "../research/wordBagFiles/reverseWordVecMap"))
 IDX_WORD_ARR = getDataFromFileWithName(os.path.join(BASE, "../research/wordBagFiles/reverseWordVecArr"))
-NUM_WEIGHTED_TERMS = getDataFromFileWithName(os.path.join(BASE, "../research/wordBagFiles/numWeightedTerms"))
+NUM_TERMS_OF_TYPE_DICT = getDataFromFileWithName(os.path.join(BASE, "../research/wordBagFiles/numWeightedTerms"))
 
 class CityViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.CreateModelMixin, mixins.DestroyModelMixin):
     serializer_class = CitySerializer
@@ -163,7 +163,8 @@ def exploreCity(request):
 def get_word_bag_ref(request):
     return JsonResponse({
         'word_bag_arr': IDX_WORD_ARR,
-        'num_weighted_terms': NUM_WEIGHTED_TERMS
+        'num_weighted_terms': NUM_TERMS_OF_TYPE_DICT['all_terms'],
+        'num_dn_terms': NUM_TERMS_OF_TYPE_DICT['dn_terms']
     })
 
 def genCityFromAPISuggestion(city_obj):

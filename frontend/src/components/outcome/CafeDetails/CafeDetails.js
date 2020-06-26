@@ -37,23 +37,9 @@ const getCarouselStyle = (showDetails) => {
 }
 
 function getColorFunc(targetCafeDict) {
-    const pal = theme.palette,
-        colorChoices = [pal.secondary.main, pal.secondary.dark, pal.info.dark];
+    const pal = theme.palette;
     return ({ text }) => {
-        return targetCafeDict[text] ?
-        pal.primary.main
-        :
-        colorChoices[Math.floor(Math.random() * colorChoices.length)]
-    }
-}
-
-function mapStateToProps(state) {
-    return {
-        cafeDetails: state.get('cafeDetails'),
-        returnedCafes: state.get('returnedCafes'),
-        cafeLocMap: state.get('cafeLocMap'),
-        wordBagRef: state.get('wordBagRef'),
-        commonTermsRefMap: state.get('commonTermsRefMap')
+        return targetCafeDict[text] || pal.secondary.main;
     }
 }
 
@@ -94,9 +80,14 @@ export class CafeDetails extends PureComponent {
         return (""+sanitizedString).replace(/<a\s+href=/gi, '<a target="_blank" href=');
     }
 
-    getCommonTermsRef(cafeLoc) {
+    getTermColorMap(cafeLoc, dnTerms, termFilters, highlightRWFriendly) {
         if (this.state.targetCafeWordPresRef && cafeLoc && cafeLoc.length) {
-            return this.props.commonTermsRefMap.get(cafeLoc[0].toString()).toJS();
+            const pal = theme.palette;
+            let groupCommonTerms = this.props.commonTermsRefMap.get(cafeLoc[0].toString()).toJS();
+            for (let key of Object.keys(groupCommonTerms)) { groupCommonTerms[key] = pal.warning.dark; }
+            highlightRWFriendly && dnTerms.forEach(term => { groupCommonTerms[term] = 'rgb(0, 209, 105)' });
+            termFilters.forEach(term => groupCommonTerms[term] = pal.primary.light);
+            return groupCommonTerms;
         }
     }
 
@@ -118,7 +109,12 @@ export class CafeDetails extends PureComponent {
             this.myRef.current.setPosition(0);
         }
         
-        const commonTermsRefMap = this.getCommonTermsRef(cafeLoc);
+        const termColorMap = this.getTermColorMap(
+                                                cafeLoc, 
+                                                this.props.dnTerms.toJS(), 
+                                                this.props.termFilters.toJS(),
+                                                this.props.highlightRWFriendly
+                                                );
         return (
             <div className={`cafeDetails${showDetails ? ' scrollOverflow' : ''}`}>
                 {
@@ -134,7 +130,7 @@ export class CafeDetails extends PureComponent {
                                         words={cafe.wordCloud}
                                         options={options(stateIsDetailsReturned)}
                                         callbacks={{
-                                            getWordColor: getColorFunc(commonTermsRefMap),
+                                            getWordColor: getColorFunc(termColorMap),
                                           }}
                                         />
                                 </div>
@@ -161,6 +157,19 @@ export class CafeDetails extends PureComponent {
                 }
             </div>
         )
+    }
+}
+
+function mapStateToProps(state) {
+    return {
+        cafeDetails: state.get('cafeDetails'),
+        returnedCafes: state.get('returnedCafes'),
+        cafeLocMap: state.get('cafeLocMap'),
+        wordBagRef: state.get('wordBagRef'),
+        termFilters: state.get('filteringByTerms'),
+        dnTerms: state.get('dnTerms'),
+        highlightRWFriendly: state.get('highlightRWFriendly'),
+        commonTermsRefMap: state.get('commonTermsRefMap')
     }
 }
 

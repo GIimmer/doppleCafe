@@ -11,9 +11,6 @@ import { tabSwitchedFunc } from "../actions/stateActions";
 export const NavBar = (props) => {
     const tabValue = [`/${CONSTS.QUERY_VIEW}`, `/${CONSTS.QUERY_OUTCOME_VIEW}`].includes(props.location) ? 0 : 1;
     const { isAuthenticated, loginWithRedirect, user, error, logout } = useAuth0();
-    console.log("Is authenticated? ", isAuthenticated);
-    console.log('here is the user: ', user);
-    console.log('here is the error: ', error);
 
     return (
         <div id="NavBar">
