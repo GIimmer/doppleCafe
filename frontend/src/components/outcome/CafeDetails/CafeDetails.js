@@ -1,6 +1,5 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'react-redux'
-import ReactWordcloud from 'react-wordcloud'
 import DOMPurify from 'dompurify'
 import { CAFE_DETAILS_RETURNED } from '../../../constants/ActionConstants'
 import "react-responsive-carousel/lib/styles/carousel.min.css" // requires a loader
@@ -8,23 +7,9 @@ import { Carousel } from 'react-responsive-carousel'
 import { genGooglePlacePhoto } from '../../../utilities/utilities'
 import CafeInformation from './CafeInformation'
 import CafeReviews from './CafeReviews'
+import CafeWordcloud from './CafeWordcloud'
 import theme from '../../../styles/muiTheme'
 import { List } from 'immutable'
-
-const options = (stateIsDetailsReturned) => {
-   return {
-        enableTooltip: false,
-        fontFamily: 'impact',
-        fontSizes: [10, 60],
-        fontStyle: 'normal',
-        fontWeight: 'normal',
-        padding: 1,
-        rotations: 5,
-        rotationAngles: [-20, 20],
-        scale: 'sqrt',
-        transitionDuration: stateIsDetailsReturned ? 0 : 1000,
-    }
-};
 
 const getCarouselStyle = (showDetails) => {
     const pal = theme.palette;
@@ -36,39 +21,12 @@ const getCarouselStyle = (showDetails) => {
     }
 }
 
-function getColorFunc(targetCafeDict) {
-    const pal = theme.palette;
-    return ({ text }) => {
-        return targetCafeDict[text] || pal.secondary.main;
-    }
-}
-
 export class CafeDetails extends PureComponent {
-    state = {};
     myRef = React.createRef();
     _isMounted = true;
 
-    componentDidMount() {
-        const wordBagRef = this.props.wordBagRef;
-        const targetWordBag = this.props.returnedCafes.getIn([0,0, 'rawWordCloud']),
-            targetCafeWordPresRef = targetWordBag.reduce((o, key) => ({ ...o, [wordBagRef.get(key.get(0))]: true }), {});
-        this.setState({
-            'targetCafeWordPresRef': targetCafeWordPresRef
-        })
-    }
-
     componentWillUnmount() {
         this._isMounted = false;
-    }
-
-    getPreparedCafe(viewingCafe) {
-        if (viewingCafe && viewingCafe.size && viewingCafe.get('wordCloud') === undefined) {
-            const jsViewingCafe = viewingCafe.toJS()
-            jsViewingCafe.wordCloud = jsViewingCafe.rawWordCloud.map((tuple) => {
-                return { text: this.props.wordBagRef.get(tuple[0]), value: tuple[1] }
-            })
-            return jsViewingCafe;
-        };
     }
 
     getCarouselHeight(showDetails) {
@@ -78,17 +36,6 @@ export class CafeDetails extends PureComponent {
     prepareLink(link) {
         let sanitizedString = DOMPurify.sanitize(link);
         return (""+sanitizedString).replace(/<a\s+href=/gi, '<a target="_blank" href=');
-    }
-
-    getTermColorMap(cafeLoc, dnTerms, termFilters, highlightRWFriendly) {
-        if (this.state.targetCafeWordPresRef && cafeLoc && cafeLoc.length) {
-            const pal = theme.palette;
-            let groupCommonTerms = this.props.commonTermsRefMap.get(cafeLoc[0].toString()).toJS();
-            for (let key of Object.keys(groupCommonTerms)) { groupCommonTerms[key] = pal.warning.dark; }
-            highlightRWFriendly && dnTerms.forEach(term => { groupCommonTerms[term] = 'rgb(0, 209, 105)' });
-            termFilters.forEach(term => groupCommonTerms[term] = pal.primary.light);
-            return groupCommonTerms;
-        }
     }
 
     render() {
@@ -101,20 +48,14 @@ export class CafeDetails extends PureComponent {
             viewingCafe = this.props.returnedCafes.getIn(cafeLoc);
         }
 
-        let cafe = this.getPreparedCafe(viewingCafe),
-            stateIsDetailsReturned = (this.props.cafeDetails.get('userActionState') === CAFE_DETAILS_RETURNED),
+        let cafe = viewingCafe && viewingCafe.size ? viewingCafe.toJS() : viewingCafe,
+            stateIsDetailsReturned = (cafeDetails.get('userActionState') === CAFE_DETAILS_RETURNED),
             showDetails = (stateIsDetailsReturned || (cafe && !!cafe.detailsLoaded));
 
         if (this.myRef.current) {
             this.myRef.current.setPosition(0);
         }
         
-        const termColorMap = this.getTermColorMap(
-                                                cafeLoc, 
-                                                this.props.dnTerms.toJS(), 
-                                                this.props.termFilters.toJS(),
-                                                this.props.highlightRWFriendly
-                                                );
         return (
             <div className={`cafeDetails${showDetails ? ' scrollOverflow' : ''}`}>
                 {
@@ -126,13 +67,11 @@ export class CafeDetails extends PureComponent {
                                 showIndicators={showDetails}
                                 ref={this.myRef}>
                                 <div style={getCarouselStyle(showDetails)}>
-                                    <ReactWordcloud
-                                        words={cafe.wordCloud}
-                                        options={options(stateIsDetailsReturned)}
-                                        callbacks={{
-                                            getWordColor: getColorFunc(termColorMap),
-                                          }}
-                                        />
+                                    <CafeWordcloud 
+                                        rawWordCloud={cafe.rawWordCloud}
+                                        groupLoc={cafeLoc[0]}
+                                        stateIsDetailsReturned={stateIsDetailsReturned}
+                                    />
                                 </div>
                                 {
                                     showDetails &&
@@ -165,11 +104,6 @@ function mapStateToProps(state) {
         cafeDetails: state.get('cafeDetails'),
         returnedCafes: state.get('returnedCafes'),
         cafeLocMap: state.get('cafeLocMap'),
-        wordBagRef: state.get('wordBagRef'),
-        termFilters: state.get('filteringByTerms'),
-        dnTerms: state.get('dnTerms'),
-        highlightRWFriendly: state.get('highlightRWFriendly'),
-        commonTermsRefMap: state.get('commonTermsRefMap')
     }
 }
 
