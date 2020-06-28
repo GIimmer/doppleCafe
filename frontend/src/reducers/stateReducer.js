@@ -40,10 +40,16 @@ function clearLockState(objectArr) {
 function clearData(state) {
     return state.merge({
         cafesReturned: false,
+        returnedCafes: List(),
         cityResponse: List(),
         cafeResponse: List(),
         cityLock: Map(),
-        cafeLock: Map()
+        cafeLock: Map(),
+        highlightedCafe: null,
+        filteringByTerms: List(),
+        cafeDetails: Map(),
+        idToCafeMapper: Map(),
+        commonTermsRefMap: Map()
     });
 }
 
@@ -91,15 +97,7 @@ export default (state = Map({}), action) => {
             )
 
         case CLEAR_SEARCH:
-            return state.merge({
-                'cityLock': Map(),
-                'cafeLock': Map(),
-                'searchParamsLocked': false,
-                'cafesReturned': false,
-                'returnedCafes': [],
-                'cafeResponse': clearLockState(state.get('cafeResponse')),
-                'cityResponse': clearLockState(state.get('cityResponse'))
-            })
+            return clearData(state);
 
         case PERMISSION_UPDATED:
             return state.set('userCanLoadNewCity', action.userCanLoadCities > 0);

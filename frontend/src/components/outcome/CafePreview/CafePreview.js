@@ -3,7 +3,6 @@ import { connect } from 'react-redux'
 import PreviewButtons from './PreviewButtons'
 import PreviewButtonsSmall from './PreviewButtonsSmall'
 
-
 const PODIUMCOLORREF = ['gold', 'silver', 'peru'];
 
 function getCrown(onLeft, podium) {
@@ -59,12 +58,12 @@ export function CafePreview(props) {
                 />
             }
             {
-                props.highlightRWFriendly && cafe.dnPodium &&
-                <i className='fas fa-crown' style={getCrown(props.onLeft, cafe.dnPodium)}></i>
-            }
-            {
                 cafeFilteredOut &&
                 <div style={{position: 'absolute', width: '100%', height: '100%', backgroundColor: 'rgba(237,244,237,.8)'}}></div>
+            }
+            {
+                props.highlightRWFriendly && cafe.dnPodium &&
+                <i className='fas fa-crown' style={getCrown(props.onLeft, cafe.dnPodium)}></i>
             }
         </div>
     )
