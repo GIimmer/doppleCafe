@@ -38,6 +38,7 @@ DN_TERMS = [
     "computer", "outlet", "outlets", "programmer", "programming", "coding", "homework", "high-speed", "electrical", "digital",
     "nomad", "wifi", "wi-fi", "plug", "plugin"
 ]
+# strip "coworkers"/"coworker"
 
 NEGATION_TERMS_MAP = {
     "no": True,
@@ -53,3 +54,4 @@ NEGATION_TERMS_MAP = {
     "barely": True,
     "n't": True,
 }
+# lacking?

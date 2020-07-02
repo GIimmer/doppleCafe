@@ -1,11 +1,13 @@
 import json
 import os.path
+import jwt
 from rest_framework import viewsets, mixins
 from django.views.decorators.http import require_http_methods
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models.query import QuerySet
 from django.db.models import Count
+from django.conf import settings
 from webapp.models import City, Cafe, Country, Placetype, Photo
 from webapp.api.serializers import CitySerializer, CafeSerializer, ReviewSerializer
 from research.cafeTest import getNearestCafesGivenCafe, givenCityRunML
@@ -27,20 +29,20 @@ class CityViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.CreateM
             # Ensure queryset is re-evaluated on each request.
             queryset = queryset.all()
 
-        name = self.request.query_params.get('name', None)
-        if (name is not None):
-            queryset = queryset.filter(name=name)
-            if (len(queryset) == 0):
-                city_obj = geocodeCityName(name)
-                queryset = [genCityFromAPISuggestion(city_obj)]
-        else:
-            queryset = queryset.annotate(cafe_count=Count('cafe')).filter(cafe_count__gt=4)
+        queryset = queryset.annotate(cafe_count=Count('cafe')).filter(cafe_count__gt=4)
 
         return CitySerializer(queryset, many=True).data
 
 @csrf_exempt
+def city_search(request):
+    query_string = request.GET.get('queryString', None)
+    if query_string is not None:
+        city_obj = geocodeCityName(query_string)
+        queryset = [genCityFromAPISuggestion(city_obj)]
+    return CitySerializer(queryset, many=True).data
+
+@csrf_exempt
 def cafe_search(request):
-    print('in cafe search with ', request)
     query_string = request.GET.get('queryString', None)
     data = {}
     if query_string is not None:
