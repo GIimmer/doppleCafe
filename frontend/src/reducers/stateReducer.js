@@ -33,10 +33,6 @@ function processReturnedCafes(candidatesArrArr, cafeLocMap, dnScoreLocArr, forMo
     })
 }
 
-function clearLockState(objectArr) {
-    return objectArr.map(res => res.delete('locked'));
-}
-
 function clearData(state) {
     return state.merge({
         cafesReturned: false,

@@ -20,6 +20,7 @@ function createCafes(cafeCandidates) {
         return {
             placeId: cafe.place_id,
             name: cafe.name,
+            formattedAddress: cafe.formatted_address,
             lat: location.lat,
             lng: location.lng,
             photos: [photo ? {

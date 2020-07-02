@@ -23,7 +23,7 @@ export const NavBar = (props) => {
                     !isAuthenticated ?
                     <Button color="inherit" onClick={() => loginWithRedirect()} className={'loginButton'}>Login</Button>
                     :
-                    <Button color="inherit" className={'loginButton'}>Logout</Button>
+                    <Button color="inherit" onClick={() => logout()} className={'loginButton'}>Logout</Button>
                 }
             </AppBar>
         </div>

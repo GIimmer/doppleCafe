@@ -1,4 +1,5 @@
 {
   "domain": "dev-0pqs5o-0.us.auth0.com",
-  "clientId": "XtiSNzsrFPJiiY47q2uoOe500AUBnS9y"
+  "clientId": "wpbqWLgzkIxb1DLlYF6ZL9RZkn0CI9q3",
+  "redirectURI": "http://localhost:3000/queryView"
 }
