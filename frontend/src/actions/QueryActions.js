@@ -24,7 +24,7 @@ export function searchForCafeFunc(dispatch) {
                 query: cafeQuery
             }
         });
-    
+
         API.get(CONSTS.SEARCH_CAFE + cafeQuery)
         .then(res => {
             if (res.status === 200) {
@@ -39,16 +39,22 @@ export function searchForCafeFunc(dispatch) {
 
 
 export function searchForCityFunc(dispatch) {
-    return (cityQuery) => {
+    return (cityQuery, getAccessTokenWithPopup) => {
         dispatch({
             type: GETTING_CITY_OPTIONS,
             payload: {
                 query: cityQuery
             }
         });
-    
-        API.get(CONSTS.SEARCH_CITY + cityQuery)
+
+        getAccessTokenWithPopup({ audience: 'http://localhost:8000/api/cities', scope: 'create:city' })
         .then(res => {
+            return API.get(CONSTS.SEARCH_CITY + cityQuery, {
+                headers: {
+                    Authorization: 'Bearer ' + res //the token is a variable which holds the token
+                }
+            })
+        }).then(res => {
             dispatch({
                 type: CITY_OPTIONS_RETURNED,
                 payload: res
