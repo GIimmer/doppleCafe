@@ -14,20 +14,15 @@ function mapStateToProps(state=Map()) {
 }
 
 export class CafeMap extends PureComponent {
-
     onMarkerClick(marker) {
         let place_id = marker.id;
         console.log('in marker click: ', place_id);
     }
 
-    onInfoWindowClose() {
-        console.log('info window closed');
-    }
-
     render() {
         const returnedCafes = this.props.returnedCafes.toJS(),
-            idxToColorRef = returnedCafes.map((group, idx) => new Array(group.length).fill(GROUPCOLORS[idx], 0, group.length)).flat(),
-            flatCafes = returnedCafes.flat()
+            idxToGroupRef = returnedCafes.map((group, idx) => new Array(group.length).fill(idx + 1, 0, group.length)).flat(),
+            flatCafes = returnedCafes.flat();
         return (
             // <div></div>
             <Map
@@ -39,9 +34,9 @@ export class CafeMap extends PureComponent {
             zoom={13}>
                 {
                     flatCafes.map((cafe, cafeIdx) => {
-                        let markerColor = cafe.placeId === this.props.highlightCafeId ? 
+                        let marker = cafe.placeId === this.props.highlightCafeId ? 
                             'black' :
-                            idxToColorRef[cafeIdx];
+                            idxToGroupRef[cafeIdx];
                         return <Marker 
                             onClick={this.onMarkerClick}
                             key={cafe.placeId}
@@ -50,17 +45,11 @@ export class CafeMap extends PureComponent {
                             title={cafe.name}
                             position={{ lat: cafe.lat, lng: cafe.lng }}
                             icon={{
-                                url: require(`../../images/${markerColor}CafeIcon.png`),
+                                url: require(`../../images/${marker}_marker.png`),
                             }}
                         />
                     }) 
                 }
-        
-                <InfoWindow onClose={this.onInfoWindowClose}>
-                    <div>
-                        <h1>{this.props.cityLock.get('name')}</h1>
-                    </div>
-                </InfoWindow>
             </Map>
         )
     }
