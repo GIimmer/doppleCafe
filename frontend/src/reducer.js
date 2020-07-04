@@ -14,6 +14,7 @@ export const InitialState = Immutable.fromJS({
     wordBagRef: null,
     weightedTerms: [],
     filteringByTerms: [],
+    cafeFilter: null,
     preLoadedCities: [
         {
             id: 1,

@@ -14,7 +14,7 @@ import { Map, List, fromJS } from 'immutable'
 function processReturnedCafes(candidatesArrArr, cafeLocMap, dnScoreLocArr, forMostSimilar) {
     return candidatesArrArr.map((group, idg) => {
         return group.map((cafe, idc) => {
-            let jsObj = forMostSimilar ? {
+            let jsObj = forMostSimilar && idg > 0 ? {
                 similarityRank: idc + 1
             } : {};
     
@@ -43,6 +43,7 @@ function clearData(state) {
         cafeLock: Map(),
         highlightedCafe: null,
         filteringByTerms: List(),
+        cafeFilter: null,
         cafeDetails: Map(),
         idToCafeMapper: Map(),
         commonTermsRefMap: Map()
