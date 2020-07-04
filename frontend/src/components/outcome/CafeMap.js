@@ -34,9 +34,10 @@ export class CafeMap extends PureComponent {
             zoom={13}>
                 {
                     flatCafes.map((cafe, cafeIdx) => {
-                        let marker = cafe.placeId === this.props.highlightCafeId ? 
-                            'black' :
-                            idxToGroupRef[cafeIdx];
+                        let markerSrc = idxToGroupRef[cafeIdx];
+                        if (cafe.placeId === this.props.highlightCafeId) {
+                            markerSrc = 'gold_' + markerSrc
+                        }
                         return <Marker 
                             onClick={this.onMarkerClick}
                             key={cafe.placeId}
@@ -45,7 +46,7 @@ export class CafeMap extends PureComponent {
                             title={cafe.name}
                             position={{ lat: cafe.lat, lng: cafe.lng }}
                             icon={{
-                                url: require(`../../images/${marker}_marker.png`),
+                                url: require(`../../images/${markerSrc}_marker.png`),
                             }}
                         />
                     }) 
