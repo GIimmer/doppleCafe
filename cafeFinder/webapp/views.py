@@ -1,6 +1,8 @@
 import json
+from functools import wraps
 import os.path
 import jwt
+from rest_framework.decorators import api_view
 from rest_framework import viewsets, mixins
 from django.views.decorators.http import require_http_methods
 from django.http import JsonResponse
@@ -9,6 +11,7 @@ from django.db.models.query import QuerySet
 from django.db.models import Count
 from django.conf import settings
 from webapp.models import City, Cafe, Country, Placetype, Photo
+from webapp.utils import remove_create_city_permissions, decode_token_auth_header
 from webapp.api.serializers import CitySerializer, CafeSerializer, ReviewSerializer
 from research.cafeTest import getNearestCafesGivenCafe, givenCityRunML
 from research.apiHandlers import geocodeCityName, getCafeWithQueryString, getCafeDetailsGivenID, givenCafeRetrieveReviews, get60CafesNearCity
@@ -18,6 +21,25 @@ BASE = os.path.dirname(os.path.abspath(__file__))
 IDX_WORD_MAP = getDataFromFileWithName(os.path.join(BASE, "../research/wordBagFiles/reverseWordVecMap"))
 IDX_WORD_ARR = getDataFromFileWithName(os.path.join(BASE, "../research/wordBagFiles/reverseWordVecArr"))
 NUM_TERMS_OF_TYPE_DICT = getDataFromFileWithName(os.path.join(BASE, "../research/wordBagFiles/numWeightedTerms"))
+
+def requires_scope(required_scope):
+    """Determines if the required scope is present in the Access Token
+    Args: required_scope (str): The scope required to access the resource"""
+    def require_scope(f):
+        @wraps(f)
+        def decorated(*args, **kwargs):
+            decoded = decode_token_auth_header(args[0])
+            if decoded.get("scope"):
+                token_scopes = decoded["scope"].split()
+                for token_scope in token_scopes:
+                    if token_scope == required_scope:
+                        return f(*args, **kwargs)
+            response = JsonResponse({'message': 'You don\'t have access to this resource'})
+            response.status_code = 403
+            return response
+        return decorated
+    return require_scope
+
 
 class CityViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.CreateModelMixin, mixins.DestroyModelMixin):
     serializer_class = CitySerializer
@@ -33,10 +55,13 @@ class CityViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.CreateM
 
         return CitySerializer(queryset, many=True).data
 
-@csrf_exempt
+# @csrf_exempt
+@api_view(['GET'])
+@requires_scope('create:city')
 def city_search(request):
     query_string = request.GET.get('queryString', None)
     if query_string is not None:
+        remove_create_city_permissions(request)
         city_obj = geocodeCityName(query_string)
         queryset = [genCityFromAPISuggestion(city_obj)]
     return CitySerializer(queryset, many=True).data
