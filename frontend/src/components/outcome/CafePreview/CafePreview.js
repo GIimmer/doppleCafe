@@ -31,8 +31,10 @@ export function CafePreview(props) {
     let onAction = props.handleAction;
 
     return (
-        <div className={getPreviewClassname(props.fullSizePreview, props.isActive, isDNFriendly, cafeFilteredOut)}
-        onMouseEnter={!cafeFilteredOut && onAction.bind(parentSelf, 'hoverOver', cafe)}>
+        <div 
+        className={getPreviewClassname(props.fullSizePreview, props.isActive, isDNFriendly, cafeFilteredOut)}
+        onMouseEnter={!cafeFilteredOut ? onAction.bind(parentSelf, 'hoverOver', cafe) : null}
+        id={cafe.placeId}>
             {
                 props.fullSizePreview &&
                 <h1>{cafe.similarityRank}</h1>

@@ -11,7 +11,8 @@ import {
     SET_TERM_FILTER,
     REMOVE_TERM_FILTER,
     SET_TERM_PRESENCE_REF,
-    CLEAR_ALL_TERM_FILTERS
+    CLEAR_ALL_TERM_FILTERS,
+    MAP_MARKER_CLICKED
 } from '../constants/ActionConstants'
 
 
@@ -113,6 +114,15 @@ export function highlightCafeOnMapFunc(dispatch) {
     return (cafeId) => {
         dispatch({
             type: HIGHLIGHT_CAFE,
+            payload: cafeId
+        })
+    }
+}
+
+export function mapMarkerClickedFunc(dispatch) {
+    return (cafeId) => {
+        dispatch({
+            type: MAP_MARKER_CLICKED,
             payload: cafeId
         })
     }

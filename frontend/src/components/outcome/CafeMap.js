@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { GoogleApiWrapper, Map, Marker } from 'google-maps-react'
 import { CONSTS } from "../../constants/Constants"
+import { mapMarkerClickedFunc } from '../../actions/outcomeActions'
 
 function getIdxToMarkerNum(returnedCafes, searchingBySimilar) {
     if (searchingBySimilar) {
@@ -12,19 +13,35 @@ function getIdxToMarkerNum(returnedCafes, searchingBySimilar) {
     }
 }
 
+function getCafes(props) {
+    let allReturnedCafes = props.returnedCafes.toJS();
+    return props.searchingBySimilar ? allReturnedCafes[1] : allReturnedCafes;
+}
+
+function getFilteredFlatCafes(props, cafesOnMap) {
+    let flatCafes = cafesOnMap.flat();
+    if (props.cafeFilter) {
+        let filterMap = {};
+        props.cafeFilter.forEach(id => filterMap[id] = true);
+        flatCafes.forEach(cafe => cafe.opacity = filterMap[cafe.placeId] ? 1 : .2);
+    }
+    return flatCafes;
+}
+
 export class CafeMap extends PureComponent {
     onMarkerClick(marker) {
-        let place_id = marker.id;
-        console.log('in marker click: ', place_id);
+        let placeId = marker.placeId;
+
+        let cafePreview = document.getElementById(placeId);
+        cafePreview.scrollIntoView({ block: 'center' });
+
+        this.props.mapMarkerClicked(placeId);
     }
 
     render() {
-        const searchingBySimilar = this.props.searchingBySimilar,
-            allReturnedCafes = this.props.returnedCafes.toJS(),
-            returnedCafes = searchingBySimilar ? allReturnedCafes[1] : allReturnedCafes;
-
-        const idxToGroupRef = getIdxToMarkerNum(returnedCafes, this.props.searchingBySimilar),
-            flatCafes = returnedCafes.flat();
+        const cafesOnMap = getCafes(this.props);
+        const idxToGroupRef = getIdxToMarkerNum(cafesOnMap, this.props.searchingBySimilar);
+        const cafesToDisplay = getFilteredFlatCafes(this.props, cafesOnMap);
 
         return (
             // <div></div>
@@ -36,16 +53,17 @@ export class CafeMap extends PureComponent {
             }}
             zoom={13}>
                 {
-                    flatCafes.map((cafe, cafeIdx) => {
+                    cafesToDisplay.map((cafe, cafeIdx) => {
                         let markerSrc = idxToGroupRef[cafeIdx],
                             cafeIsHighlighted = cafe.placeId === this.props.highlightCafeId
                         if (cafeIsHighlighted) {
                             markerSrc = 'gold_' + markerSrc
                         }
                         return <Marker 
-                            onClick={this.onMarkerClick}
+                            onClick={this.onMarkerClick.bind(this)}
                             key={cafe.placeId}
                             placeId={cafe.placeId}
+                            opacity={cafe.opacity}
                             name={cafe.name} 
                             title={cafe.name}
                             animation={cafeIsHighlighted ? this.props.google.maps.Animation.DROP : undefined}
@@ -61,16 +79,24 @@ export class CafeMap extends PureComponent {
     }
 }
 
+function mapDispatchToProps(dispatch) {
+    return {
+        mapMarkerClicked: mapMarkerClickedFunc(dispatch)
+    }
+}
+
 function mapStateToProps(state=Map(), props) {
-    const currentTab = props.location.pathname.substr(1);
+    const currentTab = props.location.pathname.substr(1),
+        cafeFilter = state.get('cafeFilter');
     return {
         highlightCafeId: state.get('highlightedCafe'),
         searchingBySimilar: (currentTab === CONSTS.QUERY_OUTCOME_VIEW),
         returnedCafes: state.get('returnedCafes'),
-        cityLock: state.get('cityLock')
+        cityLock: state.get('cityLock'),
+        cafeFilter: cafeFilter ? cafeFilter.toJS() : null
     }
 }
 
-export default withRouter(connect(mapStateToProps)(GoogleApiWrapper({
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(GoogleApiWrapper({
     apiKey: (CONSTS.MAPS_EMBED_KEY)
 })(CafeMap)))

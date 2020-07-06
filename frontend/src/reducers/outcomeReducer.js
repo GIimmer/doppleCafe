@@ -9,7 +9,8 @@ import {
     SET_TERM_FILTER,
     REMOVE_TERM_FILTER,
     SET_TERM_PRESENCE_REF,
-    CLEAR_ALL_TERM_FILTERS
+    CLEAR_ALL_TERM_FILTERS,
+    MAP_MARKER_CLICKED
   } from '../constants/ActionConstants'
   
 import { snakeToCamel } from '../utilities/utilities'
@@ -101,6 +102,7 @@ export default (state = Map({}), action) => {
             return state.set('termToCafesMap', fromJS(termToCafesMap));
 
         case CAFE_HOVER:
+        case MAP_MARKER_CLICKED:
             const cafeId = action.payload;
             cafeDetails = state.get('cafeDetails');
 
