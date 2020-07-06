@@ -25,7 +25,7 @@ export default function CafePreviewList(props) {
                         cafe={cafe} 
                         fullSizePreview={props.searchingBySimilar}
                         onLeft={props.searchingBySimilar ? true : (idx % 2) !== 1}
-                        key={cafe.placeId} 
+                        key={cafe.placeId}
                         handleAction={props.handleAction} 
                         parentContext={props.parentContext} 
                     />

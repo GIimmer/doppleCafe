@@ -16,7 +16,7 @@ export default function CafeInformation(props) {
             </div>
             <div className="infoSection contactSection">
                 <div>
-                    <a href={props.cafe.website} target="_blank">
+                    <a href={props.cafe.website} target="_blank" rel="noopener noreferrer">
                         {props.cafe.website}
                     </a>
                     <span>{props.cafe.formattedPhoneNumber}</span>

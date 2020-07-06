@@ -23,10 +23,11 @@ const getCarouselStyle = (showDetails) => {
 
 export class CafeDetails extends PureComponent {
     myRef = React.createRef();
-    _isMounted = true;
 
-    componentWillUnmount() {
-        this._isMounted = false;
+    componentDidUpdate() {
+        if (this.myRef.current) {
+            this.myRef.current.setPosition(0);
+        }
     }
 
     getCarouselHeight(showDetails) {
@@ -51,10 +52,6 @@ export class CafeDetails extends PureComponent {
         let cafe = viewingCafe && viewingCafe.size ? viewingCafe.toJS() : viewingCafe,
             stateIsDetailsReturned = (cafeDetails.get('userActionState') === CAFE_DETAILS_RETURNED),
             showDetails = (stateIsDetailsReturned || (cafe && !!cafe.detailsLoaded));
-
-        if (this.myRef.current) {
-            this.myRef.current.setPosition(0);
-        }
         
         return (
             <div className={`cafeDetails${showDetails ? ' scrollOverflow' : ''}`}>
