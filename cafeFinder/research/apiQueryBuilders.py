@@ -22,7 +22,7 @@ def buildAreaSearchRequest(lat, long, page_token):
     if page_token is not None:
         suffix = f"pagetoken={page_token}"
     else:
-        suffix = f"location={lat},{long}&radius=2000&rankby=prominence&type=cafe"
+        suffix = f"location={lat},{long}&radius=2500&rankby=prominence&type=cafe"
     return GOOGLEPLACESAPI['urlPrefix'] + GOOGLEPLACESAPI['searchAreaURLSuffix'] + suffix
 
 
