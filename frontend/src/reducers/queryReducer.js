@@ -9,7 +9,8 @@ import {
     CAFE_OPTION_UNLOCKED,
     CITY_OPTION_UNLOCKED,
     CLEAR_CAFE_MESSAGES,
-    CLEAR_CITY_MESSAGES
+    CLEAR_CITY_MESSAGES,
+    PRELOADED_CITIES_RETURNED
   } from '../constants/ActionConstants'
   import { Map, List, fromJS } from 'immutable'
 
@@ -66,6 +67,9 @@ function filterMessages(state, propName, ids) {
 
 export default (state = Map({}), action) => {
     switch (action.type) {
+        case PRELOADED_CITIES_RETURNED:
+            return state.set('preLoadedCities', fromJS(action.payload.cities));
+
         case GETTING_CAFE_OPTIONS:
             return state.set('cafeQueryState', action.type);
 

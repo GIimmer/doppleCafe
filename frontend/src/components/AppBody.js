@@ -1,13 +1,18 @@
-import React, { Component } from 'react';
-import { connect } from "react-redux";
-import { CONSTS } from "../constants/Constants";
-import ViewingPane from "./shared/ViewingPane";
-import QueryView from "./queryForming/queryView/QueryView";
-import QueryOutcome from "./outcome/QueryOutcome";
-import ExploreCities from "./queryForming/exploreView/ExploreCities";
-import { Switch, Route, Redirect } from 'react-router-dom';
+import React, { Component } from 'react'
+import { connect } from "react-redux"
+import { CONSTS } from "../constants/Constants"
+import { getPreLoadedCitiesFunc } from "../actions/queryActions"
+import ViewingPane from "./shared/ViewingPane"
+import QueryView from "./queryForming/queryView/QueryView"
+import QueryOutcome from "./outcome/QueryOutcome"
+import ExploreCities from "./queryForming/exploreView/ExploreCities"
+import { Switch, Route, Redirect } from 'react-router-dom'
 
 export class AppBody extends Component {
+
+    componentDidMount() {
+        this.props.getPreLoadedCities();
+    }
 
     render() {
         return (
@@ -27,5 +32,11 @@ export class AppBody extends Component {
     }
 }
 
-export default connect(() => ({}))(AppBody)
+function mapDispatchToProps(dispatch) {
+    return {
+        getPreLoadedCities: getPreLoadedCitiesFunc(dispatch)
+    }
+}
+
+export default connect(() => ({}), mapDispatchToProps)(AppBody)
 

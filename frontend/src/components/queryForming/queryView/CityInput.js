@@ -51,7 +51,7 @@ function usePermissions(isAuthenticated, getIdTokenClaims) {
                     const claims = await getIdTokenClaims();
                     const authLoc = CONSTS.DOMAIN_BASE + 'user_auth';
                     const permissions = claims && claims[authLoc] && claims[authLoc]['permissions'];
-                    setPermission(permissions[0]);
+                    setPermission((permissions || [])[0]);
                 } catch(err) {
                     console.error(err);
                 }
@@ -63,50 +63,64 @@ function usePermissions(isAuthenticated, getIdTokenClaims) {
     return permission;
 }
 
+function getCantLoadCityText(user, permission) {
+    if (!user) {
+        return 'Log in to load a new city';
+    } else if (!user.email_verified) {
+        return 'Verify email to load a new city';
+    } else if (permission !== 'create:city') {
+        return 'City loading permissions exhausted';
+    }
+    return null;
+}
+
 export function CityInput(props) {
     const { user, isAuthenticated, getIdTokenClaims, getAccessTokenWithPopup } = useAuth0();
     const permission = usePermissions(isAuthenticated, getIdTokenClaims),
-        userCanLoadNewCity = (user && user.email_verified && 'create:city' === permission);
+        unPermittedUserText = getCantLoadCityText(user, permission);
 
-    console.log('user: ', user);
-
-    const [cityOptions] = useState(prepareCityOptions(props.preLoadedCities.toJS()));
+    const [cityOptions, setCityOptions] = useState();
+    if (!cityOptions && props.preLoadedCities.size) {
+        setCityOptions(prepareCityOptions(props.preLoadedCities.toJS()));
+    }
 
     return (
         <div className="margin50">
-            <Autocomplete
-                id="citySearch"
-                autoHighlight
-                options={cityOptions.sort((a, b) => { return a.name > b.name })}
-                getOptionDisabled={(option) => option.inputValue !== undefined && !userCanLoadNewCity }
-                onChange={getcityInputFunc(props, getAccessTokenWithPopup)}
-                filterOptions={(options, params) => {
-                    const filtered = filter(options, params);
-            
-                    if (params.inputValue !== '') {
-                        filtered.push({
-                        inputValue: params.inputValue,
-                        name: `Search for "${params.inputValue}"`,
-                        country: 'N/A'
-                        });
-                    }
-            
-                    return filtered;
+            {
+                cityOptions &&
+                <Autocomplete
+                    id="citySearch"
+                    autoHighlight
+                    options={cityOptions.sort((a, b) => { return a.name > b.name })}
+                    getOptionDisabled={(option) => option.inputValue !== undefined && !!unPermittedUserText }
+                    onChange={getcityInputFunc(props, getAccessTokenWithPopup)}
+                    filterOptions={(options, params) => {
+                        const filtered = filter(options, params);
+                
+                        if (params.inputValue !== '') {
+                            filtered.push({
+                                inputValue: params.inputValue,
+                                name: `Search for "${params.inputValue}"${unPermittedUserText ? ' ' + unPermittedUserText : ''}`,
+                                country: 'N/A'
+                            });
+                        }
+                
+                        return filtered;
+                        }}
+                    groupBy={(option) => { return option.country }}
+                    getOptionLabel={(option) => {
+                        if (typeof option === 'string') {
+                            return option;
+                        } else if(option.inputValue) {
+                            return option.name;
+                        }
+                        return option.name
                     }}
-                groupBy={(option) => { return option.country }}
-                getOptionLabel={(option) => {
-                    if (typeof option === 'string') {
-                        return option;
-                        }
-                        if (option.inputValue) {
-                        return option.name;
-                        }
-                    return option.name
-                }}
-                renderInput={(params) => (
-                    <TextField {...params} label="Search for the city you're travelling to" margin="normal" variant="outlined" />
-                )}
-            />
+                    renderInput={(params) => (
+                        <TextField {...params} label="Search for the city you're travelling to" margin="normal" variant="outlined" />
+                    )}
+                />
+            }
         </div>
     )
 }

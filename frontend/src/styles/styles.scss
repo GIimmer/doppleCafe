@@ -48,9 +48,22 @@ a {
         min-height: 7vh;
         display: flex;
         flex-direction: row;
+        align-items: center;
 
         .tabs {
+            width: 30%;
+            flex-grow: 1;
+        }
+
+        .title {
             flex-grow: 3;
+            font-family: 'Arial Black', 'Arial Bold', Gadget, sans-serif;
+            letter-spacing: .3em;
+            color: transparent;
+            text-shadow: 1px 1px 1px rgba(237, 244, 237, 0.55);
+            background-clip: text;
+            background-color: #240000;
+            cursor: default;
         }
 
         .loginButton {
@@ -256,7 +269,7 @@ a {
                         min-height: 400px;
                         
                         box-shadow: 2px 2px 3px grey;
-                        border: 1px solid $mint-cream-dark;
+                        border: 2px solid $mint-cream-dark;
                         top: 10vh;
                         margin-bottom: 15px;
 
@@ -601,10 +614,10 @@ a {
 
 @keyframes glow {
     0% {
-		box-shadow: 0 0 5px $mint-cream;
-    }	
+		box-shadow: 0 0 5px  3px $mint-cream;
+    }
     100% {
-		box-shadow: 0 0 15px $mint-cream-dark;
+		box-shadow: 0 0 15px 3px $mint-cream-dark;
     }
 }
 

@@ -40,20 +40,13 @@ def requires_scope(required_scope):
         return decorated
     return require_scope
 
-
-class CityViewSet(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.CreateModelMixin, mixins.DestroyModelMixin):
-    serializer_class = CitySerializer
+@csrf_exempt
+@require_http_methods(["GET"])
+def get_all_cities(request):
     queryset = City.objects.all()
+    queryset = queryset.annotate(cafe_count=Count('cafe')).filter(cafe_count__gt=4)
+    return JsonResponse({ 'cities': CitySerializer(queryset, many=True).data })
 
-    def get_queryset(self):
-        queryset = self.queryset
-        if isinstance(queryset, QuerySet):
-            # Ensure queryset is re-evaluated on each request.
-            queryset = queryset.all()
-
-        queryset = queryset.annotate(cafe_count=Count('cafe')).filter(cafe_count__gt=4)
-
-        return CitySerializer(queryset, many=True).data
 
 # @csrf_exempt
 @api_view(['GET'])

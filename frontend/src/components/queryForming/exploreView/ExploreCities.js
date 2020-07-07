@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import ReactGlobe from 'react-globe'
 import earthTexture from '../../../images/2_no_clouds_8k.jpg'
-// import { Marker, defaultDotMarkerOptions } from 'react-globe'
 import { optionLockToggledFunc } from '../../../actions/queryActions'
 import theme from '../../../styles/muiTheme'
 
@@ -20,21 +19,9 @@ const lightOptions = {
 
 const globeOptions = {
     texture: earthTexture,
-    glowColor: theme.palette.warning.secondary,
-    // enableBackground: false,
+    glowColor: theme.palette.warning.secondary
 }
 
-function mapStateToProps(state) {
-    return {
-        cities: state.get('preLoadedCities')
-    }
-}
-
-function mapDispatchToProps(dispatch) {
-    return {
-        optionLockToggled: optionLockToggledFunc(dispatch)
-    }
-}
 class ExploreCities extends Component {
 
     markersFromCities(cityOptions) {
@@ -58,7 +45,6 @@ class ExploreCities extends Component {
         const cityInQuestion = this.cityFromMarker(marker);
         this.props.optionLockToggled(false, cityInQuestion);
     })
-    // }).bind(this)
 
     render() {
         let cityMarkers = this.markersFromCities(this.props.cities.toJS())
@@ -72,6 +58,18 @@ class ExploreCities extends Component {
                     markerOptions={markerOptions} />
             </div>
         )
+    }
+}
+
+function mapStateToProps(state) {
+    return {
+        cities: state.get('preLoadedCities')
+    }
+}
+
+function mapDispatchToProps(dispatch) {
+    return {
+        optionLockToggled: optionLockToggledFunc(dispatch)
     }
 }
 

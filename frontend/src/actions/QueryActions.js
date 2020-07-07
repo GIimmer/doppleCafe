@@ -10,11 +10,31 @@ import {
     CITY_OPTION_LOCKED,
     CITY_OPTION_UNLOCKED,
     CLEAR_CAFE_MESSAGES,
-    CLEAR_CITY_MESSAGES
+    CLEAR_CITY_MESSAGES,
+    GETTING_PRELOADED_CITIES,
+    PRELOADED_CITIES_RETURNED
 } from "../constants/ActionConstants";
 import CONSTS from "../constants/Constants";
 
 // ----------------------------------- API Actions ------------------------------------ //
+
+export function getPreLoadedCitiesFunc(dispatch) {
+    return () => {
+        dispatch({
+            type: GETTING_PRELOADED_CITIES
+        })
+
+        API.get(CONSTS.GET_CITIES)
+        .then(res => {
+            if (res.status === 200) {
+                dispatch({
+                    type: PRELOADED_CITIES_RETURNED,
+                    payload: res.data
+                });
+            }
+        })
+    }
+}
 
 export function searchForCafeFunc(dispatch) {
     return (cafeQuery) => {
