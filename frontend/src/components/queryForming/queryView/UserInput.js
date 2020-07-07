@@ -29,9 +29,9 @@ function mapDispatchToProps(dispatch) {
 function mapStateToProps(state=Map()) {
     return {
         cafeResponse: state.get('cafeResponse'),
-        cafeQueryState: state.get('cafeQuerystate'),
+        cafeQueryState: state.get('cafeQueryState'),
         cityResponse: state.get('cityResponse'),
-        cityQueryState: state.get('cityQuerystate'),
+        cityQueryState: state.get('cityQueryState'),
         loading: state.get('loading')
     }
 }
@@ -71,7 +71,7 @@ export class UserInput extends Component {
                             css={override}
                             size={60}
                             color={"#123abc"}
-                            loading={this.state.loading}
+                            loading={showLoading}
                         />
                         :
                         jsFieldOptions.map((searchRes) => {

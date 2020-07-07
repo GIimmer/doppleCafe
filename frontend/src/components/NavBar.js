@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { useAuth0 } from "@auth0/auth0-react";
-import { AppBar, Tabs, Tab, Button } from '@material-ui/core'
+import { AppBar, Tabs, Tab, Button, Typography } from '@material-ui/core'
 import '../styles/styles.scss'
 import CONSTS from "../constants/Constants"
 import { Link } from 'react-router-dom'
@@ -19,6 +19,9 @@ export const NavBar = (props) => {
                     <Tab label="Find a Matching Cafe" component={Link} to={`/${CONSTS.QUERY_VIEW}`} />
                     <Tab label="View Cafes by City" component={Link} to={`/${CONSTS.EXPLORE_VIEW}`} />
                 </Tabs>
+                <Typography variant="h4" className="title">
+                    CAFE FINDER
+                </Typography>
                 {
                     !isAuthenticated ?
                     <Button color="inherit" onClick={() => loginWithRedirect()} className={'loginButton'}>Login</Button>

@@ -22,7 +22,7 @@ export class CafeInput extends Component {
         return (
             <div className="margin50">
                 <form autoComplete="off" style={{ textAlign: 'center', marginTop: 16, marginBottom: 8 }} onSubmit={this.handleSubmit.bind(this)}>
-                    <TextField label="Target cafe" style={{display: 'inline-block'}} variant="outlined" required fullWidth />
+                    <TextField label="Search for a cafe you know you like" style={{display: 'inline-block'}} variant="outlined" fullWidth />
                 </form>
             </div>
         )

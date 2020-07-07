@@ -1,5 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
+import Tooltip from '@material-ui/core/Tooltip';
 import PreviewButtons from './PreviewButtons'
 import PreviewButtonsSmall from './PreviewButtonsSmall'
 
@@ -65,7 +66,9 @@ export function CafePreview(props) {
             }
             {
                 props.highlightRWFriendly && cafe.dnPodium &&
-                <i className='fas fa-crown' style={getCrown(props.onLeft, cafe.dnPodium)}></i>
+                <Tooltip title={`This cafe has the ${cafe.dnPodium < 3 ? cafe.dnPodium === 1 ? '' : 'second' : 'third'} most remote work related terms`}>
+                    <i className='fas fa-crown' style={getCrown(props.onLeft, cafe.dnPodium)}></i>
+                </Tooltip>
             }
         </div>
     )
