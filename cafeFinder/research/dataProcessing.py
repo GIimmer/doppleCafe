@@ -1,6 +1,9 @@
 import os.path
 import functools
 import numpy as np
+import nltk
+nltk.download('stopwords')
+
 from django.core.cache import caches
 
 from nltk.stem import PorterStemmer
