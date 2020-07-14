@@ -8,8 +8,16 @@ import { Link } from 'react-router-dom'
 import { withRouter } from "react-router";
 import { tabSwitchedFunc } from "../actions/stateActions";
 
+const TABVALUEMAP = {
+    [`/${CONSTS.QUERY_VIEW}`]: 0,
+    [`/${CONSTS.QUERY_OUTCOME_VIEW}`]: 0,
+    [`/${CONSTS.EXPLORE_VIEW}`]: 1,
+    [`/${CONSTS.EXPLORE_OUTCOME_VIEW}`]: 1,
+    [`/${CONSTS.ABOUT_VIEW}`]: 2
+}
+
 export const NavBar = (props) => {
-    const tabValue = [`/${CONSTS.QUERY_VIEW}`, `/${CONSTS.QUERY_OUTCOME_VIEW}`].includes(props.location) ? 0 : 1;
+    const tabValue = TABVALUEMAP[props.location];
     const { isAuthenticated, loginWithRedirect, logout } = useAuth0();
 
     return (
@@ -18,6 +26,7 @@ export const NavBar = (props) => {
                 <Tabs value={tabValue} className="tabs" onChange={props.tabSwitched} aria-label="Navbar tabs">
                     <Tab label="Find a Matching Cafe" component={Link} to={`/${CONSTS.QUERY_VIEW}`} />
                     <Tab label="View Cafes by City" component={Link} to={`/${CONSTS.EXPLORE_VIEW}`} />
+                    <Tab label="About" component={Link} to={`/${CONSTS.ABOUT_VIEW}`} />
                 </Tabs>
                 <Typography variant="h4" className="title">
                     CAFE FINDER

@@ -7,7 +7,7 @@ const options = (stateIsDetailsReturned) => {
     return {
          enableTooltip: false,
          fontFamily: 'impact',
-         fontSizes: [10, 60],
+         fontSizes: [12, 70],
          fontStyle: 'normal',
          fontWeight: 'normal',
          padding: 1,
@@ -57,7 +57,7 @@ export const CafeWordcloud = (props) => {
             callbacks={{
                 getWordColor: getColorFunc(termColorMap),
             }}
-            />
+        />
     )
 }
 
@@ -71,4 +71,4 @@ function mapStateToProps(state) {
     }
 }
 
-export default connect(mapStateToProps)(CafeWordcloud)
+export default connect(mapStateToProps)(CafeWordcloud);

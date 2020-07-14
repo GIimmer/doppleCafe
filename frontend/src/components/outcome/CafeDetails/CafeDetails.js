@@ -10,13 +10,14 @@ import CafeReviews from './CafeReviews'
 import CafeWordcloud from './CafeWordcloud'
 import theme from '../../../styles/muiTheme'
 import { List } from 'immutable'
+import TermColorTips from './TermColorTips'
 
 const getCarouselStyle = (showDetails) => {
     const pal = theme.palette;
     return {
         width: '100%',
-        height: showDetails ? '300px' : '87vh',
-        backgroundColor: 'white',
+        height: showDetails ? '300px' : '82vh',
+        padding: showDetails ? '0px' : '27px 0px',
         borderBottom: showDetails ? `27px solid ${pal.info.dark}` : 'none'
     }
 }
@@ -28,10 +29,6 @@ export class CafeDetails extends PureComponent {
         if (this.myRef.current) {
             this.myRef.current.setPosition(0);
         }
-    }
-
-    getCarouselHeight(showDetails) {
-        return showDetails ? '150px' : '100%';
     }
 
     prepareLink(link) {
@@ -58,12 +55,16 @@ export class CafeDetails extends PureComponent {
                 {
                     !!cafe ?
                         <div>
+                            {
+                                !showDetails &&
+                                <TermColorTips showTips={!!cafe.rawWordCloud} />
+                            }
                             <Carousel showThumbs={false}
                                 showArrows={showDetails}
                                 showStatus={showDetails}
                                 showIndicators={showDetails}
                                 ref={this.myRef}>
-                                <div style={getCarouselStyle(showDetails)}>
+                                <div className="wordCloudWrapper" style={getCarouselStyle(showDetails)}>
                                     <CafeWordcloud 
                                         rawWordCloud={cafe.rawWordCloud}
                                         groupLoc={cafeLoc[0]}
