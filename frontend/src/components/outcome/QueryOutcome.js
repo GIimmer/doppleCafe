@@ -53,7 +53,6 @@ export class QueryOutcome extends Component {
     componentDidUpdate() {
         if (!!this.props.returnedCafes) {
             this.props.setTermPresenceRef();
-            console.count('setTerms');
         }
     }
 

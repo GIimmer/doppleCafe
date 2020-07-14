@@ -25,7 +25,7 @@ function mapStateToProps(state=Map(), props) {
         isExploreView: [CONSTS.EXPLORE_VIEW, CONSTS.EXPLORE_OUTCOME_VIEW].includes(pathname)
     }
     return Object.assign(baseMap, {
-        searchParamsLocked: (!!baseMap.cityLock.size && (!!baseMap.cafeLock.size || baseMap.isExploreView)),
+        searchParamsLocked: (!!baseMap.cityLock && baseMap.cityLock.size && (!!baseMap.cafeLock.size || baseMap.isExploreView)),
     })
 }
 

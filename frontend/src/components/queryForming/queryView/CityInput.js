@@ -79,8 +79,8 @@ export function CityInput(props) {
     const permission = usePermissions(isAuthenticated, getIdTokenClaims),
         unPermittedUserText = getCantLoadCityText(user, permission);
 
-    const [cityOptions, setCityOptions] = useState();
-    if (!cityOptions && props.preLoadedCities.size) {
+    const [cityOptions, setCityOptions] = useState([]);
+    if (!cityOptions.length && props.preLoadedCities.size) {
         setCityOptions(prepareCityOptions(props.preLoadedCities.toJS()));
     }
 
