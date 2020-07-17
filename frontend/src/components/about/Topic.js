@@ -8,10 +8,16 @@ export default function Topic(props) {
             <p>{topic.text}</p>
             {
                 topic.subTopics.map(subTopic => {
-                    return <>
-                        <h3 className="subTitle">{subTopic.title}</h3>
-                        <p>{subTopic.text}</p>
-                    </>
+                    return <div className="subSectionHolder">
+                        <div>
+                            <h3 className="subTitle">{subTopic.title}</h3>
+                            <p>{subTopic.text}</p>
+                        </div>
+                        {
+                            subTopic.img !== undefined && 
+                            <img></img>
+                        }
+                    </div>
                 })
             }
         </div>

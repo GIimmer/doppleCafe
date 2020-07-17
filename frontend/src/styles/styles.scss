@@ -80,7 +80,7 @@ a {
     min-height: 93vh;
     &>div {
         background-color: white;
-        width: 90%;
+        max-width: 90%;
         min-height: 1000px;
         margin: 5%;
         box-shadow: 1px 1px 4px grey;
@@ -101,16 +101,36 @@ a {
 
         .aboutSection {
             padding: 10vh 10vw;
+            color: $mint-cream-contrast-text;
 
             .topicSection {
-                color: $mint-cream-contrast-text;
+                margin: 100px 0px 200px;
 
                 h2 {
-                    font-size: 64px;
+                    font-size: 42px;
+                    margin: 20px 0px;
                 }
 
-                h3 {
-                    font-size: 36px;
+                .subSectionHolder {
+                    display: flex;
+                    flex-direction: row;
+                    justify-content: space-between;
+
+                    h3 {
+                        font-size: 24px;
+                        margin: 20px 0px;
+                    }
+    
+                    p {
+                        margin-bottom: 50px;
+                        text-align: justify;
+                    }
+
+                    img { 
+                        min-width: 400px;
+                        min-height: 200px;
+                        margin: 10px;
+                    }
                 }
             }
         }
