@@ -17,7 +17,7 @@ const getCarouselStyle = (showDetails) => {
     return {
         width: '100%',
         height: showDetails ? '300px' : '82vh',
-        padding: showDetails ? '0px' : '27px 0px',
+        padding: showDetails ? '0px' : '30px 0px',
         borderBottom: showDetails ? `27px solid ${pal.info.dark}` : 'none'
     }
 }

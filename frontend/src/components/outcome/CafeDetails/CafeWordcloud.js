@@ -5,6 +5,7 @@ import ReactWordcloud from 'react-wordcloud'
 
 const options = (stateIsDetailsReturned) => {
     return {
+         enableOptimizations: true,
          enableTooltip: false,
          fontFamily: 'impact',
          fontSizes: [12, 70],
