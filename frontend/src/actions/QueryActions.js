@@ -67,7 +67,7 @@ export function searchForCityFunc(dispatch) {
             }
         });
 
-        getAccessTokenWithPopup({ audience: 'http://localhost:8000/api/cities', scope: 'create:city' })
+        getAccessTokenWithPopup({ audience: CONSTS.API_BASE + 'cities', scope: 'create:city' })
         .then(res => {
             return API.get(CONSTS.SEARCH_CITY + cityQuery, {
                 headers: {

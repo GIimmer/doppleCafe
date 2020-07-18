@@ -25,6 +25,7 @@
     "react-router-dom": "^5.2.0",
     "react-scripts": "3.4.1",
     "react-spinners": "^0.8.3",
+    "react-toast-notifications": "^2.4.0",
     "react-transition-group": "^4.4.1",
     "react-wordcloud": "^1.2.3",
     "reduce-reducers": "^1.0.4",

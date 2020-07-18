@@ -6,15 +6,19 @@ import { CONSTS } from '../../../constants/Constants'
 import Autocomplete, { createFilterOptions } from '@material-ui/lab/Autocomplete'
 import TextField from '@material-ui/core/TextField';
 import { searchForCityFunc, selectPreLoadedCityFunc } from "../../../actions/queryActions"
+import { useToasts } from 'react-toast-notifications'
 
 
 const filter = createFilterOptions();
 
-function getcityInputFunc({ searchForCity, selectPreLoadedCity, ...rest }, getAccessTokenWithPopup) {
+function getcityInputFunc({ searchForCity, selectPreLoadedCity, ...rest }, getAccessTokenWithPopup, addToast) {
     return (e, requestObj) => {
         e.preventDefault();
         if (requestObj) {
             if (requestObj.inputValue) {
+                addToast(
+                <p style={{ fontSize: '1.2em' }}>Loading a new city can take in excess of 60 seconds</p>,
+                { appearance: 'warning' });
                 searchForCity(requestObj.inputValue, getAccessTokenWithPopup);
             } else {
                 selectPreLoadedCity(requestObj);
@@ -78,6 +82,7 @@ export function CityInput(props) {
     const { user, isAuthenticated, getIdTokenClaims, getAccessTokenWithPopup } = useAuth0();
     const permission = usePermissions(isAuthenticated, getIdTokenClaims),
         unPermittedUserText = getCantLoadCityText(user, permission);
+    const { addToast } = useToasts()
 
     const [cityOptions, setCityOptions] = useState([]);
     if (!cityOptions.length && props.preLoadedCities.size) {
@@ -93,14 +98,14 @@ export function CityInput(props) {
                     autoHighlight
                     options={cityOptions.sort((a, b) => { return a.name > b.name })}
                     getOptionDisabled={(option) => option.inputValue !== undefined && !!unPermittedUserText }
-                    onChange={getcityInputFunc(props, getAccessTokenWithPopup)}
+                    onChange={getcityInputFunc(props, getAccessTokenWithPopup, addToast)}
                     filterOptions={(options, params) => {
                         const filtered = filter(options, params);
                 
                         if (params.inputValue !== '') {
                             filtered.push({
                                 inputValue: params.inputValue,
-                                name: `Search for "${params.inputValue}"${unPermittedUserText ? ' ' + unPermittedUserText : ''}`,
+                                name: unPermittedUserText ? `${unPermittedUserText}` : `Search for "${params.inputValue}"`,
                                 country: 'N/A'
                             });
                         }
