@@ -112,7 +112,7 @@ const RESULTSFAQ = {
         },
         {
             title: 'Common terms?',
-            text: `'Commmon terms' are highlighted in light brown, and have a slightly different implementation - though the same intent - depending
+            text: `'Common terms' are highlighted in light brown, and have a slightly different implementation - though the same intent - depending
             on which tab you're viewing. While on 'Find a Similar Cafe' its fairly simple; terms in brown are shared with the target cafe. So if your 
             cafe wordcloud contains the term 'quaint', any instance of that term in the ten returned cafes' wordclouds will be highlighted. On the
             'Explore City' tab, it's a little more complicated. Because groups are of varying sizes, and can share similarities that transcend
