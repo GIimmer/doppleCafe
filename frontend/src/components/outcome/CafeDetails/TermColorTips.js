@@ -13,7 +13,7 @@ function getTermColorTips(highlightRWFriendly, filteringByTerms, forSimilar) {
             color: pal.secondary.main
         },
         {
-            tip: `Terms in common with the ${forSimilar ? "target cafe" : "group"}`,
+            tip: `In common with the ${forSimilar ? "target cafe" : "group"}`,
             color: pal.warning.dark
         },
         ...highlightRWFriendly ? [{ tip: `remote work related`, color: 'rgb(0, 209, 105)' }] : [],
@@ -41,7 +41,7 @@ export function TermColorTips(props) {
         <>
             {
                 termColorTips.map((tip, idx) => {
-                    return <div className="termColorTip" style={getStyle(tip, idx)}>{tip.tip}</div>
+                    return <div className="termColorTip" key={'tip_' + idx} style={getStyle(tip, idx)}>{tip.tip}</div>
                 })
             }
         </>

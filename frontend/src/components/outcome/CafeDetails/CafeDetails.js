@@ -64,7 +64,7 @@ export class CafeDetails extends PureComponent {
                                 showStatus={showDetails}
                                 showIndicators={showDetails}
                                 ref={this.myRef}>
-                                <div className="wordCloudWrapper" style={getCarouselStyle(showDetails)}>
+                                <div className={`wordCloudWrapper${showDetails ? ' showDetails' : ''}`} style={getCarouselStyle(showDetails)}>
                                     <CafeWordcloud 
                                         rawWordCloud={cafe.rawWordCloud}
                                         groupLoc={cafeLoc[0]}
