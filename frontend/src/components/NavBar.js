@@ -26,7 +26,7 @@ export const NavBar = (props) => {
                 <Tabs value={tabValue} className="tabs" onChange={props.tabSwitched} aria-label="Navbar tabs">
                     <Tab label="Find a Matching Cafe" component={Link} to={`/${CONSTS.QUERY_VIEW}`} />
                     <Tab label="View Cafes by City" component={Link} to={`/${CONSTS.EXPLORE_VIEW}`} />
-                    <Tab label="About" component={Link} to={`/${CONSTS.ABOUT_VIEW}`} />
+                    <Tab label="About + FAQs" component={Link} to={`/${CONSTS.ABOUT_VIEW}`} />
                 </Tabs>
                 <Typography variant="h4" className="title">
                     CAFE FINDER

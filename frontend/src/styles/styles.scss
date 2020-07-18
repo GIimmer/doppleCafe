@@ -87,10 +87,6 @@ a {
     }
 }
 
-// @mixin mint-border() {
-//     border
-// }
-
 #AppBody {
     position: relative;
     min-height: 100vh;
@@ -100,7 +96,7 @@ a {
         @include information-container(100vw);
 
         .aboutSection {
-            padding: 10vh 10vw;
+            padding: 10vh 5vw;
             color: $mint-cream-contrast-text;
 
             .topicSection {
@@ -113,23 +109,42 @@ a {
 
                 .subSectionHolder {
                     display: flex;
+                    border-left: 3px solid $mint-cream-dark;
+                    border-right: 3px solid $mint-cream-dark;
+                    padding: 8px;
+                    border-radius: 15px;
                     flex-direction: row;
+                    align-items: center;
                     justify-content: space-between;
+                    margin: 30px 0px;
 
                     h3 {
                         font-size: 24px;
-                        margin: 20px 0px;
+                        margin: 5px 0px 20px;
                     }
     
                     p {
-                        margin-bottom: 50px;
+                        margin-bottom: 10px;
+                        font-size: 1.1em;
                         text-align: justify;
                     }
 
-                    img { 
-                        min-width: 400px;
-                        min-height: 200px;
-                        margin: 10px;
+                    .topicImgHolder {
+                        margin-left: 15px;
+
+                        img {
+                            min-width: 600px;
+                            max-width: 600px;
+                            
+                            &.smallTopicImage {
+                                min-width: 450px;
+                                max-width: 450px;
+                            }
+                        }
+
+                        div[data-rcs=main-handle-inner] {
+                            background-color: $dn-color !important;
+                        }
                     }
                 }
             }
@@ -347,7 +362,7 @@ a {
                                 text-align: center;
                             }
 
-                            .wordCloudWrapper {
+                            .wordCloudWrapper:not(.showDetails) {
                                 position: relative;
                                 
                                 &::before, &::after {

@@ -1,3 +1,9 @@
+const imgRoot = './images/'
+
+const getImgPath = (imgText) => {
+    return `${imgRoot}${imgText}.png`
+}
+
 const GENERALFAQ = {
     title: 'What is the purpose of this site?',
     text: `The goal of this website is to provide a jumping off point to travellers who enjoy exploring a new city through its cafes. 
@@ -10,7 +16,8 @@ const GENERALFAQ = {
             know and love in a city you are travelling to. So search for a cafe you like in the left input, search for the city you're 
             travelling to in the right-side input, and select whether you'd like to emphasize ambience, default or food. The ten most 
             similar cafes from the dataset will be output, in descending order of similarity - so the topmost result is the most similar.`,
-            img: ''
+            img: 'findMatchingNavBar',
+            img2: 'findMatchingOutcome'
         },
         {
             title: 'What does "Explore city" do?',
@@ -19,7 +26,8 @@ const GENERALFAQ = {
             using machine learning - depending in part on your selected emphasis - it will surface terms important to that group, allow
             you to filter by terms, optionally draw attention to those cafes that are probably very Digital Nomad friendly, and as always
             view their distribution on the map.`,
-            img: ''
+            img: 'exploreCityNavBar',
+            img2: 'exploreCityOutcome'
         }
     ]
 }
@@ -89,7 +97,8 @@ const RESULTSFAQ = {
             wants to find a small cafe that has oat milk. They could filter by 'cute' and 'oat', knowing that in this context oat is normally 
             associated with milk, and statements like "they don't serve oat milk" would be processed into "not_oat". The search bar only allows 
             predetermined 'special terms' which  can be found at least once in any of the cafes returned - Supercalifragilistic was never an option.`,
-            img: ''
+            img: 'termFilteringMap',
+            img2: 'termFilteringDetails'
         },
         {
             title: 'Remote work highlighting?',
@@ -98,7 +107,8 @@ const RESULTSFAQ = {
             cafes with the most positive RW terms will have crowns of bronze, silver and of course gold - which will have the highest RW term value.
             Keep in mind value does not always mean most - if one cafe has hundreds of mentions of coworking and laptop but nothing else, it will rate
             higher than other cafes that mention every possible RW term only once. Finally, RW terms will be highlighted green in the wordcloud.`,
-            img: ''
+            img: 'rwHighlightingOn',
+            img2: 'rwHighlightingOff'
         },
         {
             title: 'Common terms?',
@@ -110,7 +120,8 @@ const RESULTSFAQ = {
             In large groups the only shared terms are things like 'was' and 'good'. Therefore common terms are arrived at by adding together the term
             values of every cafe in the group, removing those which are not in at least two, and taking the 20 highest value terms from the resultant
             additive vector. The top six of these are presented explicitely ('This grouping may emphasize the following terms').`,
-            img: ''
+            img: 'findMatchingInCommon',
+            img2: 'exploreCityInCommon'
         },
         {
             title: '"Not_" syntax?',
@@ -122,7 +133,7 @@ const RESULTSFAQ = {
             there is no place for it on the mathemetical vector, and not_modern remains. This method is not perfect, for example modern is too far from 
             'not' in 'This place is not the most modern', and 'This place is not inviting, modern design cues abound.' captures not_modern erroneously. 
             But external research and personal testing has indicated that accuracy is improved substantially by implementing this method.`,
-            img: ''
+            img: 'notSyntax'
         }
     ]
 }
@@ -138,8 +149,7 @@ const MISCFAQ = {
             in the context of getting a coffee before work, or talking about employees working there, than remote work. However; Remote Workers frequently
             say 'get some work done', so I can jump through some hoops to capture that specific phrase. There are also plenty of food terms I have yet to 
             add. Long term accuracy improvements could be gained possibly by partnering with a review-hosting website like Yelp, Google, or TripAdviser to 
-            acquire much more data, as well as using a new, more advanced, and much cooler algorithm called doc2vec.`,
-            img: ''
+            acquire much more data, as well as using a new, more advanced, and much cooler algorithm called doc2vec.`
         },
         {
             title: 'Loading new cities',
@@ -148,8 +158,7 @@ const MISCFAQ = {
         },
         {
             title: 'Design',
-            text: `I'm not a designer, unsurprisingly. Paying a designer to make some revisions, therefore, would probably be a very good move.`,
-            img: ''
+            text: `I'm not a designer, unsurprisingly. Paying a designer to make some revisions, therefore, would probably be a very good move.`
         },
         {
             title: 'Contact me',

@@ -1,4 +1,5 @@
 import React from 'react'
+import { ReactCompareSlider } from 'react-compare-slider';
 
 export default function Topic(props) {
     let topic = props.topic;
@@ -14,8 +15,19 @@ export default function Topic(props) {
                             <p>{subTopic.text}</p>
                         </div>
                         {
-                            subTopic.img !== undefined && 
-                            <img></img>
+                            subTopic.img !== undefined &&
+                            <div className="topicImgHolder">
+                                {
+                                    !subTopic.img2 ?
+                                    <img className="smallTopicImage" src={require(`./images/${subTopic.img}.png`)}></img>
+                                    :
+                                    <ReactCompareSlider
+                                        itemOne={<img src={require(`./images/${subTopic.img}.png`)} alt="Image one" />}
+                                        itemTwo={<img src={require(`./images/${subTopic.img2}.png`)} alt="Image two" />}
+                                        position={60}
+                                    />
+                                }
+                            </div>
                         }
                     </div>
                 })
