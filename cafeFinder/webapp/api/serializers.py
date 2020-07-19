@@ -54,9 +54,9 @@ class CafeSerializer(serializers.ModelSerializer):
             return None
 
     def get_photos(self, obj):
-        # get 10 similar stores for this store
-        photos = obj.photo_set.all()[:1]
+        photos = obj.photo_set.all()[:3]
         return PhotoSerializer(photos, many=True).data
+
     class Meta:
         model = Cafe
         fields = "__all__"

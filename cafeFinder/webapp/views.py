@@ -2,6 +2,7 @@ import json
 from functools import wraps
 import os.path
 import jwt
+import copy
 from rest_framework.decorators import api_view
 from rest_framework import viewsets, mixins
 from django.views.decorators.http import require_http_methods
@@ -75,7 +76,7 @@ def gencafeFromSearchRes(cafe):
         cafe = Cafe.objects.get(pk=cafe['place_id'])
     except Cafe.DoesNotExist:
         location = cafe['geometry']['location']
-        photo_arr = cafe['photos']
+        photo_arr = copy.deepcopy(cafe['photos'])
 
         cafe_search_obj = {
             "place_id": cafe['place_id'],
@@ -96,7 +97,7 @@ def get_cafe_details(request, cafe_id):
         cafe = Cafe.objects.get(pk=cafe_id)
     except Cafe.DoesNotExist:
         return JsonResponse({"status": "Failed", "Reason": "Cafe not in database"})
-    # if True:
+
     if cafe.photo_set.count() == 0:
         cafe_details_res = getCafeDetailsGivenID(cafe_id)
         cafe.hours = hoursArrStringFromDetailsRes(cafe_details_res)
