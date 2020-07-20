@@ -22,8 +22,8 @@ export default function Topic(props) {
                                     <img className="smallTopicImage" src={require(`./images/${subTopic.img}.png`)}></img>
                                     :
                                     <ReactCompareSlider
-                                        itemOne={<img src={require(`./images/${subTopic.img}.png`)} alt="Image one" />}
-                                        itemTwo={<img src={require(`./images/${subTopic.img2}.png`)} alt="Image two" />}
+                                        itemOne={<img src={require(`./images/${subTopic.img}.png`)} alt={`Visual demo of ${subTopic.img}`} />}
+                                        itemTwo={<img src={require(`./images/${subTopic.img2}.png`)} alt={`Visual demo of ${subTopic.img2}`} />}
                                         position={60}
                                     />
                                 }

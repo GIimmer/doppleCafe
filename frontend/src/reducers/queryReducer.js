@@ -12,6 +12,7 @@ import {
     CLEAR_CITY_MESSAGES,
     PRELOADED_CITIES_RETURNED
   } from '../constants/ActionConstants'
+  import CONSTS from '../constants/Constants'
   import { Map, List, fromJS } from 'immutable'
 
 function createCafes(cafeCandidates) {
@@ -52,12 +53,14 @@ function toggleLockState(objectArr = List([]), lockedId=null, forCafes=false) {
 }
 
 function createCity(city) {
+    const cityPhoto = city.photo_src;
     return Map({
-        id: city.placeId,
+        id: city.id,
         name: city.name,
         lat: city.lat,
         lng: city.lng,
-        country: city.country
+        country: city.country,
+        photos: [cityPhoto ? cityPhoto : CONSTS.CITY_PHOTO_STANDIN]
     })
 }
 
@@ -110,7 +113,7 @@ export default (state = Map({}), action) => {
         case CITY_OPTIONS_RETURNED:
             return state.merge({
                 'cityQueryState': action.type,
-                'cityResponse': createCity(action.payload)
+                'cityResponse': List([createCity(action.payload[0])])
             });
 
         case CITY_OPTION_LOCKED:

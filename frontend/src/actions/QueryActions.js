@@ -75,10 +75,12 @@ export function searchForCityFunc(dispatch) {
                 }
             })
         }).then(res => {
-            dispatch({
-                type: CITY_OPTIONS_RETURNED,
-                payload: res
-            });
+            if (res.status === 200) {
+                dispatch({
+                    type: CITY_OPTIONS_RETURNED,
+                    payload: res.data.cities
+                });
+            }
         });
     }
 }

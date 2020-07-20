@@ -15,8 +15,8 @@ function ResponseCardMap({ isCafe, response, google, displaySmall, ...rest }) {
     const zoom = isCafe ? 12 : 7;
     return (
         <div style={getMapStyle(displaySmall)}>
-            <div style={getMapStyle(displaySmall)}></div>
-            {/* <Map 
+            {/* <div style={getMapStyle(displaySmall)}></div> */}
+            <Map 
             google={google}
             initialCenter={{
                 lat: response.lat,
@@ -28,7 +28,7 @@ function ResponseCardMap({ isCafe, response, google, displaySmall, ...rest }) {
             fullscreenControl={false}
             streetViewControl={false}>
                 <Marker name={response.name} />
-            </Map> */}
+            </Map>
         </div>
     )
 }
