@@ -11,7 +11,7 @@ import { useToasts } from 'react-toast-notifications'
 
 const filter = createFilterOptions();
 
-function getcityInputFunc({ searchForCity, selectPreLoadedCity, ...rest }, getAccessTokenWithPopup, addToast) {
+function getcityInputFunc({ searchForCity, selectPreLoadedCity, ...rest }, getAccessTokenSilently, addToast) {
     return (e, requestObj) => {
         e.preventDefault();
         if (requestObj) {
@@ -19,7 +19,7 @@ function getcityInputFunc({ searchForCity, selectPreLoadedCity, ...rest }, getAc
                 addToast(
                 <p style={{ fontSize: '1.2em' }}>Loading a new city can take in excess of 60 seconds</p>,
                 { appearance: 'warning' });
-                searchForCity(requestObj.inputValue, getAccessTokenWithPopup);
+                searchForCity(requestObj.inputValue, getAccessTokenSilently);
             } else {
                 selectPreLoadedCity(requestObj);
             }
@@ -79,7 +79,7 @@ function getCantLoadCityText(user, permission) {
 }
 
 export function CityInput(props) {
-    const { user, isAuthenticated, getIdTokenClaims, getAccessTokenWithPopup } = useAuth0();
+    const { user, isAuthenticated, getIdTokenClaims, getAccessTokenSilently } = useAuth0();
     const permission = usePermissions(isAuthenticated, getIdTokenClaims),
         unPermittedUserText = getCantLoadCityText(user, permission);
     const { addToast } = useToasts()
@@ -98,7 +98,7 @@ export function CityInput(props) {
                     autoHighlight
                     options={cityOptions.sort((a, b) => { return a.name > b.name })}
                     getOptionDisabled={(option) => option.inputValue !== undefined && !!unPermittedUserText }
-                    onChange={getcityInputFunc(props, getAccessTokenWithPopup, addToast)}
+                    onChange={getcityInputFunc(props, getAccessTokenSilently, addToast)}
                     filterOptions={(options, params) => {
                         const filtered = filter(options, params);
                 

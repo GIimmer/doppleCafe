@@ -59,7 +59,7 @@ export function searchForCafeFunc(dispatch) {
 
 
 export function searchForCityFunc(dispatch) {
-    return (cityQuery, getAccessTokenWithPopup) => {
+    return (cityQuery, getAccessTokenSilently) => {
         dispatch({
             type: GETTING_CITY_OPTIONS,
             payload: {
@@ -67,7 +67,7 @@ export function searchForCityFunc(dispatch) {
             }
         });
 
-        getAccessTokenWithPopup({ audience: CONSTS.API_BASE + 'cities', scope: 'create:city' })
+        getAccessTokenSilently({ audience: CONSTS.API_BASE + 'cities', scope: 'create:city' })
         .then(res => {
             return API.get(CONSTS.SEARCH_CITY + cityQuery, {
                 headers: {
