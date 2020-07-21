@@ -34,7 +34,7 @@ function mapStateToProps(state=Map(), props) {
     return {
         loading: !state.get('cafesReturned'),
         returnedCafes: state.get('returnedCafes'),
-        isExploreView: props.location.pathname === `/${CONSTS.EXPLORE_OUTCOME_VIEW}`
+        isExploreView: props.location.pathname.replace(/\\|\//g,'') === CONSTS.EXPLORE_OUTCOME_VIEW
     }
 }
 

@@ -22,7 +22,7 @@ function mapDispatchToProps(dispatch) {
 }
 
 function mapStateToProps(state=Map(), props) {
-    const currentTab = props.location.pathname.substr(1);
+    const currentTab = props.location.pathname.replace(/\\|\//g,'');
     return {
         returnedCafes: state.get('returnedCafes'),
         commonTermsRefMap: state.get('commonTermsRefMap'),

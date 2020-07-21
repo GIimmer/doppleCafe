@@ -49,7 +49,7 @@ export function TermColorTips(props) {
 }
 
 function mapStateToProps(state, props) {
-    let currentTab = props.location.pathname.substr(1);
+    let currentTab = props.location.pathname.replace(/\\|\//g,'');
     return {
         termFilters: state.get('filteringByTerms'),
         highlightRWFriendly: state.get('highlightRWFriendly'),

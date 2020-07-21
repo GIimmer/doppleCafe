@@ -9,11 +9,11 @@ import { withRouter } from "react-router";
 import { tabSwitchedFunc } from "../actions/stateActions";
 
 const TABVALUEMAP = {
-    [`/${CONSTS.QUERY_VIEW}`]: 0,
-    [`/${CONSTS.QUERY_OUTCOME_VIEW}`]: 0,
-    [`/${CONSTS.EXPLORE_VIEW}`]: 1,
-    [`/${CONSTS.EXPLORE_OUTCOME_VIEW}`]: 1,
-    [`/${CONSTS.ABOUT_VIEW}`]: 2
+    [CONSTS.QUERY_VIEW]: 0,
+    [CONSTS.QUERY_OUTCOME_VIEW]: 0,
+    [CONSTS.EXPLORE_VIEW]: 1,
+    [CONSTS.EXPLORE_OUTCOME_VIEW]: 1,
+    [CONSTS.ABOUT_VIEW]: 2
 }
 
 export const NavBar = (props) => {
@@ -44,7 +44,7 @@ export const NavBar = (props) => {
 
 const mapStateToProps = (state, props) => {
     return {
-        location: props.location.pathname
+        location: props.location.pathname.replace(/\\|\//g,'')
     }
 }
 

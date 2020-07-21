@@ -17,7 +17,7 @@ function mapDispatchToProps(dispatch) {
 }
 
 function mapStateToProps(state=Map(), props) {
-    const pathname = props.location.pathname.substr(1);
+    const pathname = props.location.pathname.replace(/\\|\//g,'');
     const baseMap = {
         cafeLock: state.get('cafeLock'),
         cityLock: state.get('cityLock'),

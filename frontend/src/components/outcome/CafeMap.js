@@ -86,7 +86,7 @@ function mapDispatchToProps(dispatch) {
 }
 
 function mapStateToProps(state=Map(), props) {
-    const currentTab = props.location.pathname.substr(1),
+    const currentTab = props.location.pathname.replace(/\\|\//g,''),
         cafeFilter = state.get('cafeFilter');
     return {
         highlightCafeId: state.get('highlightedCafe'),
