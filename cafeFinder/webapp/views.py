@@ -3,6 +3,7 @@ from functools import wraps
 import os.path
 import jwt
 import copy
+import logging
 from rest_framework.decorators import api_view
 from rest_framework import viewsets, mixins
 from django.views.decorators.http import require_http_methods
@@ -17,6 +18,8 @@ from webapp.api.serializers import CitySerializer, CafeSerializer, ReviewSeriali
 from research.cafeTest import getNearestCafesGivenCafe, givenCityRunML
 from research.apiHandlers import geocodeCityName, getCafeWithQueryString, getCafeDetailsGivenID, givenCafeRetrieveReviews, get60CafesNearCity
 from research.utilities import getDataFromFileWithName
+
+logger = logging.getLogger(__name__)
 
 BASE = os.path.dirname(os.path.abspath(__file__))
 IDX_WORD_MAP = getDataFromFileWithName(os.path.join(BASE, "../research/wordBagFiles/reverseWordVecMap"))
@@ -58,7 +61,8 @@ def city_search(request):
         remove_create_city_permissions(request)
         city_obj = geocodeCityName(query_string)
         queryset = [genCityFromAPISuggestion(city_obj)]
-    return CitySerializer(queryset, many=True).data
+    data = CitySerializer(queryset, many=True).data
+    return JsonResponse({ 'cities': data })
 
 @csrf_exempt
 def cafe_search(request):
@@ -134,19 +138,25 @@ def find_similar_cafes(request):
 
         try:
             target_cafe = Cafe.objects.get(place_id=cafe_id)
+            if len(target_cafe.placetypes.all()) == 0:
+                cafe_details_res = getCafeDetailsGivenID(cafe_id)
+                target_cafe = imbueCafeWithDetailsRes(cafe_details_res, cafe_id)
+                target_cafe.save()
         except Cafe.DoesNotExist:
-            cafe_details_res = getCafeDetailsGivenID(cafe_id)
-            target_cafe = imbueCafeWithDetailsRes(cafe_details_res, cafe_id)
+            return JsonResponse({"status": "Failed", "Reason": "City not in database"})
 
         if target_cafe.review_set.count() == 0:
             givenCafeRetrieveReviews(target_cafe, 80)
+            target_cafe.save()
 
-        # Cafe.objects.filter(city=city).delete()
         if city.cafe_set.count() == 0:
+        # if True:
             get60CafesNearCity(city)
 
         if (city.cafe_set.count() > 10):
             similar_cafe_wrapper = getNearestCafesGivenCafe(city, target_cafe, weighting)
+        else:
+            return JsonResponse({ 'res': 400 })
 
         target_cafe_model = CafeSerializer(target_cafe).data
         similar_cafes = CafeSerializer(similar_cafe_wrapper['similar_cafes'], many=True).data
@@ -193,7 +203,7 @@ def genCityFromAPISuggestion(city_obj):
         country = Country.objects.get(countryCode=city_obj['country'])
     except Country.DoesNotExist:
         country = Country.objects.create(countryCode=city_obj['country'])
-    return City.objects.create(name=city_obj['name'], country=country, latitude=city_obj['latitude'], longitude=city_obj['longitude'])
+    return City.objects.create(name=city_obj['name'], country=country, lat=city_obj['latitude'], lng=city_obj['longitude'])
 
 def genCafesFromAPICandidates(api_candidates):
     for candidate in api_candidates:
@@ -203,6 +213,9 @@ def imbueCafeWithDetailsRes(cafe_details_obj, cafe_id):
     cafe = Cafe.objects.get(pk=cafe_id)
     if (cafe is not None):
         cafe.compound_code = cafe_details_obj['plus_code']['compound_code']
+        cafe.rating = cafe_details_obj.get('rating', 0.0)
+        cafe.user_ratings_total = cafe_details_obj.get('user_ratings_total', 0)
+        cafe.formatted_phone_number = cafe_details_obj.get('formatted_phone_number', '')
 
         createPhotosForCafe(cafe_details_obj['photos'], cafe)
         cafe.hours = hoursArrStringFromDetailsRes(cafe_details_obj)

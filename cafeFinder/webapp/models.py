@@ -7,8 +7,9 @@ class City(models.Model):
     lat = models.DecimalField("Latitude", max_digits=10, decimal_places=8)
     lng = models.DecimalField("Longitude", max_digits=11, decimal_places=8)
     country = models.ForeignKey("Country", on_delete=models.CASCADE, null=True)
-    photo_src = models.CharField("PhotoSrc", max_length=255, null=True, blank=True)
+    photo_src = models.CharField("PhotoSrc", max_length=255, blank=True, default="https://upload.wikimedia.org/wikipedia/commons/c/c4/OldhamTownCentre.jpg")
     updated_at = models.DateTimeField(auto_now=True)
+    radius = models.IntegerField('Radius', blank=True, default=2500)
 
     def __str__(self):
         return self.name
@@ -38,8 +39,8 @@ class Cafe(models.Model):
     website = models.CharField('Website', max_length=255, null=True, blank=True)
     formatted_phone_number = models.CharField('FormattedPhoneNumber', max_length=255, null=True, blank=True)
     city = models.ForeignKey("City", on_delete=models.CASCADE, null=True, blank=True)
-    lat = models.DecimalField('Latitude', decimal_places=8, max_digits=10, null=True, blank=True)
-    lng = models.DecimalField('Longitude', decimal_places=8, max_digits=11, null=True, blank=True)
+    lat = models.FloatField('Latitude', null=True, blank=True)
+    lng = models.FloatField('Longitude', null=True, blank=True)
     placetypes = models.ManyToManyField(Placetype)
     updated_at = models.DateTimeField(auto_now=True)
 

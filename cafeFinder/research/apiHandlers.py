@@ -3,6 +3,7 @@ import threading
 import time
 import math
 import concurrent.futures
+import logging
 
 import numpy as np
 import requests
@@ -14,6 +15,7 @@ from research.apiQueryBuilders import (buildAreaSearchRequest, buildWextractorDe
 from research.utilities import makeAPIRequest
 from webapp.models import Review, Cafe, Placetype
 
+logger = logging.getLogger('debug')
 THREAD_LOCAL = threading.local()
 CAFE = None
 
@@ -22,23 +24,41 @@ def get_session():
         THREAD_LOCAL.session = requests.Session()
     return THREAD_LOCAL.session
 
+def makeVariableAreaSearchRequest(city, radii):
+    latitude = getattr(city, 'lat')
+    longitude = getattr(city, 'lng')
+    results_arr = None
+    
+    def makeRequestsWithRadius(radius):
+        results_array = []
+        page_token = None
+        for i in range(3):
+            area_request = None
+            if i == 0:
+                area_request = buildAreaSearchRequest(latitude, longitude, None, radius)
+            else:
+                area_request = buildAreaSearchRequest(None, None, page_token, radius)
+            response = makeAPIRequest(area_request)
+            area_results = response['results']
+            results_array.extend(area_results)
+            page_token = response.get('next_page_token', 0)
+            if page_token == 0:
+                break
+            else:
+                time.sleep(2)
+        return results_array
+
+    for idx, radius in enumerate(radii, start=1):
+        results_arr = makeRequestsWithRadius(radius)
+        if (len(results_arr) > 45 or idx == len(radii)):
+            return results_arr, radius
+
+
 def get60ResultsNearLocation(city):
-    latitude = getattr(city, 'latitude')
-    longitude = getattr(city, 'longitude')
-    page_token = None
-    results_array = []
-    for i in range(3):
-        area_request = None
-        if i == 0:
-            area_request = buildAreaSearchRequest(latitude, longitude, None)
-        else:
-            area_request = buildAreaSearchRequest(None, None, page_token)
-        response = makeAPIRequest(area_request)
-        area_results = response['results']
-        results_array.extend(area_results)
-        page_token = response.get('next_page_token', 0)
-        if page_token == 0:
-            break
+    results_array, radius = makeVariableAreaSearchRequest(city, ['2500', '5000'])
+    city.radius = int(radius)
+    city.save()
+    
     new_cafes = []
     new_cafe_placetypes = []
     existing_cafes = []
@@ -48,10 +68,13 @@ def get60ResultsNearLocation(city):
             cafe = Cafe.objects.get(pk=place_id)
             existing_cafes.append(cafe)
         except Cafe.DoesNotExist:
+            loc = result.get('geometry', {'location': {}}).get('location', {})
             cafe = Cafe(
                 name=result['name'],
                 place_id=place_id,
                 compound_code=result.get('plus_code', {'compound_code': 'unset'})['compound_code'],
+                lat=loc.get('lat', None),
+                lng=loc.get('lng', None),
                 price_level=result.get('price_level', None),
                 rating=result.get('rating', None),
                 user_ratings_total=result.get('user_ratings_total', None),

@@ -48,12 +48,13 @@ def remove_create_city_permissions(request):
         'client_secret': settings.AUTH0_CLIENT_SECRET,
         'audience': MGMT_API_BASE
     }
-    token = requests.post(f"{DOMAIN_BASE}/oauth/token", data=payload, headers=headers).json()
+    token = requests.post(f"{DOMAIN_BASE}oauth/token", data=payload, headers=headers).json()
 
     headers = { 'authorization': f"Bearer {token['access_token']}" }
     res = requests.get(f"{MGMT_API_BASE}users/{decoded['sub']}/roles", headers=headers).json()
+    role = res[0]['name'] if len(res) == 1 else False
 
-    if len(res) == 1 and (res[0]['name'] == 'Single City Authorized'):
+    if role and (role == 'Single City Authorized'):
         headers = {
             'content-type': "application/json",
             'authorization': f"Bearer {token['access_token']}",
@@ -74,5 +75,9 @@ def remove_create_city_permissions(request):
             data=json.dumps(delete_role_payload),
             headers=headers
         )
+
+    elif role == 'Unlimited User':
+        return
+
     if (not add_role_res.ok or not delete_role_res.ok):
         raise Exception('Error while updating user roles')

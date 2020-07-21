@@ -10,7 +10,6 @@ class CitySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = City
-        # fields = ["name", "latitude", "longitude"]
         fields = "__all__"
 
 class CountrySerializer(serializers.ModelSerializer):

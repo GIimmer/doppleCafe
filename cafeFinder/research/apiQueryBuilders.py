@@ -17,14 +17,13 @@ def buildCityLocationSearchRequest(city_name):
         city_name = quote(city_name)
         return GEOCODEXYZAPI['latLongFromPlaceNameURL'].format(cityName=city_name)
 
-def buildAreaSearchRequest(lat, long, page_token):
+def buildAreaSearchRequest(lat, long, page_token, radius):
     suffix = None
     if page_token is not None:
         suffix = f"pagetoken={page_token}"
     else:
-        suffix = f"location={lat},{long}&radius=2500&rankby=prominence&type=cafe"
+        suffix = f"location={lat},{long}&radius={radius}&rankby=prominence&type=cafe"
     return GOOGLEPLACESAPI['urlPrefix'] + GOOGLEPLACESAPI['searchAreaURLSuffix'] + suffix
-
 
 def buildWextractorDetailsRequest(place_id, offset):
     if len(place_id) == 0:
