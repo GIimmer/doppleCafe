@@ -1,4 +1,5 @@
 # doppleCafe
+[CafeFinder.cafe](https://cafefinder.cafe)
 
 ## Purpose
 "Dopple Cafe" is my attempt to produce something useful for myself and the digital nomad community while also practicing my skills in two areas of personal interest; Machine Learning and React.
