@@ -1,4 +1,5 @@
 # doppleCafe
+[CafeFinder.cafe](https://cafefinder.cafe)
 
 ## Purpose
 "Dopple Cafe" is my attempt to produce something useful for myself and the digital nomad community while also practicing my skills in two areas of personal interest; Machine Learning and React.
@@ -15,9 +16,10 @@ The goal of the application is to allow digital nomads to find cafes great for r
 - [x] On Cache miss, run k-means n times and vectorize best outcome. (Currently only text vectors are cached)
 - [x] Weight atmosphere and food terminology higher, optionally allow user-informed weighting
 - [x] Unanticipated new feature - term highlighting of words important to grouping
-- [ ] User authorization flow - allow one newly loaded city per user
+- [x] Unanticipated new feature - filter cafes by term presence in wordcloud
+- [x] User authorization flow - allow one newly loaded city per user
 - [ ] Updates to cafes when they become out of date (not a worry at this stage)
-- [ ] Flag to signify probably digital nomad ready (mentions of wifi, outlets, laptop, etc. open hours at least 9 - 5)
+- [x] Flag to signify probably digital nomad ready (mentions of wifi, outlets, laptop, etc. open hours at least 9 - 5)
 - [ ] Using PCA include visualization of cafes placement in 3D space
 - [ ] Convert from K-Means to doc2vec?  :scream:
 
@@ -50,7 +52,7 @@ Once the city is selected the backend API...
 The output is similar for both explore and query view. The user is given a series of cafe preview options (either ranked similarity or in groups), and some sparse information about each as well as a word cloud (the top 100 highest value words). The user can load more details about any cafe which interests them (an API call in most cases), or highlight it on the map - found at the top of the page
 
 *Query Outcome initial view*
-![Outcome Initial View](https://i.imgur.com/ND97CBy.png)
+![Outcome Initial View](https://i.imgur.com/18VzQj8.png)
 
 *Explore Outcome details view*
-![Outcome Details View](https://i.imgur.com/l9yqi2x.png)
+![Outcome Details View](https://i.imgur.com/DdQyaPF.png)
