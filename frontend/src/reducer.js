@@ -52,7 +52,7 @@ export const InitialState = Immutable.fromJS({
     cityMessages: [],
     cityResponse: [],
     cityLock: {},
-    cafeResponse: [],
+    cafeResponse: null,
     cafeLock: {},
     cafeDetails: {},
     returnedCafes: [],
