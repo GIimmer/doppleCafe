@@ -7,7 +7,7 @@ import logging
 from rest_framework.decorators import api_view
 from rest_framework import viewsets, mixins
 from django.views.decorators.http import require_http_methods
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseNotFound
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models.query import QuerySet
 from django.db.models import Count
@@ -16,7 +16,8 @@ from webapp.models import City, Cafe, Country, Placetype, Photo
 from webapp.utils import remove_create_city_permissions, decode_token_auth_header
 from webapp.api.serializers import CitySerializer, CafeSerializer, ReviewSerializer
 from research.cafeTest import getNearestCafesGivenCafe, givenCityRunML
-from research.apiHandlers import geocodeCityName, getCafeWithQueryString, getCafeDetailsGivenID, givenCafeRetrieveReviews, get60CafesNearCity
+from research.apiHandlers import (geocodeCityName, getCafeWithQueryString, getCafeDetailsGivenID,
+    givenCafeRetrieveReviews, get60CafesNearCity, getCafeBasicsGivenId)
 from research.utilities import getDataFromFileWithName
 
 logger = logging.getLogger(__name__)
@@ -64,42 +65,49 @@ def city_search(request):
     data = CitySerializer(queryset, many=True).data
     return JsonResponse({ 'cities': data })
 
-@csrf_exempt
-def cafe_search(request):
-    query_string = request.GET.get('queryString', None)
-    data = {}
-    if query_string is not None:
-        data = getCafeWithQueryString(query_string)
-    if (data.get('status', '400') == 'OK'):
-        for cafe in data.get('candidates'):
-            gencafeFromSearchRes(cafe)
-    return JsonResponse(data)
+def gencafeFromSearchRes(cafe, place_id):
+    location = cafe['geometry']['location']
+    photo_arr = copy.deepcopy(cafe['photos'])
 
-def gencafeFromSearchRes(cafe):
+    cafe_search_obj = {
+        "place_id": place_id,
+        "formatted_address": cafe['formatted_address'],
+        "name": cafe['name'],
+        "lat": location['lat'],
+        "lng": location['lng']
+    }
+    cafe_obj = CafeSerializer(data=cafe_search_obj)
+
+    if cafe_obj.is_valid(raise_exception=True):
+        cafe_model = cafe_obj.save()
+        createPhotosForCafe(photo_arr, cafe_model)
+        return cafe_model
+
+def checkCafeInDatabase(cafe_id):
     try:
-        cafe = Cafe.objects.get(pk=cafe['place_id'])
+        return Cafe.objects.get(pk=cafe_id)
     except Cafe.DoesNotExist:
-        location = cafe['geometry']['location']
-        photo_arr = copy.deepcopy(cafe['photos'])
+        return False
 
-        cafe_search_obj = {
-            "place_id": cafe['place_id'],
-            "formatted_address": cafe['formatted_address'],
-            "name": cafe['name'],
-            "lat": location['lat'],
-            "lng": location['lng']
-        }
-        cafe_obj = CafeSerializer(data=cafe_search_obj)
+@csrf_exempt
+@require_http_methods(['POST'])
+def get_cafe_basics(request):
+    request_json_body = json.loads(request.body)
+    cafe_id = request_json_body.get('id')
 
-        if cafe_obj.is_valid(raise_exception=True):
-            cafe_model = cafe_obj.save()
-            createPhotosForCafe(photo_arr, cafe_model)
+    cafe_in_db = checkCafeInDatabase(cafe_id)
+    if not cafe_in_db:
+        cafe_res = getCafeBasicsGivenId(cafe_id)
+        cafe_in_db = gencafeFromSearchRes(cafe_res, cafe_id)
+        if not cafe_in_db:
+            return HttpResponseNotFound()
+
+    return JsonResponse(CafeSerializer(cafe_in_db).data)
 
 @csrf_exempt
 def get_cafe_details(request, cafe_id):
-    try:
-        cafe = Cafe.objects.get(pk=cafe_id)
-    except Cafe.DoesNotExist:
+    cafe = checkCafeInDatabase(cafe_id)
+    if not cafe:
         return JsonResponse({"status": "Failed", "Reason": "Cafe not in database"})
 
     if cafe.photo_set.count() == 0:

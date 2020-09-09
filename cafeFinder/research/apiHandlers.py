@@ -11,7 +11,7 @@ import requests
 from django.core.exceptions import ValidationError
 from research.apiQueryBuilders import (buildAreaSearchRequest, buildWextractorDetailsRequest,
                                        buildSinglePlaceSearchRequest, buildSingleCafeDetailsRequest,
-                                       buildCityLocationSearchRequest)
+                                       buildCityLocationSearchRequest, buildCafeBasicDetailsRequest)
 from research.utilities import makeAPIRequest
 from webapp.models import Review, Cafe, Placetype
 
@@ -133,6 +133,7 @@ def getReviewBatchAndConvertToModel(batch):
         review_arr = response.json()
         response_arr = []
         for review in review_arr['reviews']:
+            review['text'] = review['text'] if review['translated_text'] is None else review['translated_text']
             review_obj = Review.create(review, CAFE)
             try:
                 review_obj.clean_fields()
@@ -166,6 +167,15 @@ def geocodeCityName(city_name):
 def getCafeWithQueryString(query_string):
     api_res = makeAPIRequest(buildSinglePlaceSearchRequest(query_string))
     return api_res
+
+def getCafeBasicsGivenId(cafe_id):
+    api_res = makeAPIRequest(buildCafeBasicDetailsRequest(cafe_id))
+
+    if api_res['status'] == 'OK':
+        result = api_res['result']
+        return result
+    else:
+        return None
 
 def getCafeDetailsGivenID(cafe_id):
     api_res = makeAPIRequest(buildSingleCafeDetailsRequest(cafe_id))

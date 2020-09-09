@@ -31,6 +31,13 @@ def buildWextractorDetailsRequest(place_id, offset):
     else:
         return WEXTRACTORAPI['detailsURLPrefix'] + WEXTRACTORAPI['detailsURLSuffix'].format(id=place_id, offset=offset)
 
+def buildCafeBasicDetailsRequest(cafe_id):
+    if len(cafe_id) == 0:
+        return
+    else:
+        suffix = GOOGLEPLACESAPI['placeBasicDetailsRequestedFeatures'].format(cafe_id=cafe_id)
+        return GOOGLEPLACESAPI['urlPrefix'] + GOOGLEPLACESAPI['placeDetailsURLSuffix'] + suffix 
+
 def buildSingleCafeDetailsRequest(cafe_id):
     if len(cafe_id) == 0:
         return
