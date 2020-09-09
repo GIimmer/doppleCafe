@@ -49,7 +49,7 @@ export function ResponseCard(props) {
         response = props.response,
         isCafe = props.field === 'cafe',
         displaySmall = props.displaySmall;
-
+    
     if (isCafe) {
         subTitle = response.formattedAddress;
         image = genGooglePlacePhoto(response.photos[0]);

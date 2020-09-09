@@ -4,12 +4,12 @@ import { ReactCompareSlider } from 'react-compare-slider';
 export default function Topic(props) {
     let topic = props.topic;
     return (
-        <div className="topicSection">
+        <div key={topic.key} className="topicSection">
             <h2 className="title">{topic.title}</h2>
             <p>{topic.text}</p>
             {
-                topic.subTopics.map(subTopic => {
-                    return <div className="subSectionHolder">
+                topic.subTopics.map(subTopic => (
+                    <div key={subTopic.key} className="subSectionHolder">
                         <div>
                             <h3 className="subTitle">{subTopic.title}</h3>
                             <p>{subTopic.text}</p>
@@ -19,7 +19,10 @@ export default function Topic(props) {
                             <div className="topicImgHolder">
                                 {
                                     !subTopic.img2 ?
-                                    <img className="smallTopicImage" src={require(`./images/${subTopic.img}.png`)}></img>
+                                    <img
+                                    className="smallTopicImage"
+                                    src={require(`./images/${subTopic.img}.png`)}
+                                    alt={`Visual demo of ${subTopic.img}`}/>
                                     :
                                     <ReactCompareSlider
                                         itemOne={<img src={require(`./images/${subTopic.img}.png`)} alt={`Visual demo of ${subTopic.img}`} />}
@@ -30,7 +33,7 @@ export default function Topic(props) {
                             </div>
                         }
                     </div>
-                })
+                ))
             }
         </div>
     )

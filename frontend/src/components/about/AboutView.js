@@ -14,7 +14,7 @@ export default function AboutView() {
             <div className="aboutSection">
                 {
                     ABOUTTOPICS.map(topic => {
-                        return <Topic topic={topic} />
+                        return <Topic key={topic.key} topic={topic} />
                     })
                 }
             </div>

@@ -1,17 +1,14 @@
-const imgRoot = './images/'
-
-const getImgPath = (imgText) => {
-    return `${imgRoot}${imgText}.png`
-}
 
 const GENERALFAQ = {
     title: 'What is the purpose of this site?',
+    key: 'sitePurpose',
     text: `The goal of this website is to provide a jumping off point to travellers who enjoy exploring a new city through its cafes. 
     Digital Nomads in particular should find various features highlighting Remote-Work friendly cafes to be useful, but with the ability
     to emphasize food or ambience, automated grouping, and term filtering, I hope many different people find value in this site.`,
     subTopics: [
         {
             title: 'What does "Find a matching café" do?',
+            key: 'findMatchingAbout',
             text: `The leftmost tab; "Find a matching café", is intended to find you the most mathematically similar cafes to a cafe you 
             know and love in a city you are travelling to. So search for a cafe you like in the left input, search for the city you're 
             travelling to in the right-side input, and select whether you'd like to emphasize ambience, default or food. The ten most 
@@ -21,6 +18,7 @@ const GENERALFAQ = {
         },
         {
             title: 'What does "Explore city" do?',
+            key: 'exploreCityAbout',
             text: `"Explore city" is for when you are travelling to a city (or simply exploring the one you're in) and would like to 
             use this tool to find some great options without already having an ideal cafe in mind. This view will group the cafes
             using machine learning - depending in part on your selected emphasis - it will surface terms important to that group, allow
@@ -34,18 +32,21 @@ const GENERALFAQ = {
 
 const ALGORITHMFAQ = {
     title: 'What are the results based on?',
+    key: 'resultBasis',
     text: `Results are derived from externally-sourced cafe reviews. Up to eighty reviews are scraped for each cafe, and those places having
     less than 800 characters of total review text are discarded for insufficient data. In order to retrieve cafes for a city, this
     website first geolocates the center of the city, then uses Googles' 'Places' API to request to the top 60 establishments listed as
     'cafe' within 2.5km of that center.`,
     subTopics: [
         {
+            key: 'resultOrigin',
             title: 'How are the cafés retrieved?',
             text: `Retrieving cafe reviews requires using a combination of the Google Places API, Geocoding API, and web scraping to start. 
             In the future I intend to add new cafes to cities on an individual basis as they are searched, perhaps using proximity to
             previously-loaded city locations.`
         },
         {
+            key: 'textProcessing',
             title: 'What text processing is being used?',
             text: `Each cafes' reviews are concatenated into one large string. The strings are then processed into a Bag of Words vector
             through TF-IDF processing. Term-Frequency/Inverse Document Frequency weights terms more highly if they occur MORE often within
@@ -58,6 +59,7 @@ const ALGORITHMFAQ = {
             improves sentiment capturing significantly with relative ease, which is borne out by personal experience.`
         },
         {
+            key: 'tabReadme',
             title: 'How does each tab work?',
             text: `'Find a matching cafe' simply processes the new cafe in the above-described manner, then compares the resultant vector
             against the vectors associated with all of the target cities' cafes. The ten vectors with the least difference mathematically 
@@ -69,6 +71,7 @@ const ALGORITHMFAQ = {
             each for 5 iterations and 9 clusters. The output with the lowest 'cost' is then cached and returned.`
         },
         {
+            key: 'emphasisReadme',
             title: 'Emphasize ambience/food/default?',
             text: `As explained above, cafes are converted into mathematical vectors of term value. Special terms pertaining to food, ambience,
             and remote-work are kept in known positions at the end of these cafe-vectors. Because these positions are known, I am able to 
@@ -80,10 +83,12 @@ const ALGORITHMFAQ = {
 }
 
 const RESULTSFAQ = {
+    key: 'resultFAQ',
     title: 'How do I interpret the results?',
     text: `If something is not clear about the website, hopefuly some help can be found below.`,
     subTopics: [
         {
+            key: 'wordCloud',
             title: 'How do I interpret the wordcloud?',
             text: `Wordclouds are used to present terms while conveying their value. Terms with a larger font size have higher value than
             smaller-sized terms. Value is increased by term frequency in a cafes reviews, reduced if it appears in many cafes' reviews (e.g.
@@ -91,6 +96,7 @@ const RESULTSFAQ = {
             pertinant to Remote Work, and light brown if they are 'common terms'.`
         },
         {
+            key: 'termFiltering',
             title: 'Filtering by term?',
             text: `The search bar found at the top of the outcome page allows users to filter out cafes which do not have the desired term in 
             their top 100 terms. Term filters will then be highlighted dark brown in cafe wordclouds. An example use case is a user who specifically 
@@ -101,6 +107,7 @@ const RESULTSFAQ = {
             img2: 'termFilteringDetails'
         },
         {
+            key: 'remoteHighlighting',
             title: 'Remote work highlighting?',
             text: `Remote work highlighting is turned on by default, this can be turned off using the toggle at the top of the outcome page. 
             When turned on, any cafe with greater than 1% of its terms relating (positively) to remote work will have a green border. The top three
@@ -111,6 +118,7 @@ const RESULTSFAQ = {
             img2: 'rwHighlightingOff'
         },
         {
+            key: 'commonTerms',
             title: 'Common terms?',
             text: `'Common terms' are highlighted in light brown, and have a slightly different implementation - though the same intent - depending
             on which tab you're viewing. While on 'Find a Similar Cafe' its fairly simple; terms in brown are shared with the target cafe. So if your 
@@ -124,6 +132,7 @@ const RESULTSFAQ = {
             img2: 'exploreCityInCommon'
         },
         {
+            key: 'not_syntax',
             title: '"Not_" syntax?',
             text: `The 'not_(term)' syntax is intended to capture sentiment by seperating negative and positive uses of a term. Prior to implementation,
             if reviews were constantly saying 'This cafe is not clean' and 'They never clean this cafe', the algorithm would have stripped the 'not' and
@@ -139,10 +148,12 @@ const RESULTSFAQ = {
 }
 
 const MISCFAQ = {
+    key: 'roadmap',
     title: 'Website roadmap',
     text: `For meta details about this website, possible future changes.`,
     subTopics: [
         {
+            key: 'resultAccuracy',
             title: 'Result accuracy',
             text: `I have a few changes in mind as I continue to support this website. In the short term I can probably noticeably improve result accuracy
             by removing or adding terms. Examples I am currently looking at include removing 'work' from RW terms, because it is much more frequently used
@@ -152,15 +163,18 @@ const MISCFAQ = {
             acquire much more data, as well as using a new, more advanced, and much cooler algorithm called doc2vec.`
         },
         {
+            key: 'loadingCities',
             title: 'Loading new cities',
             text: `Currently I can't justify the cost of allowing the loading of multiple cities per user, which is why logging in to load new cities is a
             requirement. In the future if this website gains interest, I may find some way to fund it, whether through patreon, ads, a partnership, etc.`
         },
         {
+            key: 'design',
             title: 'Design',
             text: `I'm not a designer, unsurprisingly. Paying a designer to make some revisions, therefore, would probably be a very good move.`
         },
         {
+            key: 'contact',
             title: 'Contact me',
             text: `If you have any comments, suggestions, or questions with regards to this website please email me at rwaugh52(at)gmail.com.`
         }
