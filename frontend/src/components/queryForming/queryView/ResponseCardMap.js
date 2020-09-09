@@ -1,6 +1,5 @@
 import React from 'react'
-import CONSTS from '../../../constants/Constants'
-import { GoogleApiWrapper, Map, Marker } from 'google-maps-react'
+import { Map, Marker } from 'google-maps-react'
 
 function getMapStyle(displaySmall) {
     return {
@@ -17,7 +16,7 @@ function ResponseCardMap({ isCafe, response, google, displaySmall, ...rest }) {
         <div style={getMapStyle(displaySmall)}>
             {/* <div style={getMapStyle(displaySmall)}></div> */}
             <Map 
-            google={google}
+            google={window.google}
             initialCenter={{
                 lat: response.lat,
                 lng: response.lng
@@ -32,6 +31,5 @@ function ResponseCardMap({ isCafe, response, google, displaySmall, ...rest }) {
         </div>
     )
 }
-export default GoogleApiWrapper({
-    apiKey: (CONSTS.MAPS_EMBED_KEY)
-})(ResponseCardMap)
+
+export default ResponseCardMap;

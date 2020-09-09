@@ -44,37 +44,39 @@ export class CafeMap extends PureComponent {
         const cafesToDisplay = getFilteredFlatCafes(this.props, cafesOnMap);
 
         return (
-            // <div></div>
-            <Map
-            google={this.props.google}
-            initialCenter={{
-                lat: this.props.cityLock.get('lat'),
-                lng: this.props.cityLock.get('lng')
-            }}
-            zoom={13}>
-                {
-                    cafesToDisplay.map((cafe, cafeIdx) => {
-                        let markerSrc = idxToGroupRef[cafeIdx],
-                            cafeIsHighlighted = cafe.placeId === this.props.highlightCafeId
-                        if (cafeIsHighlighted) {
-                            markerSrc = 'gold_' + markerSrc
-                        }
-                        return <Marker 
-                            onClick={this.onMarkerClick.bind(this)}
-                            key={cafe.placeId}
-                            placeId={cafe.placeId}
-                            opacity={cafe.opacity}
-                            name={cafe.name} 
-                            title={cafe.name}
-                            animation={cafeIsHighlighted ? this.props.google.maps.Animation.DROP : undefined}
-                            position={{ lat: cafe.lat, lng: cafe.lng }}
-                            icon={{
-                                url: require(`../../images/${markerSrc}_marker.png`),
-                            }}
-                        />
-                    }) 
-                }
-            </Map>
+            <div>
+                <Map
+                gestureHandling="cooperative"
+                google={window.google}
+                initialCenter={{
+                    lat: this.props.cityLock.get('lat'),
+                    lng: this.props.cityLock.get('lng')
+                }}
+                zoom={13}>
+                    {
+                        cafesToDisplay.map((cafe, cafeIdx) => {
+                            let markerSrc = idxToGroupRef[cafeIdx],
+                                cafeIsHighlighted = cafe.placeId === this.props.highlightCafeId
+                            if (cafeIsHighlighted) {
+                                markerSrc = 'gold_' + markerSrc
+                            }
+                            return <Marker 
+                                onClick={this.onMarkerClick.bind(this)}
+                                key={cafe.placeId}
+                                placeId={cafe.placeId}
+                                opacity={cafe.opacity}
+                                name={cafe.name} 
+                                title={cafe.name}
+                                animation={cafeIsHighlighted ? this.props.google.maps.Animation.DROP : undefined}
+                                position={{ lat: cafe.lat, lng: cafe.lng }}
+                                icon={{
+                                    url: require(`../../images/${markerSrc}_marker.png`),
+                                }}
+                            />
+                        }) 
+                    }
+                </Map>
+            </div>
         )
     }
 }
@@ -97,6 +99,4 @@ function mapStateToProps(state=Map(), props) {
     }
 }
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(GoogleApiWrapper({
-    apiKey: (CONSTS.MAPS_EMBED_KEY)
-})(CafeMap)))
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(CafeMap));

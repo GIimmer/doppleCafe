@@ -9,7 +9,7 @@ export function isEmpty(obj) {
 }
 
 export function genGooglePlacePhoto(photo) {
-    return `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photo.ref}&key=${CONSTS.PHOTOS_EMBED_KEY}`
+    return `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photo.ref}&key=${CONSTS.GOOGLE_PLACES_KEY}`
 }
 
 export function snakeToCamel(str) {
