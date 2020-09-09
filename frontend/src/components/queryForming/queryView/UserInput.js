@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { Map, List } from 'immutable'
 import CafeInput from './CafeInput'
 import CityInput from './CityInput'
 import MessageBox from './MessageBox'
@@ -8,7 +7,7 @@ import ResponseCard from './ResponseCard'
 import { optionLockToggledFunc } from "../../../actions/queryActions";
 import { css } from "@emotion/core";
 import RingLoader from "react-spinners/RingLoader";
-import { GETTING_CAFE_OPTIONS, GETTING_CITY_OPTIONS } from '../../../constants/ActionConstants'
+import { GETTING_CITY_OPTIONS, CAFE_OPTION_SELECTED } from '../../../constants/ActionConstants'
 
 
 const override = css`
@@ -20,21 +19,6 @@ const override = css`
     margin: auto;
 `;
 
-function mapDispatchToProps(dispatch) {
-    return {
-        optionLockToggled: optionLockToggledFunc(dispatch)
-    }
-}
-
-function mapStateToProps(state=Map()) {
-    return {
-        cafeResponse: state.get('cafeResponse'),
-        cafeQueryState: state.get('cafeQueryState'),
-        cityResponse: state.get('cityResponse'),
-        cityQueryState: state.get('cityQueryState'),
-        loading: state.get('loading')
-    }
-}
 
 export class UserInput extends Component {
     constructor(props) {
@@ -52,17 +36,16 @@ export class UserInput extends Component {
     }
 
     render() {
-        let fieldOptions = this.props[this.props.field + 'Response'],
-            jsFieldOptions = List.isList(fieldOptions) ? fieldOptions.toJS() : fieldOptions,
-            smallResCard = jsFieldOptions.length > 1;
-        const responseState = this.props[this.props.field + 'QueryState'],
-            showLoading = [GETTING_CAFE_OPTIONS, GETTING_CITY_OPTIONS].includes(responseState);
+        let cafeOrCityList = this.props.apiResponse ? this.props.apiResponse.toJS() : undefined,
+            isCafe = this.props.field === 'cafe',
+            multiplePossibleCities = !isCafe && cafeOrCityList.length > 1;
+        const showLoading = [CAFE_OPTION_SELECTED, GETTING_CITY_OPTIONS].includes(this.props.queryState);
             
         return (
             <div className="userInput">
                 <MessageBox field={this.state.field} messageProp={this.state.field + 'Messages'} />
                 {
-                    this.state.field === 'cafe' ? <CafeInput /> : <CityInput />
+                    isCafe ? <CafeInput /> : <CityInput />
                 }
                 <div className="responseCardHolder">
                     {
@@ -74,16 +57,41 @@ export class UserInput extends Component {
                             loading={showLoading}
                         />
                         :
-                        jsFieldOptions.map((searchRes) => {
-                            return <ResponseCard field={this.state.field} response={searchRes} displaySmall={smallResCard}
-                                    handleClick={this.handleClick.bind(this, this.state.field, searchRes)} />
-                        })
+                        <>
+                        {
+                            isCafe && cafeOrCityList ?
+                            <ResponseCard 
+                                field={'cafe'}
+                                response={cafeOrCityList}
+                                displaySmall={false}
+                                handleClick={this.handleClick.bind(this, 'cafe', cafeOrCityList)} />
+                            :
+                            cafeOrCityList && cafeOrCityList.map((city) => ( 
+                                <ResponseCard
+                                    key={city.id}
+                                    field={'city'}
+                                    response={city}
+                                    displaySmall={multiplePossibleCities}
+                                    handleClick={this.handleClick.bind(this, 'city', city)} />
+                            ))
+                        }
+                        </>
                     }
                 </div>
-                
             </div>
         )
     }
+}
+
+
+function mapDispatchToProps(dispatch) {
+    return {
+        optionLockToggled: optionLockToggledFunc(dispatch)
+    }
+}
+
+function mapStateToProps() {
+    return {};
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(UserInput);

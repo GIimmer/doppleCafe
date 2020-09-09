@@ -1,7 +1,5 @@
 import {
-    GETTING_CAFE_OPTIONS,
     GETTING_CITY_OPTIONS,
-    CAFE_OPTIONS_RETURNED,
     CITY_OPTIONS_RETURNED,
     CAFE_OPTION_LOCKED,
     CITY_OPTION_LOCKED,
@@ -10,45 +8,49 @@ import {
     CITY_OPTION_UNLOCKED,
     CLEAR_CAFE_MESSAGES,
     CLEAR_CITY_MESSAGES,
-    PRELOADED_CITIES_RETURNED
+    PRELOADED_CITIES_RETURNED,
+    CAFE_OPTION_SELECTED,
+    HYDRATE_CAFE_OPTION
   } from '../constants/ActionConstants'
   import CONSTS from '../constants/Constants'
   import { Map, List, fromJS } from 'immutable'
 
-function createCafes(cafeCandidates) {
-    return fromJS(cafeCandidates.map((cafe) => {
-        let location = cafe.geometry.location,
-            photo = cafe.photos ? cafe.photos[0] : null;
-        return {
-            placeId: cafe.place_id,
-            name: cafe.name,
-            formattedAddress: cafe.formatted_address,
-            lat: location.lat,
-            lng: location.lng,
-            photos: [photo ? {
-                fromGoogle: true,
-                height: photo.height,
-                width: photo.width,
-                ref: photo.photo_reference,
-                attr: photo.html_attributions[0]
-                } : { ref: "https://cdn.pixabay.com/photo/2017/05/11/08/17/coffee-2303271_960_720.jpg", fromGoogle: false }
-            ]
-        }
-    }))
+function createCafe(candidate) {
+    const photo = candidate.photos ? candidate.photos[0] : null;
+    return fromJS({
+        locked: true,
+        placeId: candidate.place_id,
+        name: candidate.name,
+        formattedAddress: candidate.formatted_address,
+        lat: candidate.lat,
+        lng: candidate.lng,
+        photos: [photo ? {
+            fromGoogle: true,
+            height: photo.height,
+            width: photo.width,
+            ref: photo.photo_ref,
+            attr: photo.html_attr
+            } : { ref: "https://cdn.pixabay.com/photo/2017/05/11/08/17/coffee-2303271_960_720.jpg", fromGoogle: false }
+        ]
+    })
 }
   
-function toggleLockState(objectArr = List([]), lockedId=null, forCafes=false) {
+function toggleCityLock(cityArr = List([]), lockedId=null) {
     if (lockedId === null) {
-        return objectArr.map(res => res.delete('locked'));
+        return cityArr.map(res => res.delete('locked'));
     } else {
-        return objectArr.map((object) => {
-            let objectId = forCafes ? object.get('placeId') : object.get('id');
-            if (objectId === lockedId) {
-                return object.set('locked', true);
-            } else {
-                return object.set('locked', false);
-            }
+        return cityArr.map(city => {
+            const cityId = city.get('id');
+            return lockedId === cityId ? city.set('locked', true) : city.set('locked', false);
         })
+    }
+}
+
+function toggleCafeLock(cafe = Map(), lockedId=null) {
+    if (lockedId === null) {
+        return cafe.delete('locked');
+    } else {
+        return lockedId === cafe.get('placeId') ? cafe.set('locked', true) : cafe.set('locked', false);
     }
 }
 
@@ -73,35 +75,45 @@ export default (state = Map({}), action) => {
         case PRELOADED_CITIES_RETURNED:
             return state.set('preLoadedCities', fromJS(action.payload.cities));
 
-        case GETTING_CAFE_OPTIONS:
+        case CAFE_OPTION_SELECTED:
             return state.set('cafeQueryState', action.type);
 
-        case CAFE_OPTIONS_RETURNED:
-            const cafe = createCafes(action.payload.candidates);
+        case HYDRATE_CAFE_OPTION:
+            const cafe = createCafe(action.payload);
             return state.merge({
                 "cafeQueryState": action.type,
-                "cafeResponse": cafe
+                "cafeResponse": cafe,
+                'cafeLock': cafe
             })
 
         case CAFE_OPTION_LOCKED:
             const CafeResponse = state.get('cafeResponse');
-            const ToggledResponse = toggleLockState(CafeResponse, action.payload.placeId, true);
+            const ToggledResponse = toggleCafeLock(CafeResponse, action.payload.placeId);
             return state.merge({
                 'cafeLock': fromJS(action.payload),
                 'cafeResponse': ToggledResponse
             });
 
         case PRELOADED_CITY_SELECTED:
-            let cityOption = action.payload;
-            const SelectedCity = state.get('preLoadedCities').filter((city) => {
+            const cityOption = action.payload;
+            let FilteredOptions = state.get('preLoadedCities').filter((city) => {
                 return (city.get('country') === cityOption.country && city.get('name') === cityOption.name);
             });
-            return state.set('cityResponse', SelectedCity);
+
+            const lockByDefault = FilteredOptions.size === 1;
+            if (lockByDefault) {
+                const lockedCity = FilteredOptions.get(0).set('locked', true);
+                FilteredOptions = FilteredOptions.set(0, lockedCity);
+            }
+            return state.merge({
+                'cityResponse': FilteredOptions,
+                'cityLock': lockByDefault ? FilteredOptions.get(0) : Map()
+            });
 
         case CAFE_OPTION_UNLOCKED:
             return state.merge({
                 'cafeLock': Map(),
-                'cafeResponse': toggleLockState(state.get('cafeResponse'))
+                'cafeResponse': null 
             })
 
         case CLEAR_CAFE_MESSAGES:
@@ -123,13 +135,13 @@ export default (state = Map({}), action) => {
             }
             return state.merge({
                 'cityLock': fromJS(action.payload),
-                'cityResponse': toggleLockState(CityResponse, action.payload.id)
+                'cityResponse': toggleCityLock(CityResponse, action.payload.id)
             });
 
         case CITY_OPTION_UNLOCKED:
             return state.merge({
                 'cityLock': Map(),
-                'cityResponse': toggleLockState(state.get('cityResponse'))
+                'cityResponse': toggleCityLock(state.get('cityResponse'))
             });
 
         case CLEAR_CITY_MESSAGES:

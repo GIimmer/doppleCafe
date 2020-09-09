@@ -38,7 +38,7 @@ function clearData(state) {
         cafesReturned: false,
         returnedCafes: List(),
         cityResponse: List(),
-        cafeResponse: List(),
+        cafeResponse: null,
         cityLock: Map(),
         cafeLock: Map(),
         highlightedCafe: null,

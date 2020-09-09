@@ -21,9 +21,18 @@ $mint-cream-contrast-text: rgba(0, 0, 0, 0.67);
     peach: $peach;
 }
 
-html {
+html, body {
+    height: 100%;
+    width: 100%;
     overflow-x: hidden;
     scroll-behavior: smooth;
+    margin: 0px;
+}
+
+.App {
+    position: absolute;
+    height: 100%;
+    width: 100%;
 }
 
 a { 
@@ -170,7 +179,6 @@ a {
                     width: 100%;
                     position: relative;
                     background-color: grey;
-                    width: 100%;
                     height: 400px;
                 }
                 
@@ -647,6 +655,8 @@ a {
     
         .margin50 {
             margin: 50px 0px;
+
+            
         }
     
         .inputSection {

@@ -1,7 +1,7 @@
 import API from "../utilities/API";
 import {
-    GETTING_CAFE_OPTIONS,
-    CAFE_OPTIONS_RETURNED,
+    CAFE_OPTION_SELECTED,
+    HYDRATE_CAFE_OPTION,
     GETTING_CITY_OPTIONS,
     CITY_OPTIONS_RETURNED,
     PRELOADED_CITY_SELECTED,
@@ -36,27 +36,26 @@ export function getPreLoadedCitiesFunc(dispatch) {
     }
 }
 
-export function searchForCafeFunc(dispatch) {
-    return (cafeQuery) => {
+export function selectCafeOptionFunc(dispatch) {
+    return (cafeId) => {
         dispatch({
-            type: GETTING_CAFE_OPTIONS,
+            type: CAFE_OPTION_SELECTED,
             payload: {
-                query: cafeQuery
+                cafe: cafeId
             }
         });
 
-        API.get(CONSTS.SEARCH_CAFE + cafeQuery)
+        API.post(CONSTS.CREATE_OR_LOAD_CAFE, { id: cafeId })
         .then(res => {
-            if (res.status === 200) {
+            if (res.status < 400) {
                 dispatch({
-                    type: CAFE_OPTIONS_RETURNED,
+                    type: HYDRATE_CAFE_OPTION,
                     payload: res.data
                 });
             }
         });
     }
 }
-
 
 export function searchForCityFunc(dispatch) {
     return (cityQuery, getAccessTokenSilently) => {
