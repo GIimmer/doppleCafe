@@ -67,7 +67,7 @@ export class CafeMap extends PureComponent {
                                 opacity={cafe.opacity}
                                 name={cafe.name} 
                                 title={cafe.name}
-                                animation={cafeIsHighlighted ? this.props.google.maps.Animation.DROP : undefined}
+                                animation={cafeIsHighlighted ? window.google.maps.Animation.DROP : undefined}
                                 position={{ lat: cafe.lat, lng: cafe.lng }}
                                 icon={{
                                     url: require(`../../images/${markerSrc}_marker.png`),

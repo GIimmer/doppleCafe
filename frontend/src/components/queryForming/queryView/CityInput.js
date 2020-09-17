@@ -17,7 +17,7 @@ function getcityInputFunc({ searchForCity, selectPreLoadedCity, ...rest }, getAc
         if (requestObj) {
             if (requestObj.inputValue) {
                 addToast(
-                <p style={{ fontSize: '1.2em' }}>Loading a new city can take in excess of 60 seconds</p>,
+                <p style={{ fontSize: '1.2em' }}>Loading a new city WILL take SEVERAL minutes; go do 100 pushups?</p>,
                 { appearance: 'warning' });
                 searchForCity(requestObj.inputValue, getAccessTokenSilently);
             } else {
