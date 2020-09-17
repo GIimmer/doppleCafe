@@ -1,5 +1,4 @@
-import {
-    GETTING_CITY_OPTIONS,
+import { GETTING_CITY_OPTIONS,
     CITY_OPTIONS_RETURNED,
     CAFE_OPTION_LOCKED,
     CITY_OPTION_LOCKED,
@@ -12,10 +11,25 @@ import {
     CAFE_OPTION_SELECTED,
     HYDRATE_CAFE_OPTION
   } from '../constants/ActionConstants'
-  import CONSTS from '../constants/Constants'
-  import { Map, List, fromJS } from 'immutable'
+import CONSTS from '../constants/Constants'
+import { Map, List, fromJS } from 'immutable'
 
-function createCafe(candidate) {
+
+export const getGooglePhotoFromJson = (photo) => ({
+    fromGoogle: true,
+    height: photo.height,
+    width: photo.width,
+    ref: photo.photo_ref,
+    attr: photo.html_attr
+});
+
+
+export const getGenericPhoto = () => ({
+    ref: CONSTS.CAFE_PHOTO_STANDIN,
+    fromGoogle: false
+});
+
+function getCafeFromJson(candidate) {
     const photo = candidate.photos ? candidate.photos[0] : null;
     return fromJS({
         locked: true,
@@ -24,16 +38,9 @@ function createCafe(candidate) {
         formattedAddress: candidate.formatted_address,
         lat: candidate.lat,
         lng: candidate.lng,
-        photos: [photo ? {
-            fromGoogle: true,
-            height: photo.height,
-            width: photo.width,
-            ref: photo.photo_ref,
-            attr: photo.html_attr
-            } : { ref: "https://cdn.pixabay.com/photo/2017/05/11/08/17/coffee-2303271_960_720.jpg", fromGoogle: false }
-        ]
+        photos: [photo ? getGooglePhotoFromJson(photo) : getGenericPhoto()]
     })
-}
+};
   
 function toggleCityLock(cityArr = List([]), lockedId=null) {
     if (lockedId === null) {
@@ -41,7 +48,9 @@ function toggleCityLock(cityArr = List([]), lockedId=null) {
     } else {
         return cityArr.map(city => {
             const cityId = city.get('id');
-            return lockedId === cityId ? city.set('locked', true) : city.set('locked', false);
+            return lockedId === cityId ?
+            city.set('locked', true) :
+            city.set('locked', false);
         })
     }
 }
@@ -50,7 +59,9 @@ function toggleCafeLock(cafe = Map(), lockedId=null) {
     if (lockedId === null) {
         return cafe.delete('locked');
     } else {
-        return lockedId === cafe.get('placeId') ? cafe.set('locked', true) : cafe.set('locked', false);
+        return lockedId === cafe.get('placeId') ?
+        cafe.set('locked', true) :
+        cafe.set('locked', false);
     }
 }
 
@@ -79,7 +90,7 @@ export default (state = Map({}), action) => {
             return state.set('cafeQueryState', action.type);
 
         case HYDRATE_CAFE_OPTION:
-            const cafe = createCafe(action.payload);
+            const cafe = getCafeFromJson(action.payload);
             return state.merge({
                 "cafeQueryState": action.type,
                 "cafeResponse": cafe,

@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
-import { GoogleApiWrapper, Map, Marker } from 'google-maps-react'
+import { Map, Marker } from 'google-maps-react'
 import { CONSTS } from "../../constants/Constants"
 import { mapMarkerClickedFunc } from '../../actions/outcomeActions'
 

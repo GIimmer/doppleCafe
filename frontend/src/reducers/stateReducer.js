@@ -8,7 +8,7 @@ import {
     CITY_DATA_RETURNED
 } from '../constants/ActionConstants'
 import { snakeToCamel } from '../utilities/utilities'
-import { prepareDetailsPhotos } from './outcomeReducer'
+import { getGooglePhotoFromJson } from './queryReducer'
 import { Map, List, fromJS } from 'immutable'
 
 function processReturnedCafes(candidatesArrArr, cafeLocMap, dnScoreLocArr, forMostSimilar) {
@@ -20,7 +20,8 @@ function processReturnedCafes(candidatesArrArr, cafeLocMap, dnScoreLocArr, forMo
     
             Object.keys(cafe).forEach(key => {
                 if (key === 'photos') {
-                    cafe[key] = prepareDetailsPhotos(cafe[key])
+                    cafe[key] = cafe[key].map(photo => getGooglePhotoFromJson(photo))
+
                 }
                 jsObj[snakeToCamel(key)] = cafe[key]
             });

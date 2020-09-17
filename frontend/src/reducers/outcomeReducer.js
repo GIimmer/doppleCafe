@@ -15,19 +15,8 @@ import {
   
 import { snakeToCamel } from '../utilities/utilities'
 import { Map, fromJS, List } from 'immutable'
+import { getGooglePhotoFromJson } from './queryReducer'
 
-
-export function prepareDetailsPhotos(photos) {
-    return photos.map((photo) => {
-        return {
-            fromGoogle: true,
-            height: photo.height,
-            width: photo.width,
-            ref: photo.photo_ref,
-            attr: photo.html_attr
-        }
-    })
-}
 
 function imbueCafeDetails(cafe, newDetails) {
     let detailedCafeObj = {
@@ -35,7 +24,9 @@ function imbueCafeDetails(cafe, newDetails) {
     };
     for (let key of Object.keys(newDetails)) {
         if (key === 'photos') {
-            detailedCafeObj[key] = fromJS(prepareDetailsPhotos(newDetails[key]));
+            detailedCafeObj[key] = fromJS(
+                newDetails[key].map(photo => getGooglePhotoFromJson(photo))
+                );
             continue;
         }
         let newKey = snakeToCamel(key);
@@ -145,7 +136,7 @@ export default (state = Map({}), action) => {
             return state.mergeIn(['cafeDetails'], {
                 'state': action.type,
                 [returnedCafeId]: imbueCafeDetails(cafeInQuestion, action.payload),
-                'photos': prepareDetailsPhotos(cafeInQuestion.get('photos'))
+                'photos': cafeInQuestion.get('photos').map(photo => getGooglePhotoFromJson(photo))
             })
 
         case HIGHLIGHT_CAFE:
